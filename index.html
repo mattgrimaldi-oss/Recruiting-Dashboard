@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RedRoute Recruiting Pipeline</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: linear-gradient(180deg, #0f172a 0%, #1e1b4b 100%); min-height: 100vh; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState } = React;
+
+    const FUNNEL_STAGES = [
+      { key: "inmails", label: "InMails Sent", color: "#6366f1", icon: "✉️" },
+      { key: "responses", label: "Applications", color: "#8b5cf6", icon: "📥" },
+      { key: "screens", label: "Screens Set", color: "#a78bfa", icon: "📞" },
+      { key: "takehomes", label: "Take-Homes Sent", color: "#c084fc", icon: "📝" },
+      { key: "offers", label: "Offers Extended", color: "#e879f9", icon: "🤝" },
+      { key: "hires", label: "Hires", color: "#f0abfc", icon: "🎉" },
+    ];
+
+    // ============================================
+    // YOUR DATA — Update this when you re-run the script
+    // ============================================
+    const PIPELINE_DATA = [
+      { weekOf: "2026-04-20", inmails: 0, responses: 112, screens: 6, takehomes: 0, offers: 0, hires: 0 },
+      { weekOf: "2026-04-13", inmails: 338, responses: 1430, screens: 28, takehomes: 8, offers: 0, hires: 0 },
+      { weekOf: "2026-04-06", inmails: 280, responses: 970, screens: 31, takehomes: 18, offers: 1, hires: 1 },
+      { weekOf: "2026-03-30", inmails: 472, responses: 611, screens: 44, takehomes: 14, offers: 1, hires: 1 },
+      { weekOf: "2026-03-23", inmails: 174, responses: 411, screens: 14, takehomes: 8, offers: 2, hires: 2 },
+      { weekOf: "2026-03-16", inmails: 303, responses: 689, screens: 26, takehomes: 21, offers: 0, hires: 0 },
+      { weekOf: "2026-03-09", inmails: 480, responses: 436, screens: 22, takehomes: 13, offers: 1, hires: 0 },
+      { weekOf: "2026-03-02", inmails: 262, responses: 365, screens: 19, takehomes: 11, offers: 0, hires: 0 },
+      { weekOf: "2026-02-23", inmails: 331, responses: 516, screens: 20, takehomes: 13, offers: 2, hires: 2 },
+      { weekOf: "2026-02-16", inmails: 297, responses: 364, screens: 26, takehomes: 21, offers: 2, hires: 2 },
+      { weekOf: "2026-02-09", inmails: 214, responses: 450, screens: 30, takehomes: 16, offers: 1, hires: 1 },
+      { weekOf: "2026-02-02", inmails: 97, responses: 533, screens: 22, takehomes: 16, offers: 4, hires: 4 },
+      { weekOf: "2026-01-26", inmails: 26, responses: 546, screens: 12, takehomes: 5, offers: 2, hires: 2 },
+    ];
+
+    const INMAIL_WEEKLY = [
+      { week: "2026-01-26", sends: 26, inmailResponses: 5, accepts: 5, responseRate: 19.2, acceptRate: 19.2 },
+      { week: "2026-02-02", sends: 97, inmailResponses: 47, accepts: 44, responseRate: 48.5, acceptRate: 45.4 },
+      { week: "2026-02-09", sends: 214, inmailResponses: 75, accepts: 65, responseRate: 35.0, acceptRate: 30.4 },
+      { week: "2026-02-16", sends: 297, inmailResponses: 109, accepts: 102, responseRate: 36.7, acceptRate: 34.3 },
+      { week: "2026-02-23", sends: 331, inmailResponses: 91, accepts: 80, responseRate: 27.5, acceptRate: 24.2 },
+      { week: "2026-03-02", sends: 262, inmailResponses: 83, accepts: 71, responseRate: 31.7, acceptRate: 27.1 },
+      { week: "2026-03-09", sends: 480, inmailResponses: 166, accepts: 143, responseRate: 34.6, acceptRate: 29.8 },
+      { week: "2026-03-16", sends: 303, inmailResponses: 76, accepts: 71, responseRate: 25.1, acceptRate: 23.4 },
+      { week: "2026-03-23", sends: 174, inmailResponses: 54, accepts: 47, responseRate: 31.0, acceptRate: 27.0 },
+      { week: "2026-03-30", sends: 472, inmailResponses: 90, accepts: 81, responseRate: 19.1, acceptRate: 17.2 },
+      { week: "2026-04-06", sends: 280, inmailResponses: 90, accepts: 80, responseRate: 32.1, acceptRate: 28.6 },
+      { week: "2026-04-13", sends: 338, inmailResponses: 67, accepts: 56, responseRate: 19.8, acceptRate: 16.6 },
+    ];
+
+    const RECRUITERS = [
+      { name: "Connor McDermott", sends: 814, responseRate: 41.8, acceptRate: 37.6 },
+      { name: "Meghan Dwyer", sends: 292, responseRate: 32.5, acceptRate: 29.5 },
+      { name: "Matthew Grimaldi", sends: 2168, responseRate: 23.9, acceptRate: 20.9 },
+    ];
+
+    const BENCHMARK_RESPONSE = 37.0;
+    const BENCHMARK_ACCEPT = 33.3;
+
+    function getWeekLabel(dateStr) {
+      const d = new Date(dateStr + "T12:00:00");
+      return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    }
+
+    function App() {
+      const [activeTab, setActiveTab] = useState("funnel");
+      const weeks = PIPELINE_DATA;
+
+      const totals = weeks.reduce((acc, w) => {
+        FUNNEL_STAGES.forEach(s => { acc[s.key] = (acc[s.key] || 0) + (w[s.key] || 0); });
+        return acc;
+      }, {});
+
+      const conv = (from, to) => {
+        if (!totals[from]) return "0.0";
+        return ((totals[to] / totals[from]) * 100).toFixed(1);
+      };
+
+      const totalSends = INMAIL_WEEKLY.reduce((a, w) => a + w.sends, 0);
+      const totalResp = INMAIL_WEEKLY.reduce((a, w) => a + w.inmailResponses, 0);
+      const totalAccepts = INMAIL_WEEKLY.reduce((a, w) => a + w.accepts, 0);
+      const avgRR = totalSends ? (totalResp / totalSends * 100).toFixed(1) : 0;
+      const avgAR = totalSends ? (totalAccepts / totalSends * 100).toFixed(1) : 0;
+      const totalHires = weeks.reduce((a, w) => a + (w.hires || 0), 0);
+      const lastUpdated = new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+
+      return (
+        <div style={z.root}>
+          <div style={z.header}>
+            <div>
+              <h1 style={z.title}>RedRoute Recruiting Pipeline</h1>
+              <p style={z.subtitle}>{weeks.length} weeks · {totalSends.toLocaleString()} InMails · {totalHires} hires · Updated {lastUpdated}</p>
+            </div>
+          </div>
+
+          <div style={z.tabBar}>
+            {[{ id: "funnel", label: "Pipeline Funnel" }, { id: "inmail", label: "InMail Analytics" }, { id: "log", label: "Weekly Data" }].map(t => (
+              <button key={t.id} onClick={() => setActiveTab(t.id)} style={{ ...z.tab, ...(activeTab === t.id ? z.tabActive : {}) }}>{t.label}</button>
+            ))}
+          </div>
+
+          {activeTab === "funnel" && (
+            <React.Fragment>
+              <div style={z.card}>
+                <h2 style={z.secTitle}>Full Funnel (All Time)</h2>
+                <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                  {FUNNEL_STAGES.map((stage, i) => {
+                    const maxV = Math.max(...FUNNEL_STAGES.map(s => totals[s.key] || 1));
+                    const bw = Math.max(((totals[stage.key] || 0) / maxV) * 100, 4);
+                    const nxt = FUNNEL_STAGES[i + 1];
+                    const c = nxt ? conv(stage.key, nxt.key) : null;
+                    return (
+                      <div key={stage.key} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 155, flexShrink: 0 }}>
+                          <span style={{ fontSize: 18 }}>{stage.icon}</span>
+                          <div>
+                            <div style={{ fontSize: 12, color: "#94a3b8", fontFamily: "Space Mono, monospace" }}>{stage.label}</div>
+                            <div style={{ fontSize: 20, fontWeight: 700, color: "#f1f5f9" }}>{(totals[stage.key] || 0).toLocaleString()}</div>
+                          </div>
+                        </div>
+                        <div style={{ flex: 1, height: 26, background: "#0f172a", borderRadius: 6, overflow: "hidden" }}>
+                          <div style={{ height: "100%", width: bw + "%", borderRadius: 6, background: "linear-gradient(90deg, " + stage.color + ", " + stage.color + "aa)", transition: "width 0.6s" }} />
+                        </div>
+                        {c !== null ? <div style={z.convBadge}>{c}%</div> : <div style={{ width: 52 }} />}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              <div style={z.metricsRow}>
+                <div style={z.mCard}><div style={z.mVal}>{totals.responses ? Math.ceil(totals.responses / (totalHires || 1)) : "—"}</div><div style={z.mLbl}>Apps per Hire</div></div>
+                <div style={z.mCard}><div style={z.mVal}>{conv("responses", "hires")}%</div><div style={z.mLbl}>App → Hire</div></div>
+                <div style={z.mCard}><div style={z.mVal}>{conv("screens", "offers")}%</div><div style={z.mLbl}>Screen → Offer</div></div>
+                <div style={z.mCard}><div style={z.mVal}>{conv("offers", "hires")}%</div><div style={z.mLbl}>Offer Accept</div></div>
+              </div>
+            </React.Fragment>
+          )}
+
+          {activeTab === "inmail" && (
+            <React.Fragment>
+              <div style={z.metricsRow}>
+                <div style={z.mCard}><div style={z.mVal}>{totalSends.toLocaleString()}</div><div style={z.mLbl}>InMails Sent</div></div>
+                <div style={z.mCard}>
+                  <div style={{ ...z.mVal, color: parseFloat(avgRR) >= BENCHMARK_RESPONSE ? "#34d399" : "#f87171" }}>{avgRR}%</div>
+                  <div style={z.mLbl}>Response Rate</div>
+                  <div style={z.bench}>Benchmark: {BENCHMARK_RESPONSE}%</div>
+                </div>
+                <div style={z.mCard}>
+                  <div style={{ ...z.mVal, color: parseFloat(avgAR) >= BENCHMARK_ACCEPT ? "#34d399" : "#f87171" }}>{avgAR}%</div>
+                  <div style={z.mLbl}>Accept Rate</div>
+                  <div style={z.bench}>Benchmark: {BENCHMARK_ACCEPT}%</div>
+                </div>
+                <div style={z.mCard}><div style={z.mVal}>{totalHires ? Math.ceil(totalSends / totalHires) : "—"}</div><div style={z.mLbl}>InMails / Hire</div></div>
+              </div>
+
+              <div style={z.card}>
+                <h2 style={z.secTitle}>Response & Accept Rate Trend</h2>
+                <svg viewBox="0 0 700 220" style={{ width: "100%", height: "auto", display: "block" }}>
+                  {[0, 20, 40, 60].map(function(v) {
+                    var y = 180 - (v / 60) * 170;
+                    return (
+                      <g key={v}>
+                        <line x1="40" y1={y} x2="690" y2={y} stroke="#1e293b" strokeWidth="1" />
+                        <text x="35" y={y + 4} textAnchor="end" fill="#475569" fontSize="10" fontFamily="Space Mono, monospace">{v}%</text>
+                      </g>
+                    );
+                  })}
+                  {function() {
+                    var by = 180 - (BENCHMARK_RESPONSE / 60) * 170;
+                    return (
+                      <g>
+                        <line x1="40" y1={by} x2="690" y2={by} stroke="#f59e0b" strokeWidth="1.5" strokeDasharray="6 4" opacity="0.5" />
+                        <text x="688" y={by - 5} textAnchor="end" fill="#f59e0b" fontSize="9" fontFamily="Space Mono, monospace">Benchmark {BENCHMARK_RESPONSE}%</text>
+                      </g>
+                    );
+                  }()}
+                  {INMAIL_WEEKLY.map(function(w, i) {
+                    var barGroupWidth = 650 / INMAIL_WEEKLY.length;
+                    var x = 45 + i * barGroupWidth;
+                    var barW = barGroupWidth * 0.35;
+                    var respH = (w.responseRate / 60) * 170;
+                    var accH = (w.acceptRate / 60) * 170;
+                    return (
+                      <g key={i}>
+                        <rect x={x} y={180 - respH} width={barW} height={respH} rx="2" fill="#6366f1" opacity="0.85" />
+                        <rect x={x + barW + 2} y={180 - accH} width={barW} height={accH} rx="2" fill="#34d399" opacity="0.85" />
+                        <text x={x + barW} y={195} textAnchor="middle" fill="#64748b" fontSize="8" fontFamily="Space Mono, monospace">{getWeekLabel(w.week)}</text>
+                        <text x={x + barW / 2} y={180 - respH - 4} textAnchor="middle" fill="#a5b4fc" fontSize="8" fontFamily="Space Mono, monospace">{w.responseRate}%</text>
+                      </g>
+                    );
+                  })}
+                </svg>
+                <div style={{ display: "flex", gap: 16, justifyContent: "center", marginTop: 8 }}>
+                  <span style={z.leg}><span style={{ ...z.dot, background: "#6366f1" }}></span> Response Rate</span>
+                  <span style={z.leg}><span style={{ ...z.dot, background: "#34d399" }}></span> Accept Rate</span>
+                  <span style={z.leg}><span style={{ display: "inline-block", width: 12, height: 2, borderRadius: 1, background: "#f59e0b" }}></span> Benchmark</span>
+                </div>
+              </div>
+
+              <div style={z.card}>
+                <h2 style={z.secTitle}>Weekly InMail Volume</h2>
+                <svg viewBox="0 0 700 160" style={{ width: "100%", height: "auto", display: "block" }}>
+                  {INMAIL_WEEKLY.map(function(w, i) {
+                    var mx = Math.max.apply(null, INMAIL_WEEKLY.map(function(ww) { return ww.sends; }));
+                    var bw = 650 / INMAIL_WEEKLY.length * 0.65;
+                    var gap = 650 / INMAIL_WEEKLY.length;
+                    var x = 30 + i * gap + (gap - bw) / 2;
+                    var barH = (w.sends / mx) * 110;
+                    return (
+                      <g key={i}>
+                        <rect x={x} y={125 - barH} width={bw} height={barH} rx="3" fill="#8b5cf6" opacity="0.8" />
+                        <text x={x + bw / 2} y={125 - barH - 5} textAnchor="middle" fill="#a5b4fc" fontSize="9" fontFamily="Space Mono, monospace">{w.sends}</text>
+                        <text x={x + bw / 2} y={140} textAnchor="middle" fill="#64748b" fontSize="8" fontFamily="Space Mono, monospace">{getWeekLabel(w.week)}</text>
+                      </g>
+                    );
+                  })}
+                  <line x1="30" y1="125" x2="690" y2="125" stroke="#334155" strokeWidth="1" />
+                </svg>
+              </div>
+
+              <div style={z.card}>
+                <h2 style={z.secTitle}>Recruiter Performance</h2>
+                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                  {RECRUITERS.map(function(r, i) {
+                    return (
+                      <div key={i} style={{ background: "#0f172a", borderRadius: 10, padding: 16 }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
+                          <div>
+                            <div style={{ fontWeight: 600, color: "#e2e8f0", fontSize: 14 }}>{r.name}</div>
+                            <div style={{ fontSize: 11, color: "#64748b", fontFamily: "Space Mono, monospace" }}>{r.sends.toLocaleString()} InMails sent</div>
+                          </div>
+                        </div>
+                        <div style={{ display: "flex", gap: 16 }}>
+                          {[{ label: "Response", val: r.responseRate, bench: BENCHMARK_RESPONSE }, { label: "Accept", val: r.acceptRate, bench: BENCHMARK_ACCEPT }].map(function(m, j) {
+                            return (
+                              <div key={j} style={{ flex: 1 }}>
+                                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                                  <span style={{ fontSize: 11, color: "#94a3b8" }}>{m.label} Rate</span>
+                                  <span style={{ fontSize: 13, fontWeight: 700, fontFamily: "Space Mono, monospace", color: m.val >= m.bench ? "#34d399" : "#f87171" }}>{m.val}%</span>
+                                </div>
+                                <div style={{ height: 6, background: "#1e293b", borderRadius: 3, overflow: "hidden", position: "relative" }}>
+                                  <div style={{ height: "100%", width: (m.val / 55) * 100 + "%", background: m.val >= m.bench ? "#34d399" : "#f87171", borderRadius: 3 }} />
+                                  <div style={{ position: "absolute", left: (m.bench / 55) * 100 + "%", top: 0, width: 2, height: "100%", background: "#f59e0b" }} />
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div style={{ display: "flex", gap: 12, justifyContent: "center", marginTop: 14 }}>
+                  <span style={z.leg}><span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: "#34d399" }}></span> Above Benchmark</span>
+                  <span style={z.leg}><span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: "#f87171" }}></span> Below Benchmark</span>
+                  <span style={z.leg}><span style={{ display: "inline-block", width: 8, height: 2, borderRadius: 1, background: "#f59e0b" }}></span> Industry Benchmark</span>
+                </div>
+              </div>
+
+              <div style={z.card}>
+                <h2 style={z.secTitle}>InMail Conversion Funnel</h2>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {[
+                    { label: "Sent", value: totalSends, color: "#6366f1" },
+                    { label: "Responded", value: totalResp, color: "#8b5cf6" },
+                    { label: "Accepted", value: totalAccepts, color: "#34d399" },
+                  ].map(function(st, i, arr) {
+                    var bw = Math.max((st.value / totalSends) * 100, 3);
+                    var nxt = arr[i + 1];
+                    var c = nxt ? ((nxt.value / st.value) * 100).toFixed(1) : null;
+                    return (
+                      <div key={i} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                        <div style={{ minWidth: 110, flexShrink: 0 }}>
+                          <div style={{ fontSize: 12, color: "#94a3b8", fontFamily: "Space Mono, monospace" }}>{st.label}</div>
+                          <div style={{ fontSize: 20, fontWeight: 700, color: "#f1f5f9" }}>{st.value.toLocaleString()}</div>
+                        </div>
+                        <div style={{ flex: 1, height: 24, background: "#0f172a", borderRadius: 6, overflow: "hidden" }}>
+                          <div style={{ height: "100%", width: bw + "%", background: "linear-gradient(90deg, " + st.color + ", " + st.color + "88)", borderRadius: 6 }} />
+                        </div>
+                        {c !== null ? <div style={z.convBadge}>{c}%</div> : <div style={{ width: 52 }} />}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </React.Fragment>
+          )}
+
+          {activeTab === "log" && (
+            <div style={z.card}>
+              <h2 style={z.secTitle}>Weekly Data</h2>
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+                  <thead><tr>
+                    <th style={z.th}>Week Of</th>
+                    {FUNNEL_STAGES.map(function(s) { return <th key={s.key} style={z.th}>{s.icon} {s.label}</th>; })}
+                  </tr></thead>
+                  <tbody>
+                    {weeks.map(function(w, i) {
+                      return (
+                        <tr key={i} style={i % 2 === 0 ? { background: "#0f172a33" } : {}}>
+                          <td style={z.td}>{getWeekLabel(w.weekOf)}</td>
+                          {FUNNEL_STAGES.map(function(s) { return <td key={s.key} style={{ ...z.td, textAlign: "center", fontFamily: "Space Mono, monospace" }}>{w[s.key] || 0}</td>; })}
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          <div style={{ textAlign: "center", padding: "20px 0 40px", color: "#334155", fontSize: 11, fontFamily: "Space Mono, monospace" }}>
+            RedRoute Recruiting · Data from Greenhouse + LinkedIn Recruiter
+          </div>
+        </div>
+      );
+    }
+
+    const z = {
+      root: { fontFamily: "DM Sans, sans-serif", maxWidth: 860, margin: "0 auto", padding: "24px 16px", color: "#e2e8f0", minHeight: "100vh" },
+      header: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20, flexWrap: "wrap", gap: 12 },
+      title: { fontSize: 28, fontWeight: 700, margin: 0, letterSpacing: "-0.02em", background: "linear-gradient(135deg, #c7d2fe, #e879f9)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" },
+      subtitle: { fontSize: 12, color: "#94a3b8", margin: "4px 0 0", fontFamily: "Space Mono, monospace" },
+      tabBar: { display: "flex", gap: 4, marginBottom: 20, background: "#1e293b", borderRadius: 10, padding: 4, border: "1px solid #334155" },
+      tab: { flex: 1, padding: "10px 12px", border: "none", borderRadius: 8, background: "transparent", color: "#64748b", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "DM Sans, sans-serif", transition: "all 0.2s" },
+      tabActive: { background: "#6366f1", color: "#fff" },
+      card: { background: "#1e293b", border: "1px solid #334155", borderRadius: 14, padding: 24, marginBottom: 20 },
+      secTitle: { fontSize: 14, fontWeight: 600, color: "#cbd5e1", margin: "0 0 18px", textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "Space Mono, monospace" },
+      convBadge: { background: "#0f172a", border: "1px solid #334155", borderRadius: 6, padding: "2px 8px", fontSize: 11, fontFamily: "Space Mono, monospace", color: "#a5b4fc", minWidth: 44, textAlign: "center", flexShrink: 0 },
+      metricsRow: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12, marginBottom: 20 },
+      mCard: { background: "#1e293b", border: "1px solid #334155", borderRadius: 14, padding: "18px 14px", textAlign: "center" },
+      mVal: { fontSize: 26, fontWeight: 700, fontFamily: "Space Mono, monospace", color: "#a5b4fc" },
+      mLbl: { fontSize: 11, color: "#64748b", marginTop: 4, fontFamily: "Space Mono, monospace" },
+      bench: { fontSize: 9, color: "#f59e0b", marginTop: 4, fontFamily: "Space Mono, monospace" },
+      leg: { display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: "#94a3b8", fontFamily: "Space Mono, monospace" },
+      dot: { width: 8, height: 8, borderRadius: "50%", display: "inline-block" },
+      th: { textAlign: "left", padding: "8px 10px", borderBottom: "1px solid #334155", color: "#64748b", fontSize: 11, fontFamily: "Space Mono, monospace", textTransform: "uppercase" },
+      td: { padding: "10px 10px", borderBottom: "1px solid #1e293b44", color: "#cbd5e1", fontSize: 13 },
+    };
+
+    ReactDOM.render(<App />, document.getElementById("root"));
+  </script>
+</body>
+</html>
