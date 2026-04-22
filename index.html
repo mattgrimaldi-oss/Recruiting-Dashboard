@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>RedRoute Recruiting Pipeline</title>
+<title>Flip Recruiting Pipeline</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
-<style>*{margin:0;padding:0;box-sizing:border-box}body{background:linear-gradient(160deg,#0c0e1a 0%,#131835 40%,#1a1040 100%);min-height:100vh}@keyframes spin{to{transform:rotate(360deg)}}</style>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{background:linear-gradient(160deg,#0c0e1a 0%,#131835 40%,#1a1040 100%);min-height:100vh}@keyframes spin{to{transform:rotate(360deg)}}select option{background:#1a1040;color:#fff}</style>
 </head><body><div id="root"></div>
 <script type="text/babel">
 const {useState}=React;
@@ -20,146 +20,94 @@ const FS=[
   {key:"offers",label:"Offer",color:"#f0abfc",glow:"#f0abfc33"},
   {key:"hires",label:"Hires",color:"#34d399",glow:"#34d39933"},
 ];
-
-const DATA=[
-  {weekOf:"2026-04-20",inmails:0,responses:112,screens:6,takehomes:0,virtuals:0,face_to_face:0,offers:0,hires:0},
-  {weekOf:"2026-04-13",inmails:338,responses:1430,screens:28,takehomes:8,virtuals:5,face_to_face:1,offers:0,hires:0},
-  {weekOf:"2026-04-06",inmails:280,responses:970,screens:31,takehomes:18,virtuals:3,face_to_face:0,offers:1,hires:1},
-  {weekOf:"2026-03-30",inmails:472,responses:611,screens:44,takehomes:14,virtuals:6,face_to_face:0,offers:1,hires:1},
-  {weekOf:"2026-03-23",inmails:174,responses:411,screens:14,takehomes:8,virtuals:9,face_to_face:2,offers:2,hires:2},
-  {weekOf:"2026-03-16",inmails:303,responses:689,screens:26,takehomes:21,virtuals:8,face_to_face:2,offers:0,hires:0},
-  {weekOf:"2026-03-09",inmails:480,responses:436,screens:22,takehomes:13,virtuals:11,face_to_face:2,offers:1,hires:0},
-  {weekOf:"2026-03-02",inmails:262,responses:365,screens:19,takehomes:11,virtuals:5,face_to_face:1,offers:0,hires:0},
-  {weekOf:"2026-02-23",inmails:331,responses:516,screens:20,takehomes:13,virtuals:4,face_to_face:0,offers:2,hires:2},
-  {weekOf:"2026-02-16",inmails:297,responses:364,screens:26,takehomes:21,virtuals:5,face_to_face:4,offers:2,hires:2},
-  {weekOf:"2026-02-09",inmails:214,responses:450,screens:30,takehomes:16,virtuals:7,face_to_face:3,offers:1,hires:1},
-  {weekOf:"2026-02-02",inmails:97,responses:533,screens:22,takehomes:16,virtuals:5,face_to_face:1,offers:4,hires:4},
-  {weekOf:"2026-01-26",inmails:26,responses:546,screens:12,takehomes:5,virtuals:3,face_to_face:2,offers:2,hires:2},
-];
-
-const IW=[
-  {week:"2026-01-26",sends:26,rr:19.2,ar:19.2},
-  {week:"2026-02-02",sends:97,rr:48.5,ar:45.4},
-  {week:"2026-02-09",sends:214,rr:35.0,ar:30.4},
-  {week:"2026-02-16",sends:297,rr:36.7,ar:34.3},
-  {week:"2026-02-23",sends:331,rr:27.5,ar:24.2},
-  {week:"2026-03-02",sends:262,rr:31.7,ar:27.1},
-  {week:"2026-03-09",sends:480,rr:34.6,ar:29.8},
-  {week:"2026-03-16",sends:303,rr:25.1,ar:23.4},
-  {week:"2026-03-23",sends:174,rr:31.0,ar:27.0},
-  {week:"2026-03-30",sends:472,rr:19.1,ar:17.2},
-  {week:"2026-04-06",sends:280,rr:32.1,ar:28.6},
-  {week:"2026-04-13",sends:338,rr:19.8,ar:16.6},
-];
-const REC=[
-  {name:"Connor McDermott",sends:814,rr:41.8,ar:37.6},
-  {name:"Meghan Dwyer",sends:292,rr:32.5,ar:29.5},
-  {name:"Matthew Grimaldi",sends:2168,rr:23.9,ar:20.9},
-];
-const BMR=37.0,BMA=33.3;
+const JD={"All":[{"weekOf":"2026-04-20","responses":116,"screens":7,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-04-13","responses":1430,"screens":28,"takehomes":8,"virtuals":5,"face_to_face":1,"offers":0,"hires":0},{"weekOf":"2026-04-06","responses":970,"screens":31,"takehomes":18,"virtuals":3,"face_to_face":0,"offers":1,"hires":1},{"weekOf":"2026-03-30","responses":611,"screens":44,"takehomes":14,"virtuals":6,"face_to_face":0,"offers":1,"hires":1},{"weekOf":"2026-03-23","responses":411,"screens":14,"takehomes":8,"virtuals":9,"face_to_face":2,"offers":2,"hires":2},{"weekOf":"2026-03-16","responses":689,"screens":26,"takehomes":21,"virtuals":8,"face_to_face":2,"offers":0,"hires":0},{"weekOf":"2026-03-09","responses":436,"screens":22,"takehomes":13,"virtuals":11,"face_to_face":2,"offers":1,"hires":0},{"weekOf":"2026-03-02","responses":365,"screens":19,"takehomes":11,"virtuals":5,"face_to_face":1,"offers":0,"hires":0},{"weekOf":"2026-02-23","responses":516,"screens":20,"takehomes":13,"virtuals":4,"face_to_face":0,"offers":2,"hires":2},{"weekOf":"2026-02-16","responses":364,"screens":26,"takehomes":21,"virtuals":5,"face_to_face":4,"offers":2,"hires":2},{"weekOf":"2026-02-09","responses":450,"screens":30,"takehomes":16,"virtuals":7,"face_to_face":3,"offers":1,"hires":1},{"weekOf":"2026-02-02","responses":533,"screens":22,"takehomes":16,"virtuals":5,"face_to_face":1,"offers":4,"hires":4},{"weekOf":"2026-01-26","responses":546,"screens":12,"takehomes":5,"virtuals":3,"face_to_face":2,"offers":2,"hires":2}],"Enterprise Customer Success Manager":[{"weekOf":"2026-04-20","responses":5,"screens":0,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-04-13","responses":32,"screens":1,"takehomes":1,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-04-06","responses":36,"screens":0,"takehomes":3,"virtuals":0,"face_to_face":0,"offers":1,"hires":1},{"weekOf":"2026-03-30","responses":33,"screens":3,"takehomes":6,"virtuals":1,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-03-23","responses":16,"screens":2,"takehomes":0,"virtuals":0,"face_to_face":1,"offers":1,"hires":1},{"weekOf":"2026-03-16","responses":12,"screens":2,"takehomes":2,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-03-09","responses":25,"screens":3,"takehomes":2,"virtuals":0,"face_to_face":0,"offers":1,"hires":0},{"weekOf":"2026-03-02","responses":27,"screens":0,"takehomes":2,"virtuals":1,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-02-23","responses":28,"screens":1,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-02-16","responses":26,"screens":3,"takehomes":1,"virtuals":0,"face_to_face":1,"offers":0,"hires":0},{"weekOf":"2026-02-09","responses":37,"screens":3,"takehomes":1,"virtuals":1,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-02-02","responses":60,"screens":11,"takehomes":8,"virtuals":1,"face_to_face":1,"offers":0,"hires":0},{"weekOf":"2026-01-26","responses":27,"screens":4,"takehomes":2,"virtuals":0,"face_to_face":0,"offers":0,"hires":0}],"Product Manager":[{"weekOf":"2026-04-20","responses":22,"screens":0,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-04-13","responses":184,"screens":1,"takehomes":3,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-04-06","responses":167,"screens":4,"takehomes":8,"virtuals":2,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-03-30","responses":212,"screens":2,"takehomes":5,"virtuals":4,"face_to_face":0,"offers":1,"hires":1},{"weekOf":"2026-03-23","responses":151,"screens":5,"takehomes":3,"virtuals":8,"face_to_face":1,"offers":0,"hires":0},{"weekOf":"2026-03-16","responses":348,"screens":12,"takehomes":16,"virtuals":5,"face_to_face":2,"offers":0,"hires":0},{"weekOf":"2026-03-09","responses":199,"screens":11,"takehomes":9,"virtuals":9,"face_to_face":2,"offers":0,"hires":0},{"weekOf":"2026-03-02","responses":51,"screens":8,"takehomes":1,"virtuals":1,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-02-23","responses":45,"screens":4,"takehomes":1,"virtuals":1,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-02-16","responses":54,"screens":5,"takehomes":2,"virtuals":1,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-02-09","responses":41,"screens":3,"takehomes":1,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-02-02","responses":91,"screens":0,"takehomes":1,"virtuals":2,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-01-26","responses":117,"screens":2,"takehomes":0,"virtuals":2,"face_to_face":2,"offers":0,"hires":0}],"Customer Success Manager":[{"weekOf":"2026-04-20","responses":15,"screens":3,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-04-13","responses":65,"screens":13,"takehomes":4,"virtuals":3,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-04-06","responses":56,"screens":11,"takehomes":6,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-03-30","responses":42,"screens":6,"takehomes":2,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-03-23","responses":65,"screens":7,"takehomes":3,"virtuals":1,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-03-16","responses":133,"screens":7,"takehomes":2,"virtuals":1,"face_to_face":0,"offers":0,"hires":0}],"Software Engineer":[{"weekOf":"2026-04-20","responses":29,"screens":0,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-04-13","responses":500,"screens":0,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-04-06","responses":226,"screens":0,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-03-30","responses":41,"screens":0,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-03-23","responses":40,"screens":0,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-03-16","responses":43,"screens":1,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-03-09","responses":38,"screens":0,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-03-02","responses":51,"screens":0,"takehomes":2,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-02-23","responses":52,"screens":0,"takehomes":3,"virtuals":0,"face_to_face":0,"offers":1,"hires":1},{"weekOf":"2026-02-16","responses":52,"screens":2,"takehomes":1,"virtuals":0,"face_to_face":0,"offers":1,"hires":1},{"weekOf":"2026-02-09","responses":75,"screens":5,"takehomes":6,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-02-02","responses":98,"screens":1,"takehomes":4,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-01-26","responses":71,"screens":0,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0}],"Product Insights Analyst":[{"weekOf":"2026-04-20","responses":25,"screens":0,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-04-13","responses":573,"screens":0,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-04-06","responses":412,"screens":0,"takehomes":1,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-03-30","responses":97,"screens":0,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-03-23","responses":113,"screens":0,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-03-16","responses":106,"screens":0,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-03-09","responses":113,"screens":4,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-03-02","responses":134,"screens":1,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-02-23","responses":133,"screens":0,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-02-16","responses":109,"screens":1,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-02-09","responses":141,"screens":0,"takehomes":0,"virtuals":1,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-02-02","responses":181,"screens":2,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-01-26","responses":254,"screens":1,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0}],"Director of Revenue Operations":[{"weekOf":"2026-04-20","responses":3,"screens":0,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-04-13","responses":10,"screens":0,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-04-06","responses":3,"screens":0,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-03-30","responses":6,"screens":0,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-03-23","responses":7,"screens":0,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-03-16","responses":5,"screens":0,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-03-09","responses":9,"screens":0,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-03-02","responses":8,"screens":0,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-02-23","responses":7,"screens":1,"takehomes":1,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-02-16","responses":6,"screens":0,"takehomes":0,"virtuals":0,"face_to_face":1,"offers":0,"hires":0},{"weekOf":"2026-02-09","responses":8,"screens":3,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-02-02","responses":4,"screens":0,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-01-26","responses":6,"screens":2,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0}],"Business Development Rep - Retail":[{"weekOf":"2026-04-20","responses":5,"screens":2,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-04-13","responses":31,"screens":11,"takehomes":0,"virtuals":2,"face_to_face":1,"offers":0,"hires":0},{"weekOf":"2026-04-06","responses":22,"screens":7,"takehomes":0,"virtuals":1,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-03-30","responses":31,"screens":9,"takehomes":0,"virtuals":1,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-03-16","responses":1,"screens":0,"takehomes":0,"virtuals":1,"face_to_face":0,"offers":0,"hires":0}],"Business Development Rep - Healthcare":[{"weekOf":"2026-04-20","responses":3,"screens":1,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-04-13","responses":17,"screens":2,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-04-06","responses":22,"screens":6,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-03-30","responses":49,"screens":11,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0}],"Performance Marketing Manager":[{"weekOf":"2026-04-20","responses":1,"screens":0,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-04-13","responses":9,"screens":0,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-04-06","responses":13,"screens":3,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0},{"weekOf":"2026-03-30","responses":80,"screens":13,"takehomes":1,"virtuals":0,"face_to_face":0,"offers":0,"hires":0}],"Account Executive (Healthcare OR Retail)":[{"weekOf":"2026-04-20","responses":7,"screens":1,"takehomes":0,"virtuals":0,"face_to_face":0,"offers":0,"hires":0}]};
+const IW=[{week:"2026-01-26",sends:26,rr:19.2,ar:19.2},{week:"2026-02-02",sends:97,rr:48.5,ar:45.4},{week:"2026-02-09",sends:214,rr:35.0,ar:30.4},{week:"2026-02-16",sends:297,rr:36.7,ar:34.3},{week:"2026-02-23",sends:331,rr:27.5,ar:24.2},{week:"2026-03-02",sends:262,rr:31.7,ar:27.1},{week:"2026-03-09",sends:480,rr:34.6,ar:29.8},{week:"2026-03-16",sends:303,rr:25.1,ar:23.4},{week:"2026-03-23",sends:174,rr:31.0,ar:27.0},{week:"2026-03-30",sends:472,rr:19.1,ar:17.2},{week:"2026-04-06",sends:280,rr:32.1,ar:28.6},{week:"2026-04-13",sends:338,rr:19.8,ar:16.6}];
+const REC=[{name:"Connor McDermott",sends:814,rr:41.8,ar:37.6},{name:"Meghan Dwyer",sends:292,rr:32.5,ar:29.5},{name:"Matthew Grimaldi",sends:2168,rr:23.9,ar:20.9}];
+const BMR=37,BMA=33.3;
 const wl=(d)=>new Date(d+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"});
-
 const G=({children,style,gradient})=>React.createElement("div",{style:{background:gradient||"rgba(255,255,255,0.04)",backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:20,padding:24,...(style||{})}},children);
 
 function App(){
   const [tab,setTab]=useState("funnel");
-  const weeks=DATA;
+  const [job,setJob]=useState("All");
+  const jobNames=Object.keys(JD).filter(k=>k!=="All"&&k!=="Unknown").sort();
+  const weeks=JD[job]||JD["All"];
   const totals={};FS.forEach(s=>{totals[s.key]=0});weeks.forEach(w=>FS.forEach(s=>{totals[s.key]+=(w[s.key]||0)}));
   const cv=(f,t)=>totals[f]?((totals[t]/totals[f])*100).toFixed(1):"0.0";
   const tS=IW.reduce((a,w)=>a+w.sends,0);
-  const tR=3274,tAcc=845; // from LinkedIn report totals
-  const avgRR=(tR/tS*100).toFixed(1),avgAR=(tAcc/tS*100).toFixed(1);
   const tH=weeks.reduce((a,w)=>a+(w.hires||0),0);
   const tApps=weeks.reduce((a,w)=>a+(w.responses||0),0);
-  const tIM=weeks.reduce((a,w)=>a+(w.inmails||0),0);
+  const allH=JD["All"].reduce((a,w)=>a+(w.hires||0),0);
 
   return React.createElement("div",{style:S.root},
-    React.createElement("link",{href:"https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap",rel:"stylesheet"}),
-
-    // Header
     React.createElement("div",{style:{marginBottom:28}},
-      React.createElement("h1",{style:S.title},"RedRoute Recruiting Pipeline"),
-      React.createElement("p",{style:S.sub},weeks.length+" weeks · "+tS.toLocaleString()+" InMails · "+tH+" hires")
+      React.createElement("h1",{style:S.title},"Flip Recruiting Pipeline"),
+      React.createElement("p",{style:S.sub},JD["All"].length+" weeks · "+tS.toLocaleString()+" InMails · "+allH+" hires")
     ),
-
-    // Tabs
     React.createElement("div",{style:S.tabBar},
-      [{id:"funnel",l:"Pipeline"},{id:"inmail",l:"InMail Analytics"},{id:"data",l:"Weekly Data"}].map(function(t){
-        return React.createElement("button",{key:t.id,onClick:function(){setTab(t.id)},style:Object.assign({},S.tab,tab===t.id?S.tabOn:{})},t.l);
-      })
+      [{id:"funnel",l:"Pipeline"},{id:"inmail",l:"InMail Analytics"},{id:"data",l:"Weekly Data"}].map(t=>React.createElement("button",{key:t.id,onClick:()=>setTab(t.id),style:{...S.tab,...(tab===t.id?S.tabOn:{})}},t.l))
     ),
 
     // FUNNEL TAB
     tab==="funnel"&&React.createElement(React.Fragment,null,
+      // Job dropdown
+      React.createElement(G,{style:{padding:"14px 20px",marginBottom:20,display:"flex",alignItems:"center",gap:14}},
+        React.createElement("span",{style:{fontSize:13,color:"rgba(255,255,255,0.4)",fontFamily:"JetBrains Mono",whiteSpace:"nowrap"}},"View by job"),
+        React.createElement("select",{value:job,onChange:e=>setJob(e.target.value),style:{flex:1,background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:10,padding:"10px 14px",color:"#fff",fontSize:14,fontFamily:"Plus Jakarta Sans",cursor:"pointer",appearance:"none",backgroundImage:"url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='rgba(255,255,255,0.4)' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E\")",backgroundRepeat:"no-repeat",backgroundPosition:"right 14px center"}},
+          React.createElement("option",{value:"All"},"All Jobs"),
+          jobNames.map(j=>React.createElement("option",{key:j,value:j},j))
+        )
+      ),
       // Volume cards
       React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:24}},
         React.createElement(G,{gradient:"linear-gradient(135deg, rgba(124,58,237,0.35), rgba(167,139,250,0.2))",style:{padding:"28px 24px",position:"relative",overflow:"hidden"}},
           React.createElement("div",{style:{position:"absolute",top:-30,right:-30,width:120,height:120,borderRadius:"50%",background:"radial-gradient(circle, rgba(167,139,250,0.25), transparent)",filter:"blur(20px)"}}),
-          React.createElement("div",{style:{position:"relative"}},
-            React.createElement("div",{style:{fontSize:13,color:"rgba(255,255,255,0.5)",fontWeight:500,marginBottom:8}},"Applicants"),
-            React.createElement("div",{style:{fontSize:36,fontWeight:800,color:"#e0d4ff",letterSpacing:"-0.02em"}},tApps.toLocaleString())
-          )
+          React.createElement("div",{style:{position:"relative"}},React.createElement("div",{style:{fontSize:13,color:"rgba(255,255,255,0.5)",fontWeight:500,marginBottom:8}},"Applicants"),React.createElement("div",{style:{fontSize:36,fontWeight:800,color:"#e0d4ff"}},tApps.toLocaleString()))
         ),
         React.createElement(G,{gradient:"linear-gradient(135deg, rgba(99,102,241,0.35), rgba(129,140,248,0.2))",style:{padding:"28px 24px",position:"relative",overflow:"hidden"}},
           React.createElement("div",{style:{position:"absolute",top:-30,right:-30,width:120,height:120,borderRadius:"50%",background:"radial-gradient(circle, rgba(129,140,248,0.25), transparent)",filter:"blur(20px)"}}),
-          React.createElement("div",{style:{position:"relative"}},
-            React.createElement("div",{style:{fontSize:13,color:"rgba(255,255,255,0.5)",fontWeight:500,marginBottom:8}},"InMails Sent"),
-            React.createElement("div",{style:{fontSize:36,fontWeight:800,color:"#c7d2fe",letterSpacing:"-0.02em"}},tS.toLocaleString())
-          )
+          React.createElement("div",{style:{position:"relative"}},React.createElement("div",{style:{fontSize:13,color:"rgba(255,255,255,0.5)",fontWeight:500,marginBottom:8}},"InMails Sent"),React.createElement("div",{style:{fontSize:36,fontWeight:800,color:"#c7d2fe"}},tS.toLocaleString()))
         )
       ),
       // Funnel
       React.createElement(G,{style:{marginBottom:20}},
-        React.createElement("h2",{style:S.secTitle},"Pipeline Funnel"),
+        React.createElement("h2",{style:S.secTitle},"Pipeline Funnel"+(job!=="All"?" — "+job:"")),
         React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:16}},
-          FS.map(function(stage,i){
-            var mx=Math.max.apply(null,FS.map(function(s){return totals[s.key]||1}));
-            var pct=Math.max(((totals[stage.key]||0)/mx)*100,3);
-            var nxt=FS[i+1];var c=nxt?cv(stage.key,nxt.key):null;
+          FS.map((stage,i)=>{const mx=Math.max(...FS.map(s=>totals[s.key]||1));const pct=Math.max(((totals[stage.key]||0)/mx)*100,3);const nxt=FS[i+1];const c=nxt?cv(stage.key,nxt.key):null;
             return React.createElement("div",{key:stage.key,style:{display:"flex",alignItems:"center",gap:14}},
-              React.createElement("div",{style:{minWidth:140,flexShrink:0}},
-                React.createElement("div",{style:{fontSize:12,color:"rgba(255,255,255,0.4)",fontFamily:"JetBrains Mono",marginBottom:2}},stage.label),
-                React.createElement("div",{style:{fontSize:22,fontWeight:700,color:"#fff"}},(totals[stage.key]||0).toLocaleString())
-              ),
-              React.createElement("div",{style:{flex:1,height:28,background:"rgba(255,255,255,0.04)",borderRadius:10,overflow:"hidden"}},
-                React.createElement("div",{style:{height:"100%",width:pct+"%",borderRadius:10,background:"linear-gradient(90deg, "+stage.color+", "+stage.color+"66)",boxShadow:"0 0 20px "+stage.glow,transition:"width 0.6s ease"}})
-              ),
-              c!==null?React.createElement("div",{style:S.convBadge},c+"%"):React.createElement("div",{style:{width:52}})
+              React.createElement("div",{style:{minWidth:140,flexShrink:0}},React.createElement("div",{style:{fontSize:12,color:"rgba(255,255,255,0.4)",fontFamily:"JetBrains Mono",marginBottom:2}},stage.label),React.createElement("div",{style:{fontSize:22,fontWeight:700,color:"#fff"}},(totals[stage.key]||0).toLocaleString())),
+              React.createElement("div",{style:{flex:1,height:28,background:"rgba(255,255,255,0.04)",borderRadius:10,overflow:"hidden"}},React.createElement("div",{style:{height:"100%",width:pct+"%",borderRadius:10,background:"linear-gradient(90deg, "+stage.color+", "+stage.color+"66)",boxShadow:"0 0 20px "+stage.glow}})),
+              c!==null?React.createElement("div",{style:S.cb},c+"%"):React.createElement("div",{style:{width:52}})
             );
           })
         )
       ),
       // Metrics
       React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(150px, 1fr))",gap:14,marginBottom:20}},
-        [{v:tApps?Math.ceil(tApps/(tH||1)):"—",l:"Apps per Hire"},{v:cv("screens","offers")+"%",l:"Screen → Offer"},{v:cv("offers","hires")+"%",l:"Offer Accept"},{v:tH?Math.ceil(tS/tH):"—",l:"InMails / Hire"}].map(function(m,i){
-          return React.createElement(G,{key:i,style:{textAlign:"center",padding:"20px 14px"}},
-            React.createElement("div",{style:{fontSize:28,fontWeight:800,color:"#fff",letterSpacing:"-0.02em"}},m.v),
-            React.createElement("div",{style:{fontSize:11,color:"rgba(255,255,255,0.35)",fontFamily:"JetBrains Mono",marginTop:4}},m.l)
-          );
-        })
+        [{v:tApps?Math.ceil(tApps/(tH||1)):"—",l:"Apps per Hire"},{v:cv("screens","offers")+"%",l:"Screen → Offer"},{v:cv("offers","hires")+"%",l:"Offer Accept"},{v:tH?Math.ceil(tS/tH):"—",l:"InMails / Hire"}].map((m,i)=>
+          React.createElement(G,{key:i,style:{textAlign:"center",padding:"20px 14px"}},React.createElement("div",{style:{fontSize:28,fontWeight:800,color:"#fff"}},m.v),React.createElement("div",{style:{fontSize:11,color:"rgba(255,255,255,0.35)",fontFamily:"JetBrains Mono",marginTop:4}},m.l))
+        )
       ),
-      // Chart
-      React.createElement(G,{style:{marginBottom:20}},
+      // Chart: TH vs Virtual vs F2F vs Hires
+      weeks.length>1&&React.createElement(G,{style:{marginBottom:20}},
         React.createElement("h2",{style:S.secTitle},"Take Home · Virtual · Face to Face · Hires"),
         React.createElement("svg",{viewBox:"0 0 700 190",style:{width:"100%",height:"auto",display:"block"}},
-          function(){
-            var sorted=DATA.slice().reverse().slice(-12);
-            var bars=[{key:"takehomes",color:"#c084fc"},{key:"virtuals",color:"#7dd3fc"},{key:"face_to_face",color:"#2dd4bf"},{key:"hires",color:"#34d399"}];
-            var mx=Math.max.apply(null,sorted.map(function(w){return Math.max.apply(null,bars.map(function(b){return w[b.key]||0}).concat([1]))}));
-            return sorted.map(function(w,i){
-              var gw=650/sorted.length,bw=gw*0.2,x0=35+i*gw;
-              return React.createElement("g",{key:i},
-                bars.map(function(b,j){var v=w[b.key]||0,h=(v/mx)*120,bx=x0+j*(bw+1);return React.createElement("g",{key:j},React.createElement("rect",{x:bx,y:140-h,width:bw,height:Math.max(h,1),rx:3,fill:b.color,opacity:0.8}),v>0&&React.createElement("text",{x:bx+bw/2,y:140-h-5,textAnchor:"middle",fill:b.color,fontSize:7,fontFamily:"JetBrains Mono"},v))}),
-                React.createElement("text",{x:x0+(bars.length*(bw+1))/2,y:156,textAnchor:"middle",fill:"rgba(255,255,255,0.25)",fontSize:8,fontFamily:"JetBrains Mono"},wl(w.weekOf))
-              );
-            });
-          }(),
+          (()=>{const sorted=[...weeks].reverse().slice(-12);const bars=[{key:"takehomes",color:"#c084fc"},{key:"virtuals",color:"#7dd3fc"},{key:"face_to_face",color:"#2dd4bf"},{key:"hires",color:"#34d399"}];const mx=Math.max(...sorted.map(w=>Math.max(...bars.map(b=>w[b.key]||0),1)));return sorted.map((w,i)=>{const gw=650/sorted.length,bw=gw*0.2,x0=35+i*gw;return React.createElement("g",{key:i},bars.map((b,j)=>{const v=w[b.key]||0,h=(v/mx)*120,bx=x0+j*(bw+1);return React.createElement("g",{key:j},React.createElement("rect",{x:bx,y:140-h,width:bw,height:Math.max(h,1),rx:3,fill:b.color,opacity:0.8}),v>0&&React.createElement("text",{x:bx+bw/2,y:140-h-5,textAnchor:"middle",fill:b.color,fontSize:7,fontFamily:"JetBrains Mono"},v))}),React.createElement("text",{x:x0+(bars.length*(bw+1))/2,y:156,textAnchor:"middle",fill:"rgba(255,255,255,0.25)",fontSize:8,fontFamily:"JetBrains Mono"},wl(w.weekOf)))})})(),
           React.createElement("line",{x1:35,y1:140,x2:690,y2:140,stroke:"rgba(255,255,255,0.06)",strokeWidth:1})
         ),
         React.createElement("div",{style:{display:"flex",gap:16,justifyContent:"center",marginTop:10,flexWrap:"wrap"}},
-          [{c:"#c084fc",l:"Take Home"},{c:"#7dd3fc",l:"Virtual"},{c:"#2dd4bf",l:"Face to Face"},{c:"#34d399",l:"Hires"}].map(function(x,i){
-            return React.createElement("span",{key:i,style:S.leg},React.createElement("span",{style:{width:8,height:8,borderRadius:"50%",background:x.c,display:"inline-block"}})," ",x.l);
-          })
+          [{c:"#c084fc",l:"Take Home"},{c:"#7dd3fc",l:"Virtual"},{c:"#2dd4bf",l:"Face to Face"},{c:"#34d399",l:"Hires"}].map((x,i)=>React.createElement("span",{key:i,style:S.leg},React.createElement("span",{style:{width:8,height:8,borderRadius:"50%",background:x.c,display:"inline-block"}})," ",x.l))
+        )
+      ),
+      // Chart: Screens → Take-Homes → Offers
+      weeks.length>1&&React.createElement(G,null,
+        React.createElement("h2",{style:S.secTitle},"Screens → Take-Homes → Offers"),
+        React.createElement("svg",{viewBox:"0 0 700 180",style:{width:"100%",height:"auto",display:"block"}},
+          (()=>{const sorted=[...weeks].reverse().slice(-12);const mx=Math.max(...sorted.map(w=>Math.max(w.screens||0,w.takehomes||0,w.offers||0,1)));return sorted.map((w,i)=>{const gw=650/sorted.length,bw=gw*0.25,x=35+i*gw;const sH=((w.screens||0)/mx)*110,tH=((w.takehomes||0)/mx)*110,oH=((w.offers||0)/mx)*110;return React.createElement("g",{key:i},React.createElement("rect",{x:x,y:130-sH,width:bw,height:sH,rx:3,fill:"#a78bfa",opacity:0.8}),React.createElement("rect",{x:x+bw+1,y:130-tH,width:bw,height:tH,rx:3,fill:"#c084fc",opacity:0.8}),React.createElement("rect",{x:x+(bw+1)*2,y:130-oH,width:bw,height:Math.max(oH,1),rx:3,fill:"#f0abfc",opacity:0.8}),React.createElement("text",{x:x+bw/2,y:130-sH-4,textAnchor:"middle",fill:"#c4b5fd",fontSize:7,fontFamily:"JetBrains Mono"},w.screens),React.createElement("text",{x:x+bw*1.5+1,y:145,textAnchor:"middle",fill:"rgba(255,255,255,0.25)",fontSize:8,fontFamily:"JetBrains Mono"},wl(w.weekOf)))})})(),
+          React.createElement("line",{x1:35,y1:130,x2:690,y2:130,stroke:"rgba(255,255,255,0.06)",strokeWidth:1})
+        ),
+        React.createElement("div",{style:{display:"flex",gap:16,justifyContent:"center",marginTop:10}},
+          [{c:"#a78bfa",l:"Screens"},{c:"#c084fc",l:"Take-Homes"},{c:"#f0abfc",l:"Offers"}].map((x,i)=>React.createElement("span",{key:i,style:S.leg},React.createElement("span",{style:{width:8,height:8,borderRadius:"50%",background:x.c,display:"inline-block"}})," ",x.l))
         )
       )
     ),
@@ -167,77 +115,64 @@ function App(){
     // INMAIL TAB
     tab==="inmail"&&React.createElement(React.Fragment,null,
       React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(150px, 1fr))",gap:14,marginBottom:20}},
-        React.createElement(G,{gradient:"linear-gradient(135deg, rgba(99,102,241,0.3), rgba(129,140,248,0.15))",style:{textAlign:"center",padding:"20px 14px"}},
-          React.createElement("div",{style:{fontSize:28,fontWeight:800,color:"#c7d2fe"}},tS.toLocaleString()),React.createElement("div",{style:S.kpiL},"InMails Sent")),
-        React.createElement(G,{gradient:"linear-gradient(135deg, rgba(248,113,113,0.25), transparent)",style:{textAlign:"center",padding:"20px 14px"}},
-          React.createElement("div",{style:{fontSize:28,fontWeight:800,color:"#fca5a5"}},avgRR+"%"),React.createElement("div",{style:S.kpiL},"Response Rate"),React.createElement("div",{style:{fontSize:9,color:"#f59e0b",marginTop:3,fontFamily:"JetBrains Mono"}},"Benchmark: 37%")),
-        React.createElement(G,{gradient:"linear-gradient(135deg, rgba(248,113,113,0.25), transparent)",style:{textAlign:"center",padding:"20px 14px"}},
-          React.createElement("div",{style:{fontSize:28,fontWeight:800,color:"#fca5a5"}},avgAR+"%"),React.createElement("div",{style:S.kpiL},"Accept Rate"),React.createElement("div",{style:{fontSize:9,color:"#f59e0b",marginTop:3,fontFamily:"JetBrains Mono"}},"Benchmark: 33.3%")),
-        React.createElement(G,{style:{textAlign:"center",padding:"20px 14px"}},
-          React.createElement("div",{style:{fontSize:28,fontWeight:800,color:"#fff"}},tH?Math.ceil(tS/tH):"—"),React.createElement("div",{style:S.kpiL},"InMails / Hire"))
+        React.createElement(G,{gradient:"linear-gradient(135deg, rgba(99,102,241,0.3), rgba(129,140,248,0.15))",style:{textAlign:"center",padding:"20px 14px"}},React.createElement("div",{style:{fontSize:28,fontWeight:800,color:"#c7d2fe"}},tS.toLocaleString()),React.createElement("div",{style:S.kl},"InMails Sent")),
+        React.createElement(G,{gradient:"linear-gradient(135deg, rgba(129,140,248,0.25), transparent)",style:{textAlign:"center",padding:"20px 14px"}},React.createElement("div",{style:{fontSize:28,fontWeight:800,color:"#c7d2fe"}},"29.1%"),React.createElement("div",{style:S.kl},"Response Rate"),React.createElement("div",{style:{fontSize:9,color:"#f59e0b",marginTop:3,fontFamily:"JetBrains Mono"}},"Benchmark: 37%")),
+        React.createElement(G,{gradient:"linear-gradient(135deg, rgba(129,140,248,0.25), transparent)",style:{textAlign:"center",padding:"20px 14px"}},React.createElement("div",{style:{fontSize:28,fontWeight:800,color:"#c7d2fe"}},"25.8%"),React.createElement("div",{style:S.kl},"Accept Rate"),React.createElement("div",{style:{fontSize:9,color:"#f59e0b",marginTop:3,fontFamily:"JetBrains Mono"}},"Benchmark: 33.3%")),
+        React.createElement(G,{style:{textAlign:"center",padding:"20px 14px"}},React.createElement("div",{style:{fontSize:28,fontWeight:800,color:"#fff"}},allH?Math.ceil(tS/allH):"—"),React.createElement("div",{style:S.kl},"InMails / Hire"))
       ),
       // Response Rate Chart
       React.createElement(G,{style:{marginBottom:20}},
         React.createElement("h2",{style:S.secTitle},"Response & Accept Rate Trend"),
         React.createElement("svg",{viewBox:"0 0 700 220",style:{width:"100%",height:"auto",display:"block"}},
-          [0,20,40,60].map(function(v){var y=180-(v/60)*170;return React.createElement("g",{key:v},React.createElement("line",{x1:40,y1:y,x2:690,y2:y,stroke:"rgba(255,255,255,0.04)",strokeWidth:1}),React.createElement("text",{x:35,y:y+4,textAnchor:"end",fill:"rgba(255,255,255,0.2)",fontSize:10,fontFamily:"JetBrains Mono"},v+"%"))}),
-          function(){var by=180-(BMR/60)*170;return React.createElement("g",null,React.createElement("line",{x1:40,y1:by,x2:690,y2:by,stroke:"#f59e0b",strokeWidth:1.5,strokeDasharray:"6 4",opacity:0.4}),React.createElement("text",{x:688,y:by-5,textAnchor:"end",fill:"#f59e0b",fontSize:9,fontFamily:"JetBrains Mono",opacity:0.7},"Benchmark 37%"))}(),
-          IW.map(function(w,i){var gw=650/IW.length,x=45+i*gw,bw=gw*0.35,rH=(w.rr/60)*170,aH=(w.ar/60)*170;return React.createElement("g",{key:i},React.createElement("rect",{x:x,y:180-rH,width:bw,height:rH,rx:3,fill:"#818cf8",opacity:0.75}),React.createElement("rect",{x:x+bw+2,y:180-aH,width:bw,height:aH,rx:3,fill:"#34d399",opacity:0.75}),React.createElement("text",{x:x+bw,y:196,textAnchor:"middle",fill:"rgba(255,255,255,0.2)",fontSize:8,fontFamily:"JetBrains Mono"},wl(w.week)),React.createElement("text",{x:x+bw/2,y:180-rH-4,textAnchor:"middle",fill:"#a5b4fc",fontSize:8,fontFamily:"JetBrains Mono"},w.rr+"%"))})
+          [0,20,40,60].map(v=>{const y=180-(v/60)*170;return React.createElement("g",{key:v},React.createElement("line",{x1:40,y1:y,x2:690,y2:y,stroke:"rgba(255,255,255,0.04)",strokeWidth:1}),React.createElement("text",{x:35,y:y+4,textAnchor:"end",fill:"rgba(255,255,255,0.2)",fontSize:10,fontFamily:"JetBrains Mono"},v+"%"))}),
+          (()=>{const by=180-(BMR/60)*170;return React.createElement("g",null,React.createElement("line",{x1:40,y1:by,x2:690,y2:by,stroke:"#f59e0b",strokeWidth:1.5,strokeDasharray:"6 4",opacity:0.4}),React.createElement("text",{x:688,y:by-5,textAnchor:"end",fill:"#f59e0b",fontSize:9,fontFamily:"JetBrains Mono",opacity:0.7},"Benchmark 37%"))})(),
+          IW.map((w,i)=>{const gw=650/IW.length,x=45+i*gw,bw=gw*0.35,rH=(w.rr/60)*170,aH=(w.ar/60)*170;return React.createElement("g",{key:i},React.createElement("rect",{x:x,y:180-rH,width:bw,height:rH,rx:3,fill:"#818cf8",opacity:0.75}),React.createElement("rect",{x:x+bw+2,y:180-aH,width:bw,height:aH,rx:3,fill:"#34d399",opacity:0.75}),React.createElement("text",{x:x+bw,y:196,textAnchor:"middle",fill:"rgba(255,255,255,0.2)",fontSize:8,fontFamily:"JetBrains Mono"},wl(w.week)),React.createElement("text",{x:x+bw/2,y:180-rH-4,textAnchor:"middle",fill:"#a5b4fc",fontSize:8,fontFamily:"JetBrains Mono"},w.rr+"%"))})
         ),
         React.createElement("div",{style:{display:"flex",gap:16,justifyContent:"center",marginTop:10}},
-          [{c:"#818cf8",l:"Response"},{c:"#34d399",l:"Accept"},{c:"#f59e0b",l:"Benchmark",w:12,h:2,r:1}].map(function(x,i){return React.createElement("span",{key:i,style:S.leg},React.createElement("span",{style:{width:x.w||8,height:x.h||8,borderRadius:x.r||"50%",background:x.c,display:"inline-block"}})," ",x.l)})
+          [{c:"#818cf8",l:"Response"},{c:"#34d399",l:"Accept"},{c:"#f59e0b",l:"Benchmark",w:12,h:2,r:1}].map((x,i)=>React.createElement("span",{key:i,style:S.leg},React.createElement("span",{style:{width:x.w||8,height:x.h||8,borderRadius:x.r||"50%",background:x.c,display:"inline-block"}})," ",x.l))
         )
       ),
-      // Volume Chart
-      React.createElement(G,{style:{marginBottom:20}},
-        React.createElement("h2",{style:S.secTitle},"Weekly InMail Volume"),
-        React.createElement("svg",{viewBox:"0 0 700 160",style:{width:"100%",height:"auto",display:"block"}},
-          React.createElement("defs",null,React.createElement("linearGradient",{id:"vg",x1:0,y1:0,x2:0,y2:1},React.createElement("stop",{offset:"0%",stopColor:"#818cf8"}),React.createElement("stop",{offset:"100%",stopColor:"#818cf833"}))),
-          IW.map(function(w,i){var mx=Math.max.apply(null,IW.map(function(x){return x.sends})),gw=650/IW.length,bw=gw*0.6,x=30+i*gw+(gw-bw)/2,h=(w.sends/mx)*110;return React.createElement("g",{key:i},React.createElement("rect",{x:x,y:125-h,width:bw,height:h,rx:4,fill:"url(#vg)",opacity:0.8}),React.createElement("text",{x:x+bw/2,y:125-h-5,textAnchor:"middle",fill:"#a5b4fc",fontSize:9,fontFamily:"JetBrains Mono"},w.sends),React.createElement("text",{x:x+bw/2,y:140,textAnchor:"middle",fill:"rgba(255,255,255,0.2)",fontSize:8,fontFamily:"JetBrains Mono"},wl(w.week)))}),
-          React.createElement("line",{x1:30,y1:125,x2:690,y2:125,stroke:"rgba(255,255,255,0.06)",strokeWidth:1})
-        )
-      ),
-      // Recruiters
+      // Recruiter Performance - neutral bars, bigger sends
       React.createElement(G,{style:{marginBottom:20}},
         React.createElement("h2",{style:S.secTitle},"Recruiter Performance"),
         React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:14}},
-          REC.map(function(r,i){return React.createElement("div",{key:i,style:{background:"rgba(255,255,255,0.03)",borderRadius:14,padding:18,border:"1px solid rgba(255,255,255,0.05)"}},
-            React.createElement("div",{style:{marginBottom:14}},React.createElement("div",{style:{fontWeight:700,color:"#fff",fontSize:15}},r.name),React.createElement("div",{style:{fontSize:11,color:"rgba(255,255,255,0.3)",fontFamily:"JetBrains Mono"}},r.sends.toLocaleString()+" sent")),
+          REC.map((r,i)=>React.createElement("div",{key:i,style:{background:"rgba(255,255,255,0.03)",borderRadius:14,padding:18,border:"1px solid rgba(255,255,255,0.05)"}},
+            React.createElement("div",{style:{marginBottom:14}},React.createElement("div",{style:{fontWeight:700,color:"#fff",fontSize:15}},r.name),React.createElement("div",{style:{fontSize:18,fontWeight:700,color:"#c7d2fe",fontFamily:"JetBrains Mono",marginTop:4}},r.sends.toLocaleString()+" InMails sent")),
             React.createElement("div",{style:{display:"flex",gap:16}},
-              [{l:"Response",v:r.rr,b:BMR},{l:"Accept",v:r.ar,b:BMA}].map(function(m,j){return React.createElement("div",{key:j,style:{flex:1}},
-                React.createElement("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:6}},React.createElement("span",{style:{fontSize:11,color:"rgba(255,255,255,0.4)"}},m.l),React.createElement("span",{style:{fontSize:14,fontWeight:700,fontFamily:"JetBrains Mono",color:m.v>=m.b?"#6ee7b7":"#fca5a5"}},m.v+"%")),
-                React.createElement("div",{style:{height:6,background:"rgba(255,255,255,0.06)",borderRadius:3,overflow:"hidden",position:"relative"}},React.createElement("div",{style:{height:"100%",width:(m.v/55)*100+"%",background:m.v>=m.b?"linear-gradient(90deg,#34d399,#6ee7b7)":"linear-gradient(90deg,#f87171,#fca5a5)",borderRadius:3}}),React.createElement("div",{style:{position:"absolute",left:(m.b/55)*100+"%",top:0,width:2,height:"100%",background:"#f59e0b"}}))
-              )})
+              [{l:"Response",v:r.rr,b:BMR},{l:"Accept",v:r.ar,b:BMA}].map((m,j)=>React.createElement("div",{key:j,style:{flex:1}},
+                React.createElement("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:6}},React.createElement("span",{style:{fontSize:11,color:"rgba(255,255,255,0.4)"}},m.l),React.createElement("span",{style:{fontSize:14,fontWeight:700,fontFamily:"JetBrains Mono",color:"#c7d2fe"}},m.v+"%")),
+                React.createElement("div",{style:{height:6,background:"rgba(255,255,255,0.06)",borderRadius:3,overflow:"hidden",position:"relative"}},React.createElement("div",{style:{height:"100%",width:(m.v/55)*100+"%",background:"linear-gradient(90deg,#818cf8,#a5b4fc)",borderRadius:3}}),React.createElement("div",{style:{position:"absolute",left:(m.b/55)*100+"%",top:0,width:2,height:"100%",background:"#f59e0b"}}))
+              ))
             )
-          )})
+          ))
         )
       )
     ),
 
     // DATA TAB
     tab==="data"&&React.createElement(G,null,
-      React.createElement("h2",{style:S.secTitle},"Weekly Data"),
+      React.createElement("h2",{style:S.secTitle},"Weekly Data"+(job!=="All"?" — "+job:"")),
       React.createElement("div",{style:{overflowX:"auto"}},
         React.createElement("table",{style:{width:"100%",borderCollapse:"collapse",fontSize:13}},
           React.createElement("thead",null,React.createElement("tr",null,
             React.createElement("th",{style:S.th},"Week"),
-            ["Apps","InMails","Screens","Take Home","Virtual","F2F","Offers","Hires"].map(function(h){return React.createElement("th",{key:h,style:S.th},h)})
+            ["Apps","Screens","Take Home","Virtual","F2F","Offers","Hires"].map(h=>React.createElement("th",{key:h,style:S.th},h))
           )),
-          React.createElement("tbody",null,weeks.map(function(w,i){
-            return React.createElement("tr",{key:i,style:{background:i%2===0?"rgba(255,255,255,0.02)":"transparent"}},
+          React.createElement("tbody",null,weeks.map((w,i)=>
+            React.createElement("tr",{key:i,style:{background:i%2===0?"rgba(255,255,255,0.02)":"transparent"}},
               React.createElement("td",{style:S.td},wl(w.weekOf)),
-              [w.responses,w.inmails,w.screens,w.takehomes,w.virtuals,w.face_to_face,w.offers,w.hires].map(function(v,j){return React.createElement("td",{key:j,style:Object.assign({},S.td,{textAlign:"center",fontFamily:"JetBrains Mono"})},v||0)})
-            );
-          }))
+              [w.responses,w.screens,w.takehomes,w.virtuals,w.face_to_face,w.offers,w.hires].map((v,j)=>React.createElement("td",{key:j,style:{...S.td,textAlign:"center",fontFamily:"JetBrains Mono"}},v||0))
+            )
+          ))
         )
       )
     ),
 
-    React.createElement("div",{style:{textAlign:"center",padding:"24px 0 40px",color:"rgba(255,255,255,0.15)",fontSize:11,fontFamily:"JetBrains Mono"}},"RedRoute Recruiting · Greenhouse + LinkedIn Recruiter")
+    React.createElement("div",{style:{textAlign:"center",padding:"24px 0 40px",color:"rgba(255,255,255,0.15)",fontSize:11,fontFamily:"JetBrains Mono"}},"Flip Recruiting · Greenhouse + LinkedIn Recruiter")
   );
 }
 
-var S={
+const S={
   root:{fontFamily:"Plus Jakarta Sans, sans-serif",maxWidth:880,margin:"0 auto",padding:"28px 20px",color:"#fff",minHeight:"100vh"},
   title:{fontSize:30,fontWeight:800,margin:0,letterSpacing:"-0.03em",background:"linear-gradient(135deg, #e0e7ff, #c084fc, #f0abfc)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"},
   sub:{fontSize:13,color:"rgba(255,255,255,0.35)",margin:"6px 0 0",fontFamily:"JetBrains Mono"},
@@ -245,8 +180,8 @@ var S={
   tab:{flex:1,padding:"11px 14px",border:"none",borderRadius:11,background:"transparent",color:"rgba(255,255,255,0.35)",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"Plus Jakarta Sans",transition:"all 0.25s"},
   tabOn:{background:"linear-gradient(135deg, rgba(99,102,241,0.6), rgba(139,92,246,0.4))",color:"#fff",boxShadow:"0 2px 12px rgba(99,102,241,0.25)"},
   secTitle:{fontSize:13,fontWeight:700,color:"rgba(255,255,255,0.5)",margin:"0 0 20px",textTransform:"uppercase",letterSpacing:"0.08em",fontFamily:"JetBrains Mono"},
-  convBadge:{background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:8,padding:"3px 10px",fontSize:11,fontFamily:"JetBrains Mono",color:"rgba(255,255,255,0.5)",minWidth:44,textAlign:"center",flexShrink:0},
-  kpiL:{fontSize:11,color:"rgba(255,255,255,0.35)",marginTop:4,fontFamily:"JetBrains Mono"},
+  cb:{background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:8,padding:"3px 10px",fontSize:11,fontFamily:"JetBrains Mono",color:"rgba(255,255,255,0.5)",minWidth:44,textAlign:"center",flexShrink:0},
+  kl:{fontSize:11,color:"rgba(255,255,255,0.35)",marginTop:4,fontFamily:"JetBrains Mono"},
   leg:{display:"flex",alignItems:"center",gap:6,fontSize:11,color:"rgba(255,255,255,0.35)",fontFamily:"JetBrains Mono"},
   th:{textAlign:"left",padding:"10px",borderBottom:"1px solid rgba(255,255,255,0.06)",color:"rgba(255,255,255,0.3)",fontSize:10,fontFamily:"JetBrains Mono",textTransform:"uppercase"},
   td:{padding:"10px",borderBottom:"1px solid rgba(255,255,255,0.03)",color:"rgba(255,255,255,0.7)",fontSize:13},
