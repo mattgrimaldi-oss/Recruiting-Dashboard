@@ -8,10 +8,36 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
-<style>*{margin:0;padding:0;box-sizing:border-box}body{background:linear-gradient(160deg,#0c0e1a 0%,#131835 40%,#1a1040 100%);min-height:100vh}@keyframes spin{to{transform:rotate(360deg)}}select option{background:#1a1040;color:#fff}</style>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{background:linear-gradient(160deg,#0c0e1a 0%,#131835 40%,#1a1040 100%);min-height:100vh}@keyframes spin{to{transform:rotate(360deg)}}select option{background:#1a1040;color:#fff}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes scaleIn{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}
+@keyframes slideRight{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
+@keyframes barGrow{from{transform:scaleX(0);transform-origin:left}to{transform:scaleX(1);transform-origin:left}}
+@keyframes dotPop{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
+.glass-card{animation:fadeUp 0.5s ease both;transition:transform 0.25s ease,box-shadow 0.25s ease}
+.glass-card:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,0.3),0 0 20px rgba(99,102,241,0.1)!important}
+.metric-card{animation:scaleIn 0.4s ease both;transition:transform 0.2s ease}
+.metric-card:hover{transform:scale(1.03)}
+.tab-btn{transition:all 0.3s cubic-bezier(0.4,0,0.2,1)!important}
+.tab-btn:hover{background:rgba(255,255,255,0.08)!important}
+.primary-btn{transition:all 0.25s ease!important}
+.primary-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(99,102,241,0.4)!important}
+.ghost-btn{transition:all 0.25s ease!important}
+.ghost-btn:hover{background:rgba(255,255,255,0.1)!important;border-color:rgba(255,255,255,0.2)!important}
+.funnel-row{animation:slideRight 0.4s ease both}
+.bubble-node{animation:dotPop 0.5s cubic-bezier(0.34,1.56,0.64,1) both}
+</style>
 </head><body><div id="root"></div>
 <script type="text/babel">
-const {useState}=React;
+const {useState,useEffect,useRef}=React;
+const AN=({value,duration=600})=>{
+  const [d,setD]=useState(value);const p=useRef(value);const r=useRef(null);
+  useEffect(()=>{const f=p.current;const t=value;p.current=value;if(f===t)return;const s=performance.now();
+    const tick=(now)=>{const pr=Math.min((now-s)/duration,1);const e=1-Math.pow(1-pr,3);setD(Math.round(f+(t-f)*e));if(pr<1)r.current=requestAnimationFrame(tick)};
+    r.current=requestAnimationFrame(tick);return()=>{if(r.current)cancelAnimationFrame(r.current)}},[value,duration]);
+  return d.toLocaleString();
+};
 const FS=[
   {key:"screens",label:"Screens",color:"#a78bfa",glow:"#a78bfa33"},
   {key:"takehomes",label:"Take Home Test",color:"#c084fc",glow:"#c084fc33"},
@@ -25,31 +51,54 @@ const IW=[{week:"2026-01-26",sends:26,rr:19.2,ar:19.2},{week:"2026-02-02",sends:
 const REC=[{name:"Connor McDermott",sends:814,rr:41.8,ar:37.6},{name:"Meghan Dwyer",sends:292,rr:32.5,ar:29.5},{name:"Matthew Grimaldi",sends:2168,rr:23.9,ar:20.9}];
 const BMR=37,BMA=33.3;
 const wl=(d)=>new Date(d+"T12:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"});
-const G=({children,style,gradient})=>React.createElement("div",{style:{background:gradient||"rgba(255,255,255,0.04)",backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:20,padding:24,...(style||{})}},children);
+const G=({children,style,gradient,className})=>React.createElement("div",{className:"glass-card "+(className||""),style:{background:gradient||"rgba(255,255,255,0.04)",backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:20,padding:24,...(style||{})}},children);
 
 function App(){
   const [tab,setTab]=useState("funnel");
   const [job,setJob]=useState("All");
+  const [chartMetric,setChartMetric]=useState("responses");
   const jobNames=Object.keys(JD).filter(k=>k!=="All"&&k!=="Unknown").sort();
   const weeks=JD[job]||JD["All"];
-  const totals={};FS.forEach(s=>{totals[s.key]=0});weeks.forEach(w=>FS.forEach(s=>{totals[s.key]+=(w[s.key]||0)}));
+  const pWeeks=weeks.length>1?weeks.slice(1):weeks;
+  const totals={};FS.forEach(s=>{totals[s.key]=0});pWeeks.forEach(w=>FS.forEach(s=>{totals[s.key]+=(w[s.key]||0)}));
   const cv=(f,t)=>totals[f]?((totals[t]/totals[f])*100).toFixed(1):"0.0";
   const tS=IW.reduce((a,w)=>a+w.sends,0);
-  const tH=weeks.reduce((a,w)=>a+(w.hires||0),0);
-  const tApps=weeks.reduce((a,w)=>a+(w.responses||0),0);
+  const [view,setView]=useState("dashboard");
+  const [importText,setImportText]=useState("");
+  const [importStatus,setImportStatus]=useState(null);
+  const [editingWeek,setEditingWeek]=useState(null);
+  const [formData,setFormData]=useState({});
+  const [confirmReset,setConfirmReset]=useState(false);
+  const tH=pWeeks.reduce((a,w)=>a+(w.hires||0),0);
+  const tApps=pWeeks.reduce((a,w)=>a+(w.responses||0),0);
   const allH=JD["All"].reduce((a,w)=>a+(w.hires||0),0);
 
+  const handleImport=()=>{try{const p=JSON.parse(importText);if(!Array.isArray(p)&&typeof p==="object"){Object.keys(p).forEach(k=>{JD[k]=p[k]});setImportStatus({ok:true,msg:"Imported "+Object.keys(p).filter(k=>k!=="All").length+" jobs"});}else if(Array.isArray(p)){JD["All"]=p;setImportStatus({ok:true,msg:"Imported "+p.length+" weeks"});}else{throw new Error("Bad format")}setTimeout(()=>{setView("dashboard");setImportStatus(null);setImportText("");setJob("All")},1200);}catch(e){setImportStatus({ok:false,msg:e.message})}};
+  const startNewWeek=()=>{const d=new Date();const diff=d.getDate()-d.getDay()+(d.getDay()===0?-6:1);const mon=new Date(d.setDate(diff)).toISOString().split("T")[0];setEditingWeek(null);setFormData({weekOf:mon,responses:0,screens:0,takehomes:0,virtuals:0,face_to_face:0,offers:0,hires:0});setView("entry")};
+  const editWeek=(i)=>{setEditingWeek(i);setFormData({...weeks[i]});setView("entry")};
+  const saveEntry=()=>{if(editingWeek!==null){weeks[editingWeek]={...formData}}else{weeks.push({...formData})}weeks.sort((a,b)=>new Date(b.weekOf)-new Date(a.weekOf));setView("dashboard")};
+  const deleteWeek=(i)=>{weeks.splice(i,1);setView("dashboard")};
+  const resetAll=()=>{if(!confirmReset){setConfirmReset(true);return}JD["All"]=[];Object.keys(JD).filter(k=>k!=="All").forEach(k=>delete JD[k]);setJob("All");setConfirmReset(false);setView("dashboard")};
+
   return React.createElement("div",{style:S.root},
-    React.createElement("div",{style:{marginBottom:28}},
-      React.createElement("h1",{style:S.title},"Flip Recruiting Pipeline"),
-      React.createElement("p",{style:S.sub},JD["All"].length+" weeks · "+tS.toLocaleString()+" InMails · "+allH+" hires")
+    React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:28,flexWrap:"wrap",gap:12,animation:"fadeIn 0.6s ease"}},
+      React.createElement("div",null,
+        React.createElement("h1",{style:S.title},"Flip Recruiting Pipeline"),
+        React.createElement("p",{style:S.sub},JD["All"].length+" weeks · "+tS.toLocaleString()+" InMails · "+allH+" hires")
+      ),
+      React.createElement("div",{style:{display:"flex",gap:10,alignItems:"center"}},
+        view==="dashboard"?React.createElement(React.Fragment,null,
+          React.createElement("button",{className:"ghost-btn",style:S.btnGhost,onClick:()=>{setView("import");setImportStatus(null);setImportText("")}},"Import"),
+          React.createElement("button",{className:"primary-btn",style:S.btnPrimary,onClick:startNewWeek},"+ Log Week")
+        ):React.createElement("button",{style:S.btnGhost,onClick:()=>setView("dashboard")},"← Back")
+      )
     ),
-    React.createElement("div",{style:S.tabBar},
-      [{id:"funnel",l:"Pipeline"},{id:"inmail",l:"InMail Analytics"},{id:"data",l:"Weekly Data"}].map(t=>React.createElement("button",{key:t.id,onClick:()=>setTab(t.id),style:{...S.tab,...(tab===t.id?S.tabOn:{})}},t.l))
+    view==="dashboard"&&React.createElement("div",{style:{...S.tabBar,animation:"fadeUp 0.5s ease 0.1s both"}},
+      [{id:"funnel",l:"Pipeline"},{id:"inmail",l:"InMail Analytics"},{id:"data",l:"Weekly Data"}].map(t=>React.createElement("button",{key:t.id,className:"tab-btn",onClick:()=>setTab(t.id),style:{...S.tab,...(tab===t.id?S.tabOn:{})}},t.l))
     ),
 
     // FUNNEL TAB
-    tab==="funnel"&&React.createElement(React.Fragment,null,
+    view==="dashboard"&&tab==="funnel"&&React.createElement(React.Fragment,null,
       // Job dropdown
       React.createElement(G,{style:{padding:"14px 20px",marginBottom:20,display:"flex",alignItems:"center",gap:14}},
         React.createElement("span",{style:{fontSize:13,color:"rgba(255,255,255,0.4)",fontFamily:"JetBrains Mono",whiteSpace:"nowrap"}},"View by job"),
@@ -59,61 +108,90 @@ function App(){
         )
       ),
       // Volume cards
-      React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:24}},
+      React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr",gap:16,marginBottom:24}},
         React.createElement(G,{gradient:"linear-gradient(135deg, rgba(124,58,237,0.35), rgba(167,139,250,0.2))",style:{padding:"28px 24px",position:"relative",overflow:"hidden"}},
           React.createElement("div",{style:{position:"absolute",top:-30,right:-30,width:120,height:120,borderRadius:"50%",background:"radial-gradient(circle, rgba(167,139,250,0.25), transparent)",filter:"blur(20px)"}}),
-          React.createElement("div",{style:{position:"relative"}},React.createElement("div",{style:{fontSize:13,color:"rgba(255,255,255,0.5)",fontWeight:500,marginBottom:8}},"Applicants"),React.createElement("div",{style:{fontSize:36,fontWeight:800,color:"#e0d4ff"}},tApps.toLocaleString()))
-        ),
-        React.createElement(G,{gradient:"linear-gradient(135deg, rgba(99,102,241,0.35), rgba(129,140,248,0.2))",style:{padding:"28px 24px",position:"relative",overflow:"hidden"}},
-          React.createElement("div",{style:{position:"absolute",top:-30,right:-30,width:120,height:120,borderRadius:"50%",background:"radial-gradient(circle, rgba(129,140,248,0.25), transparent)",filter:"blur(20px)"}}),
-          React.createElement("div",{style:{position:"relative"}},React.createElement("div",{style:{fontSize:13,color:"rgba(255,255,255,0.5)",fontWeight:500,marginBottom:8}},"InMails Sent"),React.createElement("div",{style:{fontSize:36,fontWeight:800,color:"#c7d2fe"}},tS.toLocaleString()))
+          React.createElement("div",{style:{position:"relative"}},React.createElement("div",{style:{fontSize:13,color:"rgba(255,255,255,0.5)",fontWeight:500,marginBottom:8}},"Applicants"),React.createElement("div",{style:{fontSize:36,fontWeight:800,color:"#e0d4ff"}},React.createElement(AN,{value:tApps})))
         )
       ),
       // Funnel
       React.createElement(G,{style:{marginBottom:20}},
         React.createElement("h2",{style:S.secTitle},"Pipeline Funnel"+(job!=="All"?" — "+job:"")),
         React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:16}},
-          FS.map((stage,i)=>{const mx=Math.max(...FS.map(s=>totals[s.key]||1));const pct=Math.max(((totals[stage.key]||0)/mx)*100,3);const nxt=FS[i+1];const c=nxt?cv(stage.key,nxt.key):null;
+          FS.map((stage,i)=>{const mx=Math.max(...FS.map(s=>totals[s.key]||1));const pct=Math.max(((totals[stage.key]||0)/mx)*100,3);
             return React.createElement("div",{key:stage.key,style:{display:"flex",alignItems:"center",gap:14}},
-              React.createElement("div",{style:{minWidth:140,flexShrink:0}},React.createElement("div",{style:{fontSize:12,color:"rgba(255,255,255,0.4)",fontFamily:"JetBrains Mono",marginBottom:2}},stage.label),React.createElement("div",{style:{fontSize:22,fontWeight:700,color:"#fff"}},(totals[stage.key]||0).toLocaleString())),
-              React.createElement("div",{style:{flex:1,height:28,background:"rgba(255,255,255,0.04)",borderRadius:10,overflow:"hidden"}},React.createElement("div",{style:{height:"100%",width:pct+"%",borderRadius:10,background:"linear-gradient(90deg, "+stage.color+", "+stage.color+"66)",boxShadow:"0 0 20px "+stage.glow}})),
-              c!==null?React.createElement("div",{style:S.cb},c+"%"):React.createElement("div",{style:{width:52}})
+              React.createElement("div",{style:{minWidth:140,flexShrink:0}},React.createElement("div",{style:{fontSize:12,color:"rgba(255,255,255,0.4)",fontFamily:"JetBrains Mono",marginBottom:2}},stage.label),React.createElement("div",{style:{fontSize:22,fontWeight:700,color:"#fff"}},React.createElement(AN,{value:totals[stage.key]||0}))),
+              React.createElement("div",{key:"bar-"+job+"-"+stage.key,style:{flex:1,height:28,background:"rgba(255,255,255,0.04)",borderRadius:10,overflow:"hidden"}},React.createElement("div",{style:{height:"100%",width:pct+"%",borderRadius:10,background:"linear-gradient(90deg, "+stage.color+", "+stage.color+"66)",boxShadow:"0 0 20px "+stage.glow,animation:"barGrow 0.8s ease "+(i*0.08+0.2)+"s both",transformOrigin:"left"}}))
             );
           })
         )
       ),
       // Metrics
       React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(150px, 1fr))",gap:14,marginBottom:20}},
-        [{v:tApps?Math.ceil(tApps/(tH||1)):"—",l:"Apps per Hire"},{v:cv("screens","offers")+"%",l:"Screen → Offer"},{v:cv("offers","hires")+"%",l:"Offer Accept"},{v:tH?Math.ceil(tS/tH):"—",l:"InMails / Hire"}].map((m,i)=>
-          React.createElement(G,{key:i,style:{textAlign:"center",padding:"20px 14px"}},React.createElement("div",{style:{fontSize:28,fontWeight:800,color:"#fff"}},m.v),React.createElement("div",{style:{fontSize:11,color:"rgba(255,255,255,0.35)",fontFamily:"JetBrains Mono",marginTop:4}},m.l))
+        [{v:tApps?Math.ceil(tApps/(tH||1)):"—",l:"Apps per Hire"},{v:cv("screens","offers")+"%",l:"Screen → Offer"},{v:cv("offers","hires")+"%",l:"Offer Accept"}].map((m,i)=>
+          React.createElement(G,{key:i,className:"metric-card",style:{textAlign:"center",padding:"20px 14px",animationDelay:(i*0.1+0.3)+"s"}},React.createElement("div",{style:{fontSize:28,fontWeight:800,color:"#fff"}},m.v),React.createElement("div",{style:{fontSize:11,color:"rgba(255,255,255,0.35)",fontFamily:"JetBrains Mono",marginTop:4}},m.l))
         )
       ),
-      // Chart: TH vs Virtual vs F2F vs Hires
-      weeks.length>1&&React.createElement(G,{style:{marginBottom:20}},
-        React.createElement("h2",{style:S.secTitle},"Take Home · Virtual · Face to Face · Hires"),
-        React.createElement("svg",{viewBox:"0 0 700 190",style:{width:"100%",height:"auto",display:"block"}},
-          (()=>{const sorted=[...weeks].reverse().slice(-12);const bars=[{key:"takehomes",color:"#c084fc"},{key:"virtuals",color:"#7dd3fc"},{key:"face_to_face",color:"#2dd4bf"},{key:"hires",color:"#34d399"}];const mx=Math.max(...sorted.map(w=>Math.max(...bars.map(b=>w[b.key]||0),1)));return sorted.map((w,i)=>{const gw=650/sorted.length,bw=gw*0.2,x0=35+i*gw;return React.createElement("g",{key:i},bars.map((b,j)=>{const v=w[b.key]||0,h=(v/mx)*120,bx=x0+j*(bw+1);return React.createElement("g",{key:j},React.createElement("rect",{x:bx,y:140-h,width:bw,height:Math.max(h,1),rx:3,fill:b.color,opacity:0.8}),v>0&&React.createElement("text",{x:bx+bw/2,y:140-h-5,textAnchor:"middle",fill:b.color,fontSize:7,fontFamily:"JetBrains Mono"},v))}),React.createElement("text",{x:x0+(bars.length*(bw+1))/2,y:156,textAnchor:"middle",fill:"rgba(255,255,255,0.25)",fontSize:8,fontFamily:"JetBrains Mono"},wl(w.weekOf)))})})(),
-          React.createElement("line",{x1:35,y1:140,x2:690,y2:140,stroke:"rgba(255,255,255,0.06)",strokeWidth:1})
-        ),
-        React.createElement("div",{style:{display:"flex",gap:16,justifyContent:"center",marginTop:10,flexWrap:"wrap"}},
-          [{c:"#c084fc",l:"Take Home"},{c:"#7dd3fc",l:"Virtual"},{c:"#2dd4bf",l:"Face to Face"},{c:"#34d399",l:"Hires"}].map((x,i)=>React.createElement("span",{key:i,style:S.leg},React.createElement("span",{style:{width:8,height:8,borderRadius:"50%",background:x.c,display:"inline-block"}})," ",x.l))
+      // Weekly Trend Chart
+      pWeeks.length>1&&(function(){
+        var OPTS=[{key:"responses",label:"Applicants",color:"#a78bfa"},{key:"screens",label:"Screens",color:"#c084fc"},{key:"takehomes",label:"Take Home Tests",color:"#7dd3fc"},{key:"virtuals",label:"Virtuals",color:"#2dd4bf"},{key:"hires",label:"Hires",color:"#34d399"}];
+        var opt=OPTS.find(function(o){return o.key===chartMetric})||OPTS[0];
+        var sorted=pWeeks.slice().reverse().slice(-12);
+        var vals=sorted.map(function(w){return w[opt.key]||0});
+        var mx=Math.max.apply(null,vals.concat([1]));
+        var pts=sorted.map(function(w,i){var x=55+(i/(sorted.length-1))*615;var y=160-((vals[i]/mx)*140);return{x:x,y:y}});
+        var linePath=pts.map(function(p,i){return(i===0?"M":"L")+p.x+","+p.y}).join(" ");
+        var areaPath=linePath+" L"+pts[pts.length-1].x+",160 L55,160 Z";
+        return React.createElement(G,{style:{marginBottom:20}},
+          React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}},
+            React.createElement("h2",{style:Object.assign({},S.secTitle,{margin:0})},"Weekly Trend"),
+            React.createElement("select",{value:chartMetric,onChange:function(e){setChartMetric(e.target.value)},style:{background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,padding:"7px 12px",color:"#fff",fontSize:13,fontFamily:"Plus Jakarta Sans",cursor:"pointer",appearance:"none",backgroundImage:"url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='rgba(255,255,255,0.4)' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E\")",backgroundRepeat:"no-repeat",backgroundPosition:"right 10px center",paddingRight:28}},
+              OPTS.map(function(o){return React.createElement("option",{key:o.key,value:o.key,style:{background:"#1a1040"}},o.label)})
+            )
+          ),
+          React.createElement("svg",{viewBox:"0 0 700 200",style:{width:"100%",height:"auto",display:"block"}},
+            [0,0.25,0.5,0.75,1].map(function(pct,i){var y=160-pct*140;return React.createElement("line",{key:i,x1:45,y1:y,x2:680,y2:y,stroke:"rgba(255,255,255,0.04)",strokeWidth:1})}),
+            React.createElement("defs",null,React.createElement("linearGradient",{id:"aGrad",x1:0,y1:0,x2:0,y2:1},React.createElement("stop",{offset:"0%",stopColor:opt.color,stopOpacity:0.3}),React.createElement("stop",{offset:"100%",stopColor:opt.color,stopOpacity:0.02}))),
+            React.createElement("path",{d:areaPath,fill:"url(#aGrad)"}),
+            React.createElement("path",{d:linePath,fill:"none",stroke:opt.color,strokeWidth:2.5,strokeLinecap:"round",strokeLinejoin:"round"}),
+            sorted.map(function(w,i){return React.createElement("g",{key:i},
+              React.createElement("circle",{cx:pts[i].x,cy:pts[i].y,r:4,fill:opt.color,stroke:"#0c0e1a",strokeWidth:2}),
+              React.createElement("text",{x:pts[i].x,y:pts[i].y-10,textAnchor:"middle",fill:opt.color,fontSize:9,fontWeight:700,fontFamily:"JetBrains Mono"},vals[i]),
+              React.createElement("text",{x:pts[i].x,y:178,textAnchor:"middle",fill:"rgba(255,255,255,0.2)",fontSize:8,fontFamily:"JetBrains Mono"},wl(w.weekOf))
+            )})
+          )
+        );
+      })()
+    ),
+
+    // Pipeline Speed Timeline
+    view==="dashboard"&&tab==="funnel"&&React.createElement(G,{style:{marginTop:20}},
+      React.createElement("h2",{style:S.secTitle},"Pipeline Speed — Median Days to Decision"),
+      React.createElement("div",{style:{padding:"30px 10px 20px"}},
+        React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between"}},
+          (function(){
+            var stages=[{stage:"App Review",days:1,color:"#a78bfa"},{stage:"Phone",days:8,color:"#c084fc"},{stage:"Take Home",days:14,color:"#7dd3fc"},{stage:"Virtual",days:15,color:"#2dd4bf"},{stage:"Face to Face",days:19,color:"#f0abfc"},{stage:"Offer",days:29,color:"#34d399"}];
+            var els=[];
+            stages.forEach(function(s,i){
+              els.push(React.createElement("div",{key:"b"+i,className:"bubble-node",style:{display:"flex",flexDirection:"column",alignItems:"center",flexShrink:0,animationDelay:(i*0.12+0.2)+"s"}},
+                React.createElement("div",{style:{width:64,height:64,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",background:"radial-gradient(circle at 35% 25%, "+s.color+"40, "+s.color+"15 60%, "+s.color+"08)",border:"1.5px solid "+s.color+"44",boxShadow:"0 0 24px "+s.color+"20, inset 0 0 16px "+s.color+"10"}},
+                  React.createElement("span",{style:{fontSize:18,fontWeight:800,color:"#fff",fontFamily:"JetBrains Mono",textShadow:"0 0 10px "+s.color+"55"}},s.days+"d")
+                ),
+                React.createElement("div",{style:{fontSize:11,fontWeight:600,color:"rgba(255,255,255,0.5)",textAlign:"center",marginTop:10,letterSpacing:"0.02em"}},s.stage)
+              ));
+              if(i<stages.length-1){
+                els.push(React.createElement("div",{key:"l"+i,style:{flex:1,height:2,borderRadius:1,background:"linear-gradient(90deg, "+s.color+"44, "+stages[i+1].color+"44)",margin:"0 -4px",alignSelf:"center",marginBottom:20}}));
+              }
+            });
+            return els;
+          })()
         )
       ),
-      // Chart: Screens → Take-Homes → Offers
-      weeks.length>1&&React.createElement(G,null,
-        React.createElement("h2",{style:S.secTitle},"Screens → Take-Homes → Offers"),
-        React.createElement("svg",{viewBox:"0 0 700 180",style:{width:"100%",height:"auto",display:"block"}},
-          (()=>{const sorted=[...weeks].reverse().slice(-12);const mx=Math.max(...sorted.map(w=>Math.max(w.screens||0,w.takehomes||0,w.offers||0,1)));return sorted.map((w,i)=>{const gw=650/sorted.length,bw=gw*0.25,x=35+i*gw;const sH=((w.screens||0)/mx)*110,tH=((w.takehomes||0)/mx)*110,oH=((w.offers||0)/mx)*110;return React.createElement("g",{key:i},React.createElement("rect",{x:x,y:130-sH,width:bw,height:sH,rx:3,fill:"#a78bfa",opacity:0.8}),React.createElement("rect",{x:x+bw+1,y:130-tH,width:bw,height:tH,rx:3,fill:"#c084fc",opacity:0.8}),React.createElement("rect",{x:x+(bw+1)*2,y:130-oH,width:bw,height:Math.max(oH,1),rx:3,fill:"#f0abfc",opacity:0.8}),React.createElement("text",{x:x+bw/2,y:130-sH-4,textAnchor:"middle",fill:"#c4b5fd",fontSize:7,fontFamily:"JetBrains Mono"},w.screens),React.createElement("text",{x:x+bw*1.5+1,y:145,textAnchor:"middle",fill:"rgba(255,255,255,0.25)",fontSize:8,fontFamily:"JetBrains Mono"},wl(w.weekOf)))})})(),
-          React.createElement("line",{x1:35,y1:130,x2:690,y2:130,stroke:"rgba(255,255,255,0.06)",strokeWidth:1})
-        ),
-        React.createElement("div",{style:{display:"flex",gap:16,justifyContent:"center",marginTop:10}},
-          [{c:"#a78bfa",l:"Screens"},{c:"#c084fc",l:"Take-Homes"},{c:"#f0abfc",l:"Offers"}].map((x,i)=>React.createElement("span",{key:i,style:S.leg},React.createElement("span",{style:{width:8,height:8,borderRadius:"50%",background:x.c,display:"inline-block"}})," ",x.l))
-        )
-      )
+      React.createElement("div",{style:{textAlign:"center",marginTop:4,fontSize:11,color:"rgba(255,255,255,0.2)",fontFamily:"JetBrains Mono"}},"Median days from application to rejection at each stage")
     ),
 
     // INMAIL TAB
-    tab==="inmail"&&React.createElement(React.Fragment,null,
+    view==="dashboard"&&tab==="inmail"&&React.createElement(React.Fragment,null,
       React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(150px, 1fr))",gap:14,marginBottom:20}},
         React.createElement(G,{gradient:"linear-gradient(135deg, rgba(99,102,241,0.3), rgba(129,140,248,0.15))",style:{textAlign:"center",padding:"20px 14px"}},React.createElement("div",{style:{fontSize:28,fontWeight:800,color:"#c7d2fe"}},tS.toLocaleString()),React.createElement("div",{style:S.kl},"InMails Sent")),
         React.createElement(G,{gradient:"linear-gradient(135deg, rgba(129,140,248,0.25), transparent)",style:{textAlign:"center",padding:"20px 14px"}},React.createElement("div",{style:{fontSize:28,fontWeight:800,color:"#c7d2fe"}},"29.1%"),React.createElement("div",{style:S.kl},"Response Rate"),React.createElement("div",{style:{fontSize:9,color:"#f59e0b",marginTop:3,fontFamily:"JetBrains Mono"}},"Benchmark: 37%")),
@@ -150,21 +228,62 @@ function App(){
     ),
 
     // DATA TAB
-    tab==="data"&&React.createElement(G,null,
-      React.createElement("h2",{style:S.secTitle},"Weekly Data"+(job!=="All"?" — "+job:"")),
+    view==="dashboard"&&tab==="data"&&React.createElement(G,null,
+      React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:18}},
+        React.createElement("h2",{style:{...S.secTitle,margin:0}},"Weekly Data"+(job!=="All"?" — "+job:"")),
+        React.createElement("button",{style:{background:confirmReset?"rgba(248,113,113,0.35)":"rgba(248,113,113,0.15)",color:"#fca5a5",border:"1px solid rgba(248,113,113,0.2)",borderRadius:8,padding:"5px 14px",fontSize:12,cursor:"pointer",fontFamily:"JetBrains Mono"},onClick:resetAll},confirmReset?"Confirm Reset?":"Reset")
+      ),
       React.createElement("div",{style:{overflowX:"auto"}},
         React.createElement("table",{style:{width:"100%",borderCollapse:"collapse",fontSize:13}},
           React.createElement("thead",null,React.createElement("tr",null,
             React.createElement("th",{style:S.th},"Week"),
-            ["Apps","Screens","Take Home","Virtual","F2F","Offers","Hires"].map(h=>React.createElement("th",{key:h,style:S.th},h))
+            ["Apps","Screens","Take Home","Virtual","F2F","Offers","Hires"].map(h=>React.createElement("th",{key:h,style:S.th},h)),
+            React.createElement("th",{style:S.th},"")
           )),
           React.createElement("tbody",null,weeks.map((w,i)=>
             React.createElement("tr",{key:i,style:{background:i%2===0?"rgba(255,255,255,0.02)":"transparent"}},
               React.createElement("td",{style:S.td},wl(w.weekOf)),
-              [w.responses,w.screens,w.takehomes,w.virtuals,w.face_to_face,w.offers,w.hires].map((v,j)=>React.createElement("td",{key:j,style:{...S.td,textAlign:"center",fontFamily:"JetBrains Mono"}},v||0))
+              [w.responses,w.screens,w.takehomes,w.virtuals,w.face_to_face,w.offers,w.hires].map((v,j)=>React.createElement("td",{key:j,style:{...S.td,textAlign:"center",fontFamily:"JetBrains Mono"}},v||0)),
+              React.createElement("td",{style:S.td},
+                React.createElement("button",{style:{background:"transparent",border:"none",cursor:"pointer",fontSize:14,padding:"2px 4px"},onClick:()=>editWeek(i)},"✏️"),
+                React.createElement("button",{style:{background:"transparent",border:"none",cursor:"pointer",fontSize:14,padding:"2px 4px"},onClick:()=>deleteWeek(i)},"🗑")
+              )
             )
           ))
         )
+      )
+    ),
+
+    // IMPORT VIEW
+    view==="import"&&React.createElement(G,null,
+      React.createElement("h2",{style:S.secTitle},"Import Data"),
+      React.createElement("p",{style:{color:"rgba(255,255,255,0.4)",fontSize:13,marginBottom:16,lineHeight:1.6}},"Paste JSON from ",React.createElement("span",{style:{fontFamily:"JetBrains Mono",color:"#a5b4fc"}},"greenhouse_pipeline.py")),
+      React.createElement("textarea",{value:importText,onChange:e=>setImportText(e.target.value),placeholder:'{\n  "All": [{ "weekOf": "2026-04-14", ... }],\n  "Job Name": [...]\n}',style:S.textarea}),
+      importStatus&&React.createElement("div",{style:{marginTop:12,padding:"12px 16px",borderRadius:12,background:importStatus.ok?"rgba(52,211,153,0.15)":"rgba(248,113,113,0.15)",color:importStatus.ok?"#6ee7b7":"#fca5a5",fontSize:13,fontFamily:"JetBrains Mono"}},importStatus.msg),
+      React.createElement("div",{style:{display:"flex",gap:12,marginTop:18}},
+        React.createElement("button",{style:S.btnPrimary,onClick:handleImport},"Import"),
+        React.createElement("button",{style:S.btnGhost,onClick:()=>setView("dashboard")},"Cancel")
+      )
+    ),
+
+    // ENTRY VIEW
+    view==="entry"&&React.createElement(G,null,
+      React.createElement("h2",{style:S.secTitle},editingWeek!==null?"Edit Week":"Log New Week"),
+      React.createElement("div",{style:{marginBottom:20}},
+        React.createElement("label",{style:{display:"block",fontSize:12,color:"rgba(255,255,255,0.4)",marginBottom:6,fontFamily:"JetBrains Mono",textTransform:"uppercase"}},"Week Starting"),
+        React.createElement("input",{type:"date",value:formData.weekOf||"",onChange:e=>setFormData({...formData,weekOf:e.target.value}),style:S.dateInput})
+      ),
+      React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(150px, 1fr))",gap:12}},
+        [{key:"responses",label:"Applicants"},{key:"screens",label:"Screens"},{key:"takehomes",label:"Take Home"},{key:"virtuals",label:"Virtual"},{key:"face_to_face",label:"Face to Face"},{key:"offers",label:"Offers"},{key:"hires",label:"Hires"}].map(s=>
+          React.createElement("div",{key:s.key,style:{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.06)",borderRadius:14,padding:14}},
+            React.createElement("div",{style:{fontSize:12,fontWeight:600,color:"rgba(255,255,255,0.5)",marginBottom:8}},s.label),
+            React.createElement("input",{type:"number",min:"0",value:formData[s.key]||0,onChange:e=>setFormData({...formData,[s.key]:parseInt(e.target.value)||0}),style:S.numInput})
+          )
+        )
+      ),
+      React.createElement("div",{style:{display:"flex",gap:12,marginTop:24}},
+        React.createElement("button",{style:S.btnPrimary,onClick:saveEntry},editingWeek!==null?"Update":"Save"),
+        React.createElement("button",{style:S.btnGhost,onClick:()=>setView("dashboard")},"Cancel")
       )
     ),
 
@@ -185,6 +304,11 @@ const S={
   leg:{display:"flex",alignItems:"center",gap:6,fontSize:11,color:"rgba(255,255,255,0.35)",fontFamily:"JetBrains Mono"},
   th:{textAlign:"left",padding:"10px",borderBottom:"1px solid rgba(255,255,255,0.06)",color:"rgba(255,255,255,0.3)",fontSize:10,fontFamily:"JetBrains Mono",textTransform:"uppercase"},
   td:{padding:"10px",borderBottom:"1px solid rgba(255,255,255,0.03)",color:"rgba(255,255,255,0.7)",fontSize:13},
+  btnPrimary:{background:"linear-gradient(135deg, #6366f1, #8b5cf6, #a78bfa)",color:"#fff",border:"none",borderRadius:12,padding:"11px 24px",fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"Plus Jakarta Sans",boxShadow:"0 4px 20px rgba(99,102,241,0.3)"},
+  btnGhost:{background:"rgba(255,255,255,0.06)",color:"rgba(255,255,255,0.6)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:12,padding:"11px 24px",fontSize:14,cursor:"pointer",fontFamily:"Plus Jakarta Sans"},
+  textarea:{width:"100%",minHeight:180,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:12,padding:16,color:"#fff",fontSize:13,fontFamily:"JetBrains Mono",resize:"vertical",boxSizing:"border-box"},
+  dateInput:{background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:10,padding:"11px 16px",color:"#fff",fontSize:14,fontFamily:"JetBrains Mono",width:200},
+  numInput:{width:"100%",background:"rgba(255,255,255,0.04)",border:"2px solid rgba(255,255,255,0.08)",borderRadius:10,padding:"10px 12px",color:"#fff",fontSize:22,fontWeight:700,fontFamily:"JetBrains Mono",textAlign:"center",boxSizing:"border-box"},
 };
 ReactDOM.render(React.createElement(App),document.getElementById("root"));
 </script></body></html>
