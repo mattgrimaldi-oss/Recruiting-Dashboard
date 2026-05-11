@@ -103,7 +103,6 @@ module.exports = async (req, res) => {
   }
 
   const tmplSigners = tmplResp.body.signers || [];
-  console.log('Template signers:', JSON.stringify(tmplSigners.map(s => ({ roleName: s.roleName, name: s.name, recipientId: s.recipientId, hasTabs: !!s.tabs }))));
   const candidateSigner = tmplSigners.find(s => s.roleName === 'candidate' || s.name === 'candidate');
   const ceoSigner = tmplSigners.find(s => s.roleName === 'ceo' || s.name === 'ceo');
 
@@ -119,10 +118,8 @@ module.exports = async (req, res) => {
     return remapped;
   }
 
-  console.log('CEO template tabs:', JSON.stringify(ceoSigner?.tabs));
   const candidateTabs = remapTabs(candidateSigner?.tabs, '1');
   const ceoTabs = remapTabs(ceoSigner?.tabs, '2');
-  console.log('CEO remapped tabs:', JSON.stringify(ceoTabs));
 
   const envelopeResp = await httpsPost(DOCUSIGN_BASE_URL, `${apiBase}/envelopes`, authHeader, {
     emailSubject: `Action Required: Offer Letter for ${candidateName} — Flip CX`,
