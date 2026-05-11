@@ -3,24 +3,26 @@
     "jobId": "4462684008",
     "jobName": "Account Executive",
     "criteria": [
-      { "key": "sales_experience",    "label": "Sales Experience",    "detail": "At least 1 year as an Account Executive OR at least 3 years as a BDR/SDR. SaaS experience preferred.", "required": true },
-      { "key": "startup_experience",  "label": "Startup Background",  "detail": "At least one employer was a startup or company with under 200 employees. Ideally 10–100 employees.", "required": true },
-      { "key": "education",           "label": "Education",           "detail": "Note whether they have a bachelor's degree and when they graduated.", "required": false },
-      { "key": "quota_attainment",    "label": "Quota Attainment",    "detail": "Resume explicitly mentions exceeding quota (e.g. '130% of quota', 'exceeded targets', '#1 rep').", "required": true },
-      { "key": "employment_recency",  "label": "Employment Recency",  "detail": "Currently employed OR most recent role ended within 2 months of today. Year-only end dates (e.g. '2025') are treated as December of that year.", "required": true }
-    ],
-    "bonus": []
+      { "key": "sales_experience",   "label": "Sales Experience",   "detail": "At least 1 year as an Account Executive OR at least 3 years as a BDR/SDR. SaaS experience preferred.", "status": "required" },
+      { "key": "startup_experience", "label": "Startup Background", "detail": "At least one employer was a startup or company with under 200 employees. Ideally 10–100 employees.", "status": "required" },
+      { "key": "education",          "label": "Education",          "detail": "Note whether they have a bachelor's degree and when they graduated.", "status": "not_required" },
+      { "key": "quota_attainment",   "label": "Quota Attainment",   "detail": "Resume explicitly mentions exceeding quota (e.g. '130% of quota', 'exceeded targets', '#1 rep').", "status": "required" },
+      { "key": "employment_recency", "label": "Employment Recency", "detail": "Currently employed OR most recent role ended within 2 months of today. Year-only end dates are treated as December of that year.", "status": "required" }
+    ]
   },
   "swe": {
     "jobId": "4203780008",
     "jobName": "Software Engineer",
     "criteria": [
-      { "key": "engineering_experience", "label": "Engineering Experience", "detail": "7+ years of full stack engineering experience. SaaS experience preferred.", "required": true },
-      { "key": "startup_experience",     "label": "Startup Background",     "detail": "At least one employer was a startup or company with under 200 employees. Ideally 10–100 employees.", "required": true },
-      { "key": "education",              "label": "Education",              "detail": "Bachelor's degree in Computer Science, Information Management Systems, Applied Math, or a related technical/CS field. Must have graduated in 2018 or earlier.", "required": true },
-      { "key": "python",                 "label": "Python",                 "detail": "Python must explicitly appear on the resume as a language they have used.", "required": true },
-      { "key": "employment_recency",     "label": "Employment Recency",     "detail": "Currently employed OR most recent role ended within 2 months of today. Year-only end dates (e.g. '2025') are treated as December of that year.", "required": true }
-    ],
-    "bonus": ["React", "AWS", "AI / voice AI experience", "Prestigious university (top 50 US)"]
+      { "key": "engineering_experience", "label": "Engineering Experience",       "detail": "7+ years of full stack engineering experience. SaaS experience preferred.", "status": "required" },
+      { "key": "startup_experience",     "label": "Startup Background",           "detail": "At least one employer was a startup or company with under 200 employees. Ideally 10–100 employees.", "status": "required" },
+      { "key": "education",              "label": "Education",                    "detail": "Bachelor's degree in Computer Science, Information Management Systems, Applied Math, or a related technical/CS field. Must have graduated in 2018 or earlier.", "status": "required" },
+      { "key": "python",                 "label": "Python",                       "detail": "Python must explicitly appear on the resume as a language they have used.", "status": "required" },
+      { "key": "employment_recency",     "label": "Employment Recency",           "detail": "Currently employed OR most recent role ended within 2 months of today. Year-only end dates are treated as December of that year.", "status": "required" },
+      { "key": "react",                  "label": "React",                        "detail": "React experience noted on resume.", "status": "bonus" },
+      { "key": "aws",                    "label": "AWS",                          "detail": "AWS experience noted on resume.", "status": "bonus" },
+      { "key": "ai_experience",          "label": "AI / Voice AI Experience",     "detail": "Experience at an AI product or AI SaaS company, or voice AI / speech tech experience.", "status": "bonus" },
+      { "key": "prestigious_university", "label": "Prestigious University",       "detail": "Attended a top 50 US university.", "status": "bonus" }
+    ]
   }
 }

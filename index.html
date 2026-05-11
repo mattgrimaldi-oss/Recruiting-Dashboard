@@ -905,69 +905,106 @@ window.getPdfBase64 = async function() {
       );
     }
 
+    const PILL_CYCLE = { required: "bonus", bonus: "not_required", not_required: "required" };
+    const PILL_LABEL  = { required: "REQUIRED", bonus: "BONUS", not_required: "NOT REQUIRED" };
+    const PILL_STYLE  = {
+      required:    { bg: "rgba(98,13,236,0.25)",   color: "#a78bfa", border: "1px solid rgba(98,13,236,0.4)" },
+      bonus:       { bg: "rgba(125,211,252,0.15)",  color: "#7dd3fc", border: "1px solid rgba(125,211,252,0.3)" },
+      not_required:{ bg: "rgba(255,255,255,0.08)",  color: "rgba(255,255,255,0.4)", border: "1px solid rgba(255,255,255,0.1)" },
+    };
+
+    const RoleCard = React.memo(function RoleCard({ roleKey, roleConfig, editing, inputStyle, onToggle, onLabelChange, onDetailChange }) {
+      return (
+        <Glass style={{ flex: 1, minWidth: 280 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+            <span style={{ fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 700, fontSize: 15, color: "#fff" }}>{roleConfig.jobName}</span>
+            <a href={"https://app8.greenhouse.io/sdash/" + roleConfig.jobId} target="_blank" rel="noreferrer"
+              style={{ fontSize: 12, color: "#a78bfa", fontFamily: "JetBrains Mono", textDecoration: "none" }}>
+              Greenhouse ↗
+            </a>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {roleConfig.criteria.map((c, i) => {
+              const ps = PILL_STYLE[c.status] || PILL_STYLE.not_required;
+              return (
+                <div key={c.key} style={{ padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+                    <span
+                      onClick={() => editing && onToggle(roleKey, i)}
+                      style={{
+                        fontSize: 10, fontFamily: "JetBrains Mono", fontWeight: 700,
+                        padding: "2px 8px", borderRadius: 20, letterSpacing: "0.06em",
+                        background: ps.bg, color: ps.color, border: ps.border,
+                        flexShrink: 0, userSelect: "none",
+                        cursor: editing ? "pointer" : "default",
+                        whiteSpace: "nowrap",
+                      }}
+                    >{PILL_LABEL[c.status] || "NOT REQUIRED"}</span>
+                    <div style={{ flex: 1 }}>
+                      {editing ? (
+                        <>
+                          <input value={c.label} onChange={e => onLabelChange(roleKey, i, e.target.value)}
+                            style={{ ...inputStyle, fontWeight: 600, marginBottom: 6 }} />
+                          <textarea value={c.detail} onChange={e => onDetailChange(roleKey, i, e.target.value)}
+                            rows={2} style={{ ...inputStyle, resize: "vertical", lineHeight: 1.5 }} />
+                        </>
+                      ) : (
+                        <>
+                          <div style={{ fontWeight: 600, fontSize: 13, color: "rgba(255,255,255,0.9)", marginBottom: 2 }}>{c.label}</div>
+                          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", lineHeight: 1.5 }}>{c.detail}</div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </Glass>
+      );
+    });
+
     function ScreeningTab() {
       const [criteria, setCriteria] = React.useState(null);
       const [sha, setSha] = React.useState(null);
       const [editing, setEditing] = React.useState(false);
       const [draft, setDraft] = React.useState(null);
-      const [saveStatus, setSaveStatus] = React.useState(null); // null | "saving" | "saved" | "error"
+      const [saveStatus, setSaveStatus] = React.useState(null);
       const [triggerStatus, setTriggerStatus] = React.useState(null);
       const [lastRun, setLastRun] = React.useState(null);
 
       React.useEffect(() => {
-        fetch("/api/criteria")
-          .then(r => r.json())
-          .then(d => { setCriteria(d.criteria); setSha(d.sha); })
-          .catch(() => {});
-        fetch("/api/trigger-screening")
-          .then(r => r.json())
-          .then(d => { if (d.lastRun) setLastRun(d.lastRun); })
-          .catch(() => {});
+        fetch("/api/criteria").then(r => r.json()).then(d => { setCriteria(d.criteria); setSha(d.sha); }).catch(() => {});
+        fetch("/api/trigger-screening").then(r => r.json()).then(d => { if (d.lastRun) setLastRun(d.lastRun); }).catch(() => {});
       }, []);
 
-      function startEdit() {
-        setDraft(JSON.parse(JSON.stringify(criteria)));
-        setEditing(true);
-        setSaveStatus(null);
-      }
+      function startEdit() { setDraft(JSON.parse(JSON.stringify(criteria))); setEditing(true); setSaveStatus(null); }
+      function cancelEdit() { setEditing(false); setDraft(null); setSaveStatus(null); }
 
-      function cancelEdit() {
-        setEditing(false);
-        setDraft(null);
-        setSaveStatus(null);
-      }
-
-      function updateCriterion(roleKey, idx, field, value) {
+      const handleToggle = React.useCallback((roleKey, idx) => {
         setDraft(prev => {
           const next = JSON.parse(JSON.stringify(prev));
-          next[roleKey].criteria[idx][field] = value;
+          const cur = next[roleKey].criteria[idx].status || "required";
+          next[roleKey].criteria[idx].status = PILL_CYCLE[cur] || "required";
           return next;
         });
-      }
+      }, []);
 
-      function updateBonus(roleKey, idx, value) {
+      const handleLabelChange = React.useCallback((roleKey, idx, value) => {
         setDraft(prev => {
           const next = JSON.parse(JSON.stringify(prev));
-          next[roleKey].bonus[idx] = value;
+          next[roleKey].criteria[idx].label = value;
           return next;
         });
-      }
+      }, []);
 
-      function addBonus(roleKey) {
+      const handleDetailChange = React.useCallback((roleKey, idx, value) => {
         setDraft(prev => {
           const next = JSON.parse(JSON.stringify(prev));
-          next[roleKey].bonus = [...(next[roleKey].bonus || []), "New signal"];
+          next[roleKey].criteria[idx].detail = value;
           return next;
         });
-      }
-
-      function removeBonus(roleKey, idx) {
-        setDraft(prev => {
-          const next = JSON.parse(JSON.stringify(prev));
-          next[roleKey].bonus.splice(idx, 1);
-          return next;
-        });
-      }
+      }, []);
 
       async function saveCriteria() {
         setSaveStatus("saving");
@@ -978,19 +1015,9 @@ window.getPdfBase64 = async function() {
             body: JSON.stringify({ criteria: draft, sha }),
           });
           const d = await r.json();
-          if (r.ok) {
-            setCriteria(draft);
-            setSha(d.sha);
-            setEditing(false);
-            setDraft(null);
-            setSaveStatus("saved");
-            setTimeout(() => setSaveStatus(null), 3000);
-          } else {
-            setSaveStatus("error");
-          }
-        } catch {
-          setSaveStatus("error");
-        }
+          if (r.ok) { setCriteria(draft); setSha(d.sha); setEditing(false); setDraft(null); setSaveStatus("saved"); setTimeout(() => setSaveStatus(null), 3000); }
+          else setSaveStatus("error");
+        } catch { setSaveStatus("error"); }
       }
 
       async function trigger() {
@@ -1011,100 +1038,8 @@ window.getPdfBase64 = async function() {
         fontFamily: "Plus Jakarta Sans, sans-serif", outline: "none", width: "100%",
       };
 
-      const pill = (required) => ({
-        fontSize: 10, fontFamily: "JetBrains Mono", fontWeight: 700,
-        padding: "2px 8px", borderRadius: 20, letterSpacing: "0.06em", cursor: editing ? "pointer" : "default",
-        background: required ? "rgba(98,13,236,0.25)" : "rgba(255,255,255,0.08)",
-        color: required ? "#a78bfa" : "rgba(255,255,255,0.4)",
-        border: required ? "1px solid rgba(98,13,236,0.4)" : "1px solid rgba(255,255,255,0.1)",
-        flexShrink: 0, userSelect: "none",
-        transition: "all 0.2s",
-      });
-
-      function RoleCard({ roleKey, roleConfig }) {
-        return (
-          <Glass style={{ flex: 1, minWidth: 280 }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-              <span style={{ fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 700, fontSize: 15, color: "#fff" }}>{roleConfig.jobName}</span>
-              <a href={"https://app8.greenhouse.io/sdash/" + roleConfig.jobId} target="_blank" rel="noreferrer"
-                style={{ fontSize: 12, color: "#a78bfa", fontFamily: "JetBrains Mono", textDecoration: "none" }}>
-                Greenhouse ↗
-              </a>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {roleConfig.criteria.map((c, i) => (
-                <div key={i} style={{ padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                  <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-                    <span
-                      style={pill(c.required)}
-                      onClick={() => editing && updateCriterion(roleKey, i, "required", !c.required)}
-                      title={editing ? "Click to toggle required/informational" : ""}
-                    >
-                      {c.required ? "REQUIRED" : "INFO"}
-                    </span>
-                    <div style={{ flex: 1 }}>
-                      {editing ? (
-                        <>
-                          <input
-                            value={c.label}
-                            onChange={e => updateCriterion(roleKey, i, "label", e.target.value)}
-                            style={{ ...inputStyle, fontWeight: 600, marginBottom: 6 }}
-                          />
-                          <textarea
-                            value={c.detail}
-                            onChange={e => updateCriterion(roleKey, i, "detail", e.target.value)}
-                            rows={2}
-                            style={{ ...inputStyle, resize: "vertical", lineHeight: 1.5 }}
-                          />
-                        </>
-                      ) : (
-                        <>
-                          <div style={{ fontWeight: 600, fontSize: 13, color: "rgba(255,255,255,0.9)", marginBottom: 2 }}>{c.label}</div>
-                          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", lineHeight: 1.5 }}>{c.detail}</div>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-
-              {/* Bonus signals */}
-              {(roleConfig.bonus?.length > 0 || editing) && (
-                <div style={{ marginTop: 4, padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                  <div style={{ fontWeight: 600, fontSize: 13, color: "rgba(255,255,255,0.9)", marginBottom: 8 }}>
-                    Bonus Signals <span style={{ fontWeight: 400, fontSize: 11, color: "rgba(255,255,255,0.4)" }}>(informational)</span>
-                  </div>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                    {(roleConfig.bonus || []).map((b, i) => editing ? (
-                      <div key={i} style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                        <input
-                          value={b}
-                          onChange={e => updateBonus(roleKey, i, e.target.value)}
-                          style={{ ...inputStyle, width: 140 }}
-                        />
-                        <button onClick={() => removeBonus(roleKey, i)}
-                          style={{ background: "none", border: "none", color: "rgba(255,100,100,0.7)", cursor: "pointer", fontSize: 14, padding: "0 4px" }}>×</button>
-                      </div>
-                    ) : (
-                      <span key={i} style={{ fontSize: 11, fontFamily: "JetBrains Mono", padding: "3px 10px", borderRadius: 20, background: "rgba(125,211,252,0.1)", color: "#7dd3fc", border: "1px solid rgba(125,211,252,0.2)" }}>{b}</span>
-                    ))}
-                    {editing && (
-                      <button onClick={() => addBonus(roleKey)}
-                        style={{ fontSize: 11, padding: "3px 10px", borderRadius: 20, background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.5)", border: "1px dashed rgba(255,255,255,0.2)", cursor: "pointer" }}>
-                        + Add
-                      </button>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          </Glass>
-        );
-      }
-
       return (
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-          {/* Header */}
           <Glass style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
             <div>
               <div style={{ fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 700, fontSize: 17, color: "#fff", marginBottom: 4 }}>Candidate Screening</div>
@@ -1114,12 +1049,8 @@ window.getPdfBase64 = async function() {
               </div>
             </div>
             <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-              {saveStatus === "saved" && (
-                <span style={{ fontSize: 12, color: "#34d399", fontFamily: "JetBrains Mono" }}>✓ Criteria saved</span>
-              )}
-              {saveStatus === "error" && (
-                <span style={{ fontSize: 12, color: "#fca5a5", fontFamily: "JetBrains Mono" }}>Save failed — try again</span>
-              )}
+              {saveStatus === "saved" && <span style={{ fontSize: 12, color: "#34d399", fontFamily: "JetBrains Mono" }}>✓ Criteria saved</span>}
+              {saveStatus === "error" && <span style={{ fontSize: 12, color: "#fca5a5", fontFamily: "JetBrains Mono" }}>Save failed — try again</span>}
               {editing ? (
                 <>
                   <button onClick={cancelEdit} className="ghost-btn"
@@ -1146,13 +1077,21 @@ window.getPdfBase64 = async function() {
             </div>
           </Glass>
 
-          {/* Criteria cards */}
           {!display ? (
             <Glass><div style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, fontFamily: "JetBrains Mono" }}>Loading criteria…</div></Glass>
           ) : (
             <div style={{ display: "flex", gap: 20, flexWrap: "wrap", alignItems: "flex-start" }}>
               {Object.entries(display).map(([roleKey, roleConfig]) => (
-                <RoleCard key={roleKey} roleKey={roleKey} roleConfig={roleConfig} />
+                <RoleCard
+                  key={roleKey}
+                  roleKey={roleKey}
+                  roleConfig={roleConfig}
+                  editing={editing}
+                  inputStyle={inputStyle}
+                  onToggle={handleToggle}
+                  onLabelChange={handleLabelChange}
+                  onDetailChange={handleDetailChange}
+                />
               ))}
             </div>
           )}
