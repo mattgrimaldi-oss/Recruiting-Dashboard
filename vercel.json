@@ -4,21 +4,13 @@
     "api/chat.js": { "maxDuration": 60 },
     "api/test-resume.js": { "maxDuration": 60 },
     "api/check-candidates-ae.js": { "maxDuration": 60 },
-    "api/check-candidates-swe.js": { "maxDuration": 60 },
-    "api/screening-results.js": { "maxDuration": 10 },
-    "api/trigger-screening.js": { "maxDuration": 10 },
-    "api/get-criteria.js": { "maxDuration": 10 },
-    "api/save-criteria.js": { "maxDuration": 10 }
+    "api/check-candidates-swe.js": { "maxDuration": 60 }
   },
   "routes": [
     { "src": "/api/send-to-docusign", "dest": "/api/send-to-docusign.js", "methods": ["POST", "OPTIONS"] },
     { "src": "/api/chat", "dest": "/api/chat.js", "methods": ["POST", "OPTIONS"] },
     { "src": "/api/test-resume", "dest": "/api/test-resume.js", "methods": ["GET", "OPTIONS"] },
     { "src": "/api/check-candidates-ae", "dest": "/api/check-candidates-ae.js", "methods": ["GET", "OPTIONS"] },
-    { "src": "/api/check-candidates-swe", "dest": "/api/check-candidates-swe.js", "methods": ["GET", "OPTIONS"] },
-    { "src": "/api/screening-results", "dest": "/api/screening-results.js", "methods": ["GET", "OPTIONS"] },
-    { "src": "/api/trigger-screening", "dest": "/api/trigger-screening.js", "methods": ["POST", "OPTIONS"] },
-    { "src": "/api/get-criteria", "dest": "/api/get-criteria.js", "methods": ["GET", "OPTIONS"] },
-    { "src": "/api/save-criteria", "dest": "/api/save-criteria.js", "methods": ["POST", "OPTIONS"] }
+    { "src": "/api/check-candidates-swe", "dest": "/api/check-candidates-swe.js", "methods": ["GET", "OPTIONS"] }
   ]
 }

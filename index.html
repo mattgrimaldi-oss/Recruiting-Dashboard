@@ -69,20 +69,6 @@ function App(){
   const [editingWeek,setEditingWeek]=useState(null);
   const [formData,setFormData]=useState({});
   const [confirmReset,setConfirmReset]=useState(false);
-  const [screeningResults,setScreeningResults]=useState(null);
-  const [criteriaData,setCriteriaData]=useState(null);
-  const [criteriaTab,setCriteriaTab]=useState("ae");
-  const [criteriaEditing,setCriteriaEditing]=useState({});
-  const [criteriaSaving,setCriteriaSaving]=useState(false);
-  const [criteriaSuccess,setCriteriaSuccess]=useState(false);
-  const [triggerStatus,setTriggerStatus]=useState(null);
-  useEffect(()=>{
-    if(tab!=="screening")return;
-    fetch("/api/screening-results").then(r=>r.json()).then(d=>setScreeningResults(d)).catch(()=>{});
-    fetch("/api/get-criteria").then(r=>r.json()).then(d=>{setCriteriaData(d);const e={};Object.entries(d).forEach(([rk,rc])=>{e[rk]={};rc.criteria.forEach(c=>{e[rk][c.key]=c.description});});setCriteriaEditing(e);}).catch(()=>{});
-  },[tab]);
-  const triggerScreening=async()=>{setTriggerStatus("running");try{const r=await fetch("/api/trigger-screening",{method:"POST"});setTriggerStatus(r.ok?"done":"error");}catch{setTriggerStatus("error");}setTimeout(()=>setTriggerStatus(null),6000);};
-  const saveCriteria=async()=>{setCriteriaSaving(true);try{const updated=JSON.parse(JSON.stringify(criteriaData));Object.entries(criteriaEditing).forEach(([rk,edits])=>{if(updated[rk])updated[rk].criteria=updated[rk].criteria.map(c=>({...c,description:edits[c.key]??c.description}));});const r=await fetch("/api/save-criteria",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(updated)});if(r.ok){setCriteriaData(updated);setCriteriaSuccess(true);setTimeout(()=>setCriteriaSuccess(false),3000);}}catch{}setCriteriaSaving(false);};
   const tH=pWeeks.reduce((a,w)=>a+(w.hires||0),0);
   const tApps=pWeeks.reduce((a,w)=>a+(w.responses||0),0);
   const allH=JD["All"].reduce((a,w)=>a+(w.hires||0),0);
@@ -108,7 +94,7 @@ function App(){
       )
     ),
     view==="dashboard"&&React.createElement("div",{style:{...S.tabBar,animation:"fadeUp 0.5s ease 0.1s both"}},
-      [{id:"funnel",l:"Pipeline"},{id:"inmail",l:"InMail Analytics"},{id:"data",l:"Weekly Data"},{id:"screening",l:"Candidate Screening"}].map(t=>React.createElement("button",{key:t.id,className:"tab-btn",onClick:()=>setTab(t.id),style:{...S.tab,...(tab===t.id?S.tabOn:{})}},t.l))
+      [{id:"funnel",l:"Pipeline"},{id:"inmail",l:"InMail Analytics"},{id:"data",l:"Weekly Data"}].map(t=>React.createElement("button",{key:t.id,className:"tab-btn",onClick:()=>setTab(t.id),style:{...S.tab,...(tab===t.id?S.tabOn:{})}},t.l))
     ),
 
     // FUNNEL TAB
@@ -298,69 +284,6 @@ function App(){
       React.createElement("div",{style:{display:"flex",gap:12,marginTop:24}},
         React.createElement("button",{style:S.btnPrimary,onClick:saveEntry},editingWeek!==null?"Update":"Save"),
         React.createElement("button",{style:S.btnGhost,onClick:()=>setView("dashboard")},"Cancel")
-      )
-    ),
-
-    // SCREENING TAB
-    view==="dashboard"&&tab==="screening"&&React.createElement(React.Fragment,null,
-      // Header row
-      React.createElement(G,{style:{marginBottom:20,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:12}},
-        React.createElement("div",null,
-          React.createElement("div",{style:{fontSize:13,fontWeight:700,color:"rgba(255,255,255,0.5)",fontFamily:"JetBrains Mono",textTransform:"uppercase",letterSpacing:"0.08em"}},"Candidate Screening"),
-          React.createElement("div",{style:{fontSize:12,color:"rgba(255,255,255,0.25)",fontFamily:"JetBrains Mono",marginTop:5}},
-            screeningResults?.lastRun?"Last run: "+new Date(screeningResults.lastRun).toLocaleString():"No runs recorded yet"
-          )
-        ),
-        React.createElement("button",{className:"primary-btn",style:{...S.btnPrimary,opacity:triggerStatus==="running"?0.6:1,fontSize:13},disabled:triggerStatus==="running",onClick:triggerScreening},
-          triggerStatus==="running"?"⏳ Running…":triggerStatus==="done"?"✓ Triggered — check back in ~2 min":triggerStatus==="error"?"Error — try again":"Run Screening Now"
-        )
-      ),
-
-      // Top candidates
-      React.createElement(G,{style:{marginBottom:20}},
-        React.createElement("h2",{style:S.secTitle},"Top Candidates — Last Run"),
-        (()=>{
-          const passing=(screeningResults?Object.entries(screeningResults.jobs||{}).flatMap(([rk,job])=>(job.candidates||[]).filter(c=>c.passes).map(c=>({...c,jobName:job.jobName}))):null);
-          if(!passing)return React.createElement("div",{style:{color:"rgba(255,255,255,0.25)",fontSize:13,fontFamily:"JetBrains Mono",padding:"16px 0",textAlign:"center"}},"Loading…");
-          if(!passing.length)return React.createElement("div",{style:{color:"rgba(255,255,255,0.25)",fontSize:13,fontFamily:"JetBrains Mono",padding:"24px 0",textAlign:"center"}},"No qualifying candidates in the last run");
-          return React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:10}},
-            passing.map((c,i)=>React.createElement("div",{key:i,style:{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"14px 16px",background:"rgba(255,255,255,0.03)",borderRadius:12,border:"1px solid rgba(255,255,255,0.06)"}},
-              React.createElement("div",null,
-                React.createElement("a",{href:"https://app8.greenhouse.io/people/"+c.candidateId,target:"_blank",rel:"noopener",style:{fontSize:15,fontWeight:700,color:"#c7d2fe",textDecoration:"none",transition:"color 0.2s"}},c.name),
-                React.createElement("div",{style:{fontSize:12,color:"rgba(255,255,255,0.3)",fontFamily:"JetBrains Mono",marginTop:3}},c.jobName+(c.location?" · "+c.location:""))
-              ),
-              React.createElement("div",{style:{fontSize:10,color:"#34d399",fontFamily:"JetBrains Mono",background:"rgba(52,211,153,0.1)",border:"1px solid rgba(52,211,153,0.2)",borderRadius:6,padding:"3px 8px"}},"PASSED")
-            ))
-          );
-        })()
-      ),
-
-      // Criteria editor
-      React.createElement(G,null,
-        React.createElement("h2",{style:S.secTitle},"Screening Criteria"),
-        React.createElement("div",{style:{display:"flex",gap:4,marginBottom:20,background:"rgba(255,255,255,0.03)",borderRadius:10,padding:3,border:"1px solid rgba(255,255,255,0.05)"}},
-          [{k:"ae",l:"Account Executive"},{k:"swe",l:"Software Engineer"}].map(r=>
-            React.createElement("button",{key:r.k,onClick:()=>setCriteriaTab(r.k),style:{flex:1,padding:"8px 12px",border:"none",borderRadius:8,background:criteriaTab===r.k?"linear-gradient(135deg,rgba(99,102,241,0.6),rgba(139,92,246,0.4))":"transparent",color:criteriaTab===r.k?"#fff":"rgba(255,255,255,0.35)",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"Plus Jakarta Sans",transition:"all 0.2s"}},r.l)
-          )
-        ),
-        criteriaData&&criteriaData[criteriaTab]
-          ?React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:14}},
-              criteriaData[criteriaTab].criteria.map(c=>
-                React.createElement("div",{key:c.key},
-                  React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:6}},
-                    React.createElement("span",{style:{fontSize:11,fontWeight:700,color:c.required&&!c.informational?"#a78bfa":"rgba(255,255,255,0.35)",fontFamily:"JetBrains Mono",textTransform:"uppercase",letterSpacing:"0.06em"}},c.label),
-                    c.informational&&React.createElement("span",{style:{fontSize:9,background:"rgba(255,255,255,0.06)",color:"rgba(255,255,255,0.3)",borderRadius:4,padding:"2px 6px",fontFamily:"JetBrains Mono"}},"INFO ONLY"),
-                    c.dynamic&&React.createElement("span",{style:{fontSize:9,background:"rgba(99,102,241,0.15)",color:"#a78bfa",borderRadius:4,padding:"2px 6px",fontFamily:"JetBrains Mono"}},"AUTO-DATE")
-                  ),
-                  React.createElement("textarea",{value:(criteriaEditing[criteriaTab]||{})[c.key]??c.description,onChange:e=>{const v=e.target.value;setCriteriaEditing(prev=>({...prev,[criteriaTab]:{...(prev[criteriaTab]||{}),[c.key]:v}}));},style:{...S.textarea,minHeight:64,fontSize:12,lineHeight:1.5,resize:"vertical"}})
-                )
-              ),
-              React.createElement("div",{style:{display:"flex",alignItems:"center",gap:14,marginTop:4}},
-                React.createElement("button",{className:"primary-btn",style:{...S.btnPrimary,opacity:criteriaSaving?0.6:1,fontSize:13},disabled:criteriaSaving,onClick:saveCriteria},criteriaSaving?"Saving…":"Save Changes"),
-                criteriaSuccess&&React.createElement("span",{style:{fontSize:12,color:"#34d399",fontFamily:"JetBrains Mono"}},"✓ Saved — takes effect on next run")
-              )
-            )
-          :React.createElement("div",{style:{color:"rgba(255,255,255,0.25)",fontSize:13,fontFamily:"JetBrains Mono",padding:"16px 0",textAlign:"center"}},"Loading criteria…")
       )
     ),
 
