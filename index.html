@@ -965,21 +965,46 @@ window.getPdfBase64 = async function() {
     });
 
     function ScreeningTab() {
+      const FREQ_OPTIONS = [
+        { value: "daily",        label: "Daily",        cron: "0 9 * * *",   runsPerMonth: 30 },
+        { value: "every_2_days", label: "Every 2 days", cron: "0 9 */2 * *", runsPerMonth: 15 },
+        { value: "every_3_days", label: "Every 3 days", cron: "0 9 */3 * *", runsPerMonth: 10 },
+        { value: "weekly",       label: "Weekly",       cron: "0 9 * * 1",   runsPerMonth: 4  },
+      ];
+      const TIME_OPTIONS = [
+        { value: 24,  label: "Last 24 hrs", estCandidates: 8  },
+        { value: 48,  label: "Last 48 hrs", estCandidates: 17 },
+        { value: 72,  label: "Last 72 hrs", estCandidates: 25 },
+        { value: 168, label: "Last 7 days", estCandidates: 59 },
+      ];
+      const COST_PER = 0.0003;
+
       const [criteria, setCriteria] = React.useState(null);
       const [sha, setSha] = React.useState(null);
       const [editing, setEditing] = React.useState(false);
       const [draft, setDraft] = React.useState(null);
+      const [configDraft, setConfigDraft] = React.useState({ frequency: "every_2_days", timeWindowHours: 48 });
       const [saveStatus, setSaveStatus] = React.useState(null);
       const [triggerStatus, setTriggerStatus] = React.useState(null);
       const [lastRun, setLastRun] = React.useState(null);
       const [selectedRole, setSelectedRole] = React.useState(null);
 
       React.useEffect(() => {
-        fetch("/api/criteria").then(r => r.json()).then(d => { setCriteria(d.criteria); setSha(d.sha); setSelectedRole(k => k || Object.keys(d.criteria)[0]); }).catch(() => {});
+        fetch("/api/criteria").then(r => r.json()).then(d => {
+          setCriteria(d.criteria);
+          setSha(d.sha);
+          setSelectedRole(k => k || Object.keys(d.criteria).filter(k => k !== "config")[0]);
+          if (d.criteria.config) setConfigDraft(d.criteria.config);
+        }).catch(() => {});
         fetch("/api/trigger-screening").then(r => r.json()).then(d => { if (d.lastRun) setLastRun(d.lastRun); }).catch(() => {});
       }, []);
 
-      function startEdit() { setDraft(JSON.parse(JSON.stringify(criteria))); setEditing(true); setSaveStatus(null); }
+      function startEdit() {
+        setDraft(JSON.parse(JSON.stringify(criteria)));
+        if (criteria.config) setConfigDraft({ ...criteria.config });
+        setEditing(true);
+        setSaveStatus(null);
+      }
       function cancelEdit() { setEditing(false); setDraft(null); setSaveStatus(null); }
 
       const handleToggle = React.useCallback((roleKey, idx) => {
@@ -1009,14 +1034,15 @@ window.getPdfBase64 = async function() {
 
       async function saveCriteria() {
         setSaveStatus("saving");
+        const payload = { ...draft, config: configDraft };
         try {
           const r = await fetch("/api/criteria", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ criteria: draft, sha }),
+            body: JSON.stringify({ criteria: payload, sha }),
           });
           const d = await r.json();
-          if (r.ok) { setCriteria(draft); setSha(d.sha); setEditing(false); setDraft(null); setSaveStatus("saved"); setTimeout(() => setSaveStatus(null), 3000); }
+          if (r.ok) { setCriteria(payload); setSha(d.sha); setEditing(false); setDraft(null); setSaveStatus("saved"); setTimeout(() => setSaveStatus(null), 3000); }
           else setSaveStatus("error");
         } catch { setSaveStatus("error"); }
       }
@@ -1032,6 +1058,19 @@ window.getPdfBase64 = async function() {
       }
 
       const display = editing ? draft : criteria;
+      const roleKeys = display ? Object.keys(display).filter(k => k !== "config") : [];
+
+      const estCandidates = (TIME_OPTIONS.find(t => t.value === configDraft.timeWindowHours) || TIME_OPTIONS[1]).estCandidates;
+      const runsPerMonth  = (FREQ_OPTIONS.find(f => f.value === configDraft.frequency) || FREQ_OPTIONS[1]).runsPerMonth;
+      const costPerRun    = estCandidates * COST_PER;
+      const costPerMonth  = costPerRun * runsPerMonth;
+      const fmt = (n) => n < 0.01 ? `$${(n * 100).toFixed(2)}¢` : `$${n.toFixed(2)}`;
+
+      const selectStyle = {
+        background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)",
+        borderRadius: 8, padding: "7px 12px", color: "#fff", fontSize: 12,
+        fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 500, outline: "none", cursor: "pointer",
+      };
 
       const inputStyle = {
         background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)",
@@ -1041,6 +1080,7 @@ window.getPdfBase64 = async function() {
 
       return (
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+          {/* Header */}
           <Glass style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
             <div>
               <div style={{ fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 700, fontSize: 17, color: "#fff", marginBottom: 4 }}>Candidate Screening</div>
@@ -1049,9 +1089,45 @@ window.getPdfBase64 = async function() {
                 {" · "}Results sent to <span style={{ color: "#a78bfa" }}>#candidate-alerts</span>
               </div>
             </div>
+
             <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-              {saveStatus === "saved" && <span style={{ fontSize: 12, color: "#34d399", fontFamily: "JetBrains Mono" }}>✓ Criteria saved</span>}
-              {saveStatus === "error" && <span style={{ fontSize: 12, color: "#fca5a5", fontFamily: "JetBrains Mono" }}>Save failed — try again</span>}
+              {/* Config fields — slide in when editing */}
+              <div style={{
+                display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap",
+                opacity: editing ? 1 : 0,
+                transform: editing ? "translateX(0)" : "translateX(12px)",
+                maxWidth: editing ? "600px" : "0px",
+                overflow: "hidden",
+                transition: "opacity 0.25s ease, transform 0.25s ease, max-width 0.3s ease",
+                pointerEvents: editing ? "auto" : "none",
+              }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                  <span style={{ fontSize: 10, fontFamily: "JetBrains Mono", color: "rgba(255,255,255,0.35)", letterSpacing: "0.06em", textTransform: "uppercase" }}>Frequency</span>
+                  <select value={configDraft.frequency} onChange={e => setConfigDraft(p => ({ ...p, frequency: e.target.value }))} style={selectStyle}>
+                    {FREQ_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                  </select>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                  <span style={{ fontSize: 10, fontFamily: "JetBrains Mono", color: "rgba(255,255,255,0.35)", letterSpacing: "0.06em", textTransform: "uppercase" }}>Search Window</span>
+                  <select value={configDraft.timeWindowHours} onChange={e => setConfigDraft(p => ({ ...p, timeWindowHours: Number(e.target.value) }))} style={selectStyle}>
+                    {TIME_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                  </select>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 3, padding: "0 4px" }}>
+                  <span style={{ fontSize: 10, fontFamily: "JetBrains Mono", color: "rgba(255,255,255,0.35)", letterSpacing: "0.06em", textTransform: "uppercase" }}>Est. Cost</span>
+                  <div style={{ fontSize: 13, fontFamily: "JetBrains Mono", color: "#a78bfa", whiteSpace: "nowrap" }}>
+                    {fmt(costPerRun)}<span style={{ color: "rgba(255,255,255,0.3)" }}>/run</span>
+                    <span style={{ margin: "0 6px", color: "rgba(255,255,255,0.2)" }}>·</span>
+                    {fmt(costPerMonth)}<span style={{ color: "rgba(255,255,255,0.3)" }}>/mo</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Status messages */}
+              {saveStatus === "saved" && <span style={{ fontSize: 12, color: "#34d399", fontFamily: "JetBrains Mono" }}>✓ Saved</span>}
+              {saveStatus === "error"  && <span style={{ fontSize: 12, color: "#fca5a5", fontFamily: "JetBrains Mono" }}>Save failed</span>}
+
+              {/* Buttons */}
               {editing ? (
                 <>
                   <button onClick={cancelEdit} className="ghost-btn"
@@ -1060,24 +1136,25 @@ window.getPdfBase64 = async function() {
                   </button>
                   <button onClick={saveCriteria} disabled={saveStatus === "saving"} className="primary-btn"
                     style={{ padding: "10px 22px", borderRadius: 12, border: "none", cursor: "pointer", background: "#620DEC", color: "#fff", fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 13, opacity: saveStatus === "saving" ? 0.6 : 1 }}>
-                    {saveStatus === "saving" ? "Saving…" : "Save Criteria"}
+                    {saveStatus === "saving" ? "Saving…" : "Save"}
                   </button>
                 </>
               ) : (
                 <>
                   <button onClick={startEdit} className="ghost-btn"
-                    style={{ padding: "10px 18px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.15)", background: "transparent", color: "rgba(255,255,255,0.6)", fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 13, cursor: "pointer" }}>
+                    style={{ padding: "10px 18px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.15)", background: "transparent", color: "rgba(255,255,255,0.6)", fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 13, cursor: "pointer", transition: "opacity 0.2s ease, transform 0.2s ease" }}>
                     Edit Criteria
                   </button>
                   <button onClick={trigger} disabled={triggerStatus === "triggering"} className="primary-btn"
                     style={{ padding: "10px 22px", borderRadius: 12, border: "none", cursor: triggerStatus === "triggering" ? "not-allowed" : "pointer", background: triggerStatus === "error" ? "rgba(248,113,113,0.2)" : "#620DEC", color: triggerStatus === "error" ? "#fca5a5" : "#fff", fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 13, opacity: triggerStatus === "triggering" ? 0.6 : 1 }}>
-                    {triggerStatus === "triggering" ? "⏳ Triggering…" : triggerStatus === "done" ? "✓ Running — check Slack" : triggerStatus === "error" ? "Error — try again" : "Run Screening Now"}
+                    {triggerStatus === "triggering" ? "⏳ Triggering…" : triggerStatus === "done" ? "✓ Check Slack" : triggerStatus === "error" ? "Error" : "Run Screening Now"}
                   </button>
                 </>
               )}
             </div>
           </Glass>
 
+          {/* Role selector + criteria card */}
           {!display ? (
             <Glass><div style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, fontFamily: "JetBrains Mono" }}>Loading criteria…</div></Glass>
           ) : (
@@ -1091,8 +1168,8 @@ window.getPdfBase64 = async function() {
                   fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, outline: "none", cursor: "pointer",
                 }}
               >
-                {Object.entries(display).map(([roleKey, roleConfig]) => (
-                  <option key={roleKey} value={roleKey}>{roleConfig.jobName}</option>
+                {roleKeys.map(roleKey => (
+                  <option key={roleKey} value={roleKey}>{display[roleKey].jobName}</option>
                 ))}
               </select>
               {selectedRole && display[selectedRole] && (

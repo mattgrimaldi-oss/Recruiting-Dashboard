@@ -1,4 +1,8 @@
 {
+  "config": {
+    "frequency": "every_2_days",
+    "timeWindowHours": 48
+  },
   "ae": {
     "jobId": "4462684008",
     "jobName": "Account Executive",
@@ -12,7 +16,7 @@
       {
         "key": "startup_experience",
         "label": "Startup Background",
-        "detail": "At least one employer was a startup or company with under 200 employees. Ideally 10–100 employees.",
+        "detail": "At least one employer was a startup or company with under 200 employees. Ideally 10\u2013100 employees.",
         "status": "required"
       },
       {
@@ -48,7 +52,7 @@
       {
         "key": "startup_experience",
         "label": "Startup Background",
-        "detail": "At least one employer was a startup or company with under 200 employees. Ideally 10–100 employees.",
+        "detail": "At least one employer was a startup or company with under 200 employees. Ideally 10\u2013100 employees.",
         "status": "required"
       },
       {
