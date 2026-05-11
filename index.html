@@ -1051,10 +1051,18 @@ window.getPdfBase64 = async function() {
         setTriggerStatus("triggering");
         try {
           const r = await fetch("/api/trigger-screening", { method: "POST" });
-          if (r.ok) { setTriggerStatus("done"); setLastRun(new Date().toISOString()); }
-          else setTriggerStatus("error");
-        } catch { setTriggerStatus("error"); }
-        setTimeout(() => setTriggerStatus(null), 8000);
+          if (r.ok) {
+            setLastRun(new Date().toISOString());
+            setTriggerStatus("running");
+            setTimeout(() => setTriggerStatus("done"), 120000);
+          } else {
+            setTriggerStatus("error");
+            setTimeout(() => setTriggerStatus(null), 8000);
+          }
+        } catch {
+          setTriggerStatus("error");
+          setTimeout(() => setTriggerStatus(null), 8000);
+        }
       }
 
       const display = editing ? draft : criteria;
@@ -1137,10 +1145,20 @@ window.getPdfBase64 = async function() {
                     style={{ padding: "10px 18px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.15)", background: "transparent", color: "rgba(255,255,255,0.6)", fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 13, cursor: "pointer", transition: "opacity 0.2s ease, transform 0.2s ease" }}>
                     Edit Criteria
                   </button>
-                  <button onClick={trigger} disabled={triggerStatus === "triggering"} className="primary-btn"
-                    style={{ padding: "10px 22px", borderRadius: 12, border: "none", cursor: triggerStatus === "triggering" ? "not-allowed" : "pointer", background: triggerStatus === "error" ? "rgba(248,113,113,0.2)" : "#620DEC", color: triggerStatus === "error" ? "#fca5a5" : "#fff", fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 13, opacity: triggerStatus === "triggering" ? 0.6 : 1 }}>
-                    {triggerStatus === "triggering" ? "⏳ Triggering…" : triggerStatus === "done" ? "✓ Check Slack" : triggerStatus === "error" ? "Error" : "Run Screening Now"}
-                  </button>
+                  {(triggerStatus === "triggering" || triggerStatus === "running") ? (
+                    <div style={{ padding: "10px 22px", borderRadius: 12, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.3)", fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 13, whiteSpace: "nowrap" }}>
+                      Running — est. ~2 min
+                    </div>
+                  ) : triggerStatus === "done" ? (
+                    <div style={{ padding: "10px 22px", borderRadius: 12, background: "rgba(52,211,153,0.12)", border: "1px solid rgba(52,211,153,0.25)", color: "#34d399", fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 13, whiteSpace: "nowrap" }}>
+                      Check Slack ✓
+                    </div>
+                  ) : (
+                    <button onClick={trigger} className="primary-btn"
+                      style={{ padding: "10px 22px", borderRadius: 12, border: "none", cursor: "pointer", background: triggerStatus === "error" ? "rgba(248,113,113,0.2)" : "#620DEC", color: triggerStatus === "error" ? "#fca5a5" : "#fff", fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 13 }}>
+                      {triggerStatus === "error" ? "Error — try again" : "Run Screening Now"}
+                    </button>
+                  )}
                 </>
               )}
             </div>
