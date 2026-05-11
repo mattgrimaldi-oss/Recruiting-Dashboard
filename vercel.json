@@ -1,0 +1,16 @@
+{
+  "functions": {
+    "api/send-to-docusign.js": { "maxDuration": 30 },
+    "api/chat.js": { "maxDuration": 60 },
+    "api/test-resume.js": { "maxDuration": 60 },
+    "api/check-candidates-ae.js": { "maxDuration": 60 },
+    "api/check-candidates-swe.js": { "maxDuration": 60 }
+  },
+  "routes": [
+    { "src": "/api/send-to-docusign", "dest": "/api/send-to-docusign.js", "methods": ["POST", "OPTIONS"] },
+    { "src": "/api/chat", "dest": "/api/chat.js", "methods": ["POST", "OPTIONS"] },
+    { "src": "/api/test-resume", "dest": "/api/test-resume.js", "methods": ["GET", "OPTIONS"] },
+    { "src": "/api/check-candidates-ae", "dest": "/api/check-candidates-ae.js", "methods": ["GET", "OPTIONS"] },
+    { "src": "/api/check-candidates-swe", "dest": "/api/check-candidates-swe.js", "methods": ["GET", "OPTIONS"] }
+  ]
+}
