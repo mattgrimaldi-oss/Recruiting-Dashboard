@@ -972,9 +972,10 @@ window.getPdfBase64 = async function() {
       const [saveStatus, setSaveStatus] = React.useState(null);
       const [triggerStatus, setTriggerStatus] = React.useState(null);
       const [lastRun, setLastRun] = React.useState(null);
+      const [selectedRole, setSelectedRole] = React.useState(null);
 
       React.useEffect(() => {
-        fetch("/api/criteria").then(r => r.json()).then(d => { setCriteria(d.criteria); setSha(d.sha); }).catch(() => {});
+        fetch("/api/criteria").then(r => r.json()).then(d => { setCriteria(d.criteria); setSha(d.sha); setSelectedRole(k => k || Object.keys(d.criteria)[0]); }).catch(() => {});
         fetch("/api/trigger-screening").then(r => r.json()).then(d => { if (d.lastRun) setLastRun(d.lastRun); }).catch(() => {});
       }, []);
 
@@ -1080,20 +1081,33 @@ window.getPdfBase64 = async function() {
           {!display ? (
             <Glass><div style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, fontFamily: "JetBrains Mono" }}>Loading criteria…</div></Glass>
           ) : (
-            <div style={{ display: "flex", gap: 20, flexWrap: "wrap", alignItems: "flex-start" }}>
-              {Object.entries(display).map(([roleKey, roleConfig]) => (
+            <>
+              <select
+                value={selectedRole || ""}
+                onChange={e => setSelectedRole(e.target.value)}
+                style={{
+                  alignSelf: "flex-start", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)",
+                  borderRadius: 10, padding: "10px 16px", color: "#fff", fontSize: 14,
+                  fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, outline: "none", cursor: "pointer",
+                }}
+              >
+                {Object.entries(display).map(([roleKey, roleConfig]) => (
+                  <option key={roleKey} value={roleKey}>{roleConfig.jobName}</option>
+                ))}
+              </select>
+              {selectedRole && display[selectedRole] && (
                 <RoleCard
-                  key={roleKey}
-                  roleKey={roleKey}
-                  roleConfig={roleConfig}
+                  key={selectedRole}
+                  roleKey={selectedRole}
+                  roleConfig={display[selectedRole]}
                   editing={editing}
                   inputStyle={inputStyle}
                   onToggle={handleToggle}
                   onLabelChange={handleLabelChange}
                   onDetailChange={handleDetailChange}
                 />
-              ))}
-            </div>
+              )}
+            </>
           )}
         </div>
       );
