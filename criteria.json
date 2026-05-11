@@ -1,7 +1,7 @@
 {
   "config": {
     "frequency": "daily",
-    "timeWindowHours": 168
+    "timeWindowHours": 24
   },
   "ae": {
     "jobId": "4462684008",
