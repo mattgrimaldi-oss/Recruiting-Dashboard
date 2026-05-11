@@ -1064,7 +1064,7 @@ window.getPdfBase64 = async function() {
       const runsPerMonth  = (FREQ_OPTIONS.find(f => f.value === configDraft.frequency) || FREQ_OPTIONS[1]).runsPerMonth;
       const costPerRun    = estCandidates * COST_PER;
       const costPerMonth  = costPerRun * runsPerMonth;
-      const fmt = (n) => n < 0.01 ? `$${(n * 100).toFixed(2)}¢` : `$${n.toFixed(2)}`;
+      const fmt = (n) => n < 0.1 ? `$${n.toFixed(4)}` : `$${n.toFixed(2)}`;
 
       const selectStyle = {
         background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)",
@@ -1091,16 +1091,8 @@ window.getPdfBase64 = async function() {
             </div>
 
             <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-              {/* Config fields — slide in when editing */}
-              <div style={{
-                display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap",
-                opacity: editing ? 1 : 0,
-                transform: editing ? "translateX(0)" : "translateX(12px)",
-                maxWidth: editing ? "600px" : "0px",
-                overflow: "hidden",
-                transition: "opacity 0.25s ease, transform 0.25s ease, max-width 0.3s ease",
-                pointerEvents: editing ? "auto" : "none",
-              }}>
+              {/* Config fields — only rendered when editing */}
+              {editing && <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", animation: "fadeIn 0.2s ease" }}>
                 <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
                   <span style={{ fontSize: 10, fontFamily: "JetBrains Mono", color: "rgba(255,255,255,0.35)", letterSpacing: "0.06em", textTransform: "uppercase" }}>Frequency</span>
                   <select value={configDraft.frequency} onChange={e => setConfigDraft(p => ({ ...p, frequency: e.target.value }))} style={selectStyle}>
@@ -1121,7 +1113,7 @@ window.getPdfBase64 = async function() {
                     {fmt(costPerMonth)}<span style={{ color: "rgba(255,255,255,0.3)" }}>/mo</span>
                   </div>
                 </div>
-              </div>
+              </div>}
 
               {/* Status messages */}
               {saveStatus === "saved" && <span style={{ fontSize: 12, color: "#34d399", fontFamily: "JetBrains Mono" }}>✓ Saved</span>}
