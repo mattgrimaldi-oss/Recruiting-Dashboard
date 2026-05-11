@@ -22,6 +22,7 @@ module.exports = async (req, res) => {
     if (!run) return res.json({ lastRun: null });
     return res.json({
       lastRun: run.updated_at,
+      createdAt: run.created_at,
       status: run.status,
       conclusion: run.conclusion,
     });

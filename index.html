@@ -987,6 +987,7 @@ window.getPdfBase64 = async function() {
       const [saveStatus, setSaveStatus] = React.useState(null);
       const [triggerStatus, setTriggerStatus] = React.useState(null);
       const [lastRun, setLastRun] = React.useState(null);
+      const pollRef = React.useRef(null);
       const [selectedRole, setSelectedRole] = React.useState(null);
 
       React.useEffect(() => {
@@ -1048,17 +1049,30 @@ window.getPdfBase64 = async function() {
       }
 
       async function trigger() {
-        setTriggerStatus("triggering");
+        if (pollRef.current) clearInterval(pollRef.current);
+        setTriggerStatus("running");
+        const triggeredAt = Date.now();
         try {
           const r = await fetch("/api/trigger-screening", { method: "POST" });
-          if (r.ok) {
-            setLastRun(new Date().toISOString());
-            setTriggerStatus("running");
-            setTimeout(() => setTriggerStatus("done"), 120000);
-          } else {
+          if (!r.ok) {
             setTriggerStatus("error");
             setTimeout(() => setTriggerStatus(null), 8000);
+            return;
           }
+          setLastRun(new Date().toISOString());
+          // Wait 30s for GH Actions to register the run, then poll every 20s
+          setTimeout(() => {
+            pollRef.current = setInterval(async () => {
+              try {
+                const res = await fetch("/api/trigger-screening");
+                const d = await res.json();
+                if (d.createdAt && new Date(d.createdAt).getTime() > triggeredAt && d.status === "completed") {
+                  clearInterval(pollRef.current);
+                  setTriggerStatus("done");
+                }
+              } catch {}
+            }, 20000);
+          }, 30000);
         } catch {
           setTriggerStatus("error");
           setTimeout(() => setTriggerStatus(null), 8000);
