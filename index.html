@@ -71,18 +71,20 @@
     const EMPTY_WEEK = ALL_STAGES.reduce((a, s) => ({ ...a, [s.key]: 0 }), {});
 
     const INMAIL_WEEKLY = [
-      { week: "2026-01-26", sends: 26, inmailResponses: 5, accepts: 5, responseRate: 19.2, acceptRate: 19.2 },
-      { week: "2026-02-02", sends: 97, inmailResponses: 47, accepts: 44, responseRate: 48.5, acceptRate: 45.4 },
-      { week: "2026-02-09", sends: 214, inmailResponses: 75, accepts: 65, responseRate: 35.0, acceptRate: 30.4 },
+      { week: "2026-02-02", sends: 97,  inmailResponses: 47,  accepts: 44,  responseRate: 48.5, acceptRate: 45.4 },
+      { week: "2026-02-09", sends: 214, inmailResponses: 75,  accepts: 65,  responseRate: 35.0, acceptRate: 30.4 },
       { week: "2026-02-16", sends: 297, inmailResponses: 109, accepts: 102, responseRate: 36.7, acceptRate: 34.3 },
-      { week: "2026-02-23", sends: 331, inmailResponses: 91, accepts: 80, responseRate: 27.5, acceptRate: 24.2 },
-      { week: "2026-03-02", sends: 262, inmailResponses: 83, accepts: 71, responseRate: 31.7, acceptRate: 27.1 },
+      { week: "2026-02-23", sends: 331, inmailResponses: 91,  accepts: 80,  responseRate: 27.5, acceptRate: 24.2 },
+      { week: "2026-03-02", sends: 262, inmailResponses: 83,  accepts: 71,  responseRate: 31.7, acceptRate: 27.1 },
       { week: "2026-03-09", sends: 480, inmailResponses: 166, accepts: 143, responseRate: 34.6, acceptRate: 29.8 },
-      { week: "2026-03-16", sends: 303, inmailResponses: 76, accepts: 71, responseRate: 25.1, acceptRate: 23.4 },
-      { week: "2026-03-23", sends: 174, inmailResponses: 54, accepts: 47, responseRate: 31.0, acceptRate: 27.0 },
-      { week: "2026-03-30", sends: 472, inmailResponses: 90, accepts: 81, responseRate: 19.1, acceptRate: 17.2 },
-      { week: "2026-04-06", sends: 280, inmailResponses: 90, accepts: 80, responseRate: 32.1, acceptRate: 28.6 },
-      { week: "2026-04-13", sends: 338, inmailResponses: 67, accepts: 56, responseRate: 19.8, acceptRate: 16.6 },
+      { week: "2026-03-16", sends: 303, inmailResponses: 76,  accepts: 71,  responseRate: 25.1, acceptRate: 23.4 },
+      { week: "2026-03-23", sends: 174, inmailResponses: 54,  accepts: 47,  responseRate: 31.0, acceptRate: 27.0 },
+      { week: "2026-03-30", sends: 472, inmailResponses: 93,  accepts: 84,  responseRate: 19.7, acceptRate: 17.8 },
+      { week: "2026-04-06", sends: 280, inmailResponses: 96,  accepts: 86,  responseRate: 34.3, acceptRate: 30.7 },
+      { week: "2026-04-13", sends: 338, inmailResponses: 74,  accepts: 62,  responseRate: 21.9, acceptRate: 18.3 },
+      { week: "2026-04-20", sends: 346, inmailResponses: 71,  accepts: 62,  responseRate: 20.5, acceptRate: 17.9 },
+      { week: "2026-04-27", sends: 317, inmailResponses: 72,  accepts: 68,  responseRate: 22.7, acceptRate: 21.5 },
+      { week: "2026-05-04", sends: 177, inmailResponses: 25,  accepts: 24,  responseRate: 14.1, acceptRate: 13.6 },
     ];
     const RECRUITERS = [
       { name: "Connor McDermott", sends: 814, responseRate: 41.8, acceptRate: 37.6 },
@@ -1018,6 +1020,124 @@ window.getPdfBase64 = async function() {
       );
     });
 
+    const NewRoleForm = React.memo(function NewRoleForm({ onSave, onCancel, inputStyle }) {
+      const [roleName, setRoleName] = React.useState("");
+      const [ghLink, setGhLink] = React.useState("");
+      const [rows, setRows] = React.useState([
+        { label: "", detail: "", status: "required" },
+        { label: "", detail: "", status: "required" },
+        { label: "", detail: "", status: "required" },
+        { label: "", detail: "", status: "required" },
+      ]);
+      const [error, setError] = React.useState(null);
+      const [saving, setSaving] = React.useState(false);
+
+      function parseJobId(link) {
+        const nums = (link || "").match(/\d{5,}/g);
+        return nums ? nums[nums.length - 1] : null;
+      }
+      function toKey(str) {
+        return str.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "") || "role_" + Math.random().toString(36).slice(2, 7);
+      }
+
+      function toggleRow(i) {
+        setRows(p => p.map((c, idx) => idx === i ? { ...c, status: PILL_CYCLE[c.status] || "required" } : c));
+      }
+      function addRow() { setRows(p => [...p, { label: "", detail: "", status: "required" }]); }
+      function removeRow(i) { setRows(p => p.filter((_, idx) => idx !== i)); }
+      function updateRow(i, field, val) { setRows(p => p.map((c, idx) => idx === i ? { ...c, [field]: val } : c)); }
+
+      async function handleSave() {
+        setError(null);
+        if (!roleName.trim()) { setError("Role name is required."); return; }
+        if (!ghLink.trim()) { setError("Greenhouse link is required."); return; }
+        const jobId = parseJobId(ghLink);
+        if (!jobId) { setError("Couldn't find a job ID in that link — paste the full Greenhouse URL."); return; }
+        const filled = rows.filter(c => c.label.trim());
+        if (filled.length === 0) { setError("Add at least one criterion with a label."); return; }
+        const roleData = {
+          jobId,
+          jobName: roleName.trim(),
+          criteria: filled.map(c => ({
+            key: toKey(c.label),
+            label: c.label.trim(),
+            detail: c.detail.trim(),
+            status: c.status,
+          })),
+        };
+        setSaving(true);
+        try { await onSave(toKey(roleName), roleData); }
+        catch { setError("Failed to save — try again."); setSaving(false); }
+      }
+
+      return (
+        <Glass style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+          <div style={{ fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 700, fontSize: 15, color: "#fff" }}>New Role</div>
+
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+            <div style={{ flex: 1, minWidth: 200, display: "flex", flexDirection: "column", gap: 5 }}>
+              <span style={{ fontSize: 10, fontFamily: "JetBrains Mono", color: "rgba(255,255,255,0.35)", letterSpacing: "0.06em", textTransform: "uppercase" }}>Role Name</span>
+              <input value={roleName} onChange={e => setRoleName(e.target.value)} placeholder="e.g. Customer Success Manager"
+                style={{ ...inputStyle, fontSize: 13 }} />
+            </div>
+            <div style={{ flex: 1, minWidth: 200, display: "flex", flexDirection: "column", gap: 5 }}>
+              <span style={{ fontSize: 10, fontFamily: "JetBrains Mono", color: "rgba(255,255,255,0.35)", letterSpacing: "0.06em", textTransform: "uppercase" }}>Greenhouse Link</span>
+              <input value={ghLink} onChange={e => setGhLink(e.target.value)} placeholder="https://app8.greenhouse.io/sdash/..."
+                style={{ ...inputStyle, fontSize: 13 }} />
+            </div>
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <span style={{ fontSize: 10, fontFamily: "JetBrains Mono", color: "rgba(255,255,255,0.35)", letterSpacing: "0.06em", textTransform: "uppercase" }}>Criteria</span>
+            {rows.map((c, i) => {
+              const ps = PILL_STYLE[c.status] || PILL_STYLE.not_required;
+              return (
+                <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 12px", borderRadius: 10, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                  <span onClick={() => toggleRow(i)} style={{
+                    fontSize: 10, fontFamily: "JetBrains Mono", fontWeight: 700, padding: "2px 8px", borderRadius: 20,
+                    letterSpacing: "0.06em", background: ps.bg, color: ps.color, border: ps.border,
+                    flexShrink: 0, userSelect: "none", cursor: "pointer", whiteSpace: "nowrap", marginTop: 3,
+                  }}>{PILL_LABEL[c.status] || "NOT REQUIRED"}</span>
+                  <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 6 }}>
+                    <input value={c.label} onChange={e => updateRow(i, "label", e.target.value)}
+                      placeholder="Criterion label (e.g. Sales Experience)"
+                      style={{ ...inputStyle, fontWeight: 600 }} />
+                    <textarea value={c.detail} onChange={e => updateRow(i, "detail", e.target.value)}
+                      placeholder="Description / what to look for…" rows={2}
+                      style={{ ...inputStyle, resize: "vertical", lineHeight: 1.5 }} />
+                  </div>
+                  <button onClick={() => removeRow(i)} title="Remove" style={{
+                    background: "none", border: "none", color: "rgba(255,255,255,0.25)",
+                    cursor: "pointer", fontSize: 18, padding: "0 4px", flexShrink: 0, marginTop: 2, lineHeight: 1,
+                  }}>×</button>
+                </div>
+              );
+            })}
+            <button onClick={addRow} style={{
+              alignSelf: "flex-start", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
+              borderRadius: 8, padding: "6px 14px", color: "rgba(255,255,255,0.5)",
+              fontFamily: "Plus Jakarta Sans, sans-serif", fontSize: 12, fontWeight: 600, cursor: "pointer",
+            }}>+ Add Criterion</button>
+          </div>
+
+          {error && <div style={{ fontSize: 12, color: "#fca5a5", fontFamily: "JetBrains Mono" }}>{error}</div>}
+
+          <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+            <button onClick={onCancel} className="ghost-btn" style={{
+              padding: "10px 18px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.15)",
+              background: "transparent", color: "rgba(255,255,255,0.6)",
+              fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 13, cursor: "pointer",
+            }}>Cancel</button>
+            <button onClick={handleSave} disabled={saving} className="primary-btn" style={{
+              padding: "10px 22px", borderRadius: 12, border: "none",
+              cursor: saving ? "not-allowed" : "pointer", background: "#620DEC", color: "#fff",
+              fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 13, opacity: saving ? 0.6 : 1,
+            }}>{saving ? "Saving…" : "Create Role"}</button>
+          </div>
+        </Glass>
+      );
+    });
+
     function ScreeningTab() {
       const FREQ_OPTIONS = [
         { value: "daily",        label: "Daily",        cron: "0 9 * * *",   runsPerMonth: 30 },
@@ -1043,6 +1163,8 @@ window.getPdfBase64 = async function() {
       const [lastRun, setLastRun] = React.useState(null);
       const pollRef = React.useRef(null);
       const [selectedRole, setSelectedRole] = React.useState(null);
+      const [creatingRole, setCreatingRole] = React.useState(false);
+      const [confirmDelete, setConfirmDelete] = React.useState(false);
 
       React.useEffect(() => {
         fetch("/api/criteria").then(r => r.json()).then(d => {
@@ -1100,6 +1222,36 @@ window.getPdfBase64 = async function() {
           if (r.ok) { setCriteria(payload); setSha(d.sha); setEditing(false); setDraft(null); setSaveStatus("saved"); setTimeout(() => setSaveStatus(null), 3000); }
           else setSaveStatus("error");
         } catch { setSaveStatus("error"); }
+      }
+
+      async function saveNewRole(roleKey, roleData) {
+        const updated = { ...criteria, [roleKey]: roleData };
+        const r = await fetch("/api/criteria", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ criteria: updated, sha }),
+        });
+        const d = await r.json();
+        if (r.ok) { setCriteria(updated); setSha(d.sha); setSelectedRole(roleKey); setCreatingRole(false); }
+        else throw new Error(d.error || "Save failed");
+      }
+
+      async function deleteRole() {
+        const updated = JSON.parse(JSON.stringify(criteria));
+        delete updated[selectedRole];
+        const r = await fetch("/api/criteria", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ criteria: updated, sha }),
+        });
+        const d = await r.json();
+        if (r.ok) {
+          setCriteria(updated);
+          setSha(d.sha);
+          const remaining = Object.keys(updated).filter(k => k !== "config");
+          setSelectedRole(remaining[0] || null);
+          setConfirmDelete(false);
+        }
       }
 
       async function trigger() {
@@ -1229,21 +1381,60 @@ window.getPdfBase64 = async function() {
 
           {!display ? (
             <Glass><div style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, fontFamily: "JetBrains Mono" }}>Loading criteria…</div></Glass>
+          ) : creatingRole ? (
+            <NewRoleForm onSave={saveNewRole} onCancel={() => setCreatingRole(false)} inputStyle={inputStyle} />
           ) : (
             <>
-              <select
-                value={selectedRole || ""}
-                onChange={e => setSelectedRole(e.target.value)}
-                style={{
-                  alignSelf: "flex-start", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)",
-                  borderRadius: 10, padding: "10px 16px", color: "#fff", fontSize: 14,
-                  fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, outline: "none", cursor: "pointer",
-                }}
-              >
-                {roleKeys.map(roleKey => (
-                  <option key={roleKey} value={roleKey}>{display[roleKey].jobName}</option>
-                ))}
-              </select>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                <select
+                  value={selectedRole || ""}
+                  onChange={e => { setSelectedRole(e.target.value); setConfirmDelete(false); }}
+                  style={{
+                    background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)",
+                    borderRadius: 10, padding: "10px 16px", color: "#fff", fontSize: 14,
+                    fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, outline: "none", cursor: "pointer",
+                  }}
+                >
+                  {roleKeys.map(roleKey => (
+                    <option key={roleKey} value={roleKey}>{display[roleKey].jobName}</option>
+                  ))}
+                </select>
+
+                {!editing && (
+                  <button onClick={() => { setCreatingRole(true); setConfirmDelete(false); }} className="ghost-btn" style={{
+                    padding: "10px 16px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.15)",
+                    background: "transparent", color: "rgba(255,255,255,0.6)",
+                    fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 13, cursor: "pointer",
+                  }}>+ Add Role</button>
+                )}
+
+                {!editing && selectedRole && !confirmDelete && (
+                  <button onClick={() => setConfirmDelete(true)} style={{
+                    padding: "10px 14px", borderRadius: 10, border: "1px solid rgba(248,113,113,0.2)",
+                    background: "transparent", color: "rgba(248,113,113,0.55)",
+                    fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 13, cursor: "pointer",
+                  }}>Delete Role</button>
+                )}
+
+                {confirmDelete && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, animation: "fadeIn 0.15s ease" }}>
+                    <span style={{ fontSize: 12, color: "#fca5a5", fontFamily: "JetBrains Mono" }}>
+                      Delete "{display[selectedRole]?.jobName}"?
+                    </span>
+                    <button onClick={deleteRole} style={{
+                      padding: "7px 14px", borderRadius: 8, border: "none",
+                      background: "rgba(248,113,113,0.2)", color: "#fca5a5",
+                      fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 12, cursor: "pointer",
+                    }}>Yes, delete</button>
+                    <button onClick={() => setConfirmDelete(false)} className="ghost-btn" style={{
+                      padding: "7px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.15)",
+                      background: "transparent", color: "rgba(255,255,255,0.5)",
+                      fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 12, cursor: "pointer",
+                    }}>Cancel</button>
+                  </div>
+                )}
+              </div>
+
               {selectedRole && display[selectedRole] && (
                 <RoleCard
                   key={selectedRole}
@@ -1277,6 +1468,13 @@ window.getPdfBase64 = async function() {
       const [chartMetric, setChartMetric] = useState("offers");
       const [confirmReset, setConfirmReset] = useState(false);
       const [timeframe, setTimeframe] = useState("since_mc");
+      const [manualEntries, setManualEntries] = useState(() => { try { return JSON.parse(localStorage.getItem('flipManualEntries_v2') || '[]'); } catch(e) { return []; } });
+      const [slackOffers, setSlackOffers] = useState([]);
+      const [addingFor, setAddingFor] = useState(null);
+      const [addDate, setAddDate] = useState("");
+      const [addName, setAddName] = useState("");
+      const [addError, setAddError] = useState("");
+      const [shakeKey, setShakeKey] = useState(null);
 
       const TIMEFRAMES = [
         { id: "last_week",     label: "Last Week",       cutoff: () => { const d = new Date(); d.setDate(d.getDate() - 7);  return d; } },
@@ -1308,6 +1506,8 @@ window.getPdfBase64 = async function() {
           try { const j = await window.storage.get("recruiting-jobs"); if (j?.value) setJobData(JSON.parse(j.value)); } catch(e) {}
           setLoading(false);
         })();
+        // Load Slack offer data
+        (async () => { try { const r = await fetch('/slackOffers.json?t=' + Date.now()); if (r.ok) { const d = await r.json(); setSlackOffers(d.offers || []); } } catch(e) {} })();
       }, []);
 
       const saveWeeks = useCallback(async (nw) => {
@@ -1328,9 +1528,16 @@ window.getPdfBase64 = async function() {
       const rawTotals = pipelineWeeks.reduce((a, w) => { ALL_STAGES.forEach(s => { a[s.key] = (a[s.key]||0) + (w[s.key]||0); }); return a; }, { ...EMPTY_WEEK });
       // Manual overrides for timeframes where Greenhouse data is incomplete
       const MANUAL_OVERRIDES = {
-        since_mc: { offers: 19, hires: 14 },
+        since_mc: { hires: 14 }, // offers now sourced from Slack via slackOffers.json
       };
-      const totals = { ...rawTotals, ...(MANUAL_OVERRIDES[timeframe] || {}) };
+      const slackOffersInPeriod = slackOffers.filter(e => new Date(e.date) >= tfCutoff).length;
+      const manualOffers = manualEntries.filter(e => e.type === 'offer' && new Date(e.date) >= tfCutoff && !slackOffers.some(s => s.name.toLowerCase() === (e.name||'').toLowerCase())).length;
+      const manualHires  = manualEntries.filter(e => e.type === 'hire'  && new Date(e.date) >= tfCutoff).length;
+      const totalOffersInPeriod = slackOffersInPeriod + manualOffers;
+      const baseOverride = MANUAL_OVERRIDES[timeframe] || {};
+      const totals = (timeframe === 'last_week' || timeframe === 'last_month')
+        ? { ...rawTotals, offers: totalOffersInPeriod, hires: manualHires }
+        : { ...rawTotals, ...baseOverride, offers: totalOffersInPeriod, hires: (baseOverride.hires ?? rawTotals.hires ?? 0) + manualHires };
       const conv = (f, t) => totals[f] ? ((totals[t] / totals[f]) * 100).toFixed(1) : "0.0";
 
       const startNewWeek = () => { setEditingWeek(null); setFormData({ ...EMPTY_WEEK, weekOf: getCurrentMonday() }); setActiveView("entry"); };
@@ -1435,6 +1642,7 @@ window.getPdfBase64 = async function() {
             @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
             @keyframes slideRight { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: translateX(0); } }
             @keyframes barGrow { from { transform: scaleX(0); transform-origin: left; } to { transform: scaleX(1); transform-origin: left; } }
+            @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
             @keyframes dotPop { from { opacity: 0; transform: scale(0); } to { opacity: 1; transform: scale(1); } }
             .glass-card { animation: fadeUp 0.5s ease both; transition: transform 0.25s ease, box-shadow 0.25s ease; }
             .glass-card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 0 20px rgba(99,102,241,0.1) !important; }
@@ -1522,6 +1730,32 @@ window.getPdfBase64 = async function() {
                         {FUNNEL_STAGES.map((stage, i) => {
                           const maxV = Math.max(...FUNNEL_STAGES.map(s => totals[s.key] || 1));
                           const pct = Math.max(((totals[stage.key] || 0) / maxV) * 100, 3);
+                          const isAddable = stage.key === 'offers' || stage.key === 'hires';
+                          const isOpen = addingFor === stage.key;
+                          const typeLabel = stage.key === 'hires' ? 'Hire' : 'Offer';
+                          const confirmAdd = () => {
+                            if (!addDate || !addName.trim()) return;
+                            const entryType = stage.key === 'hires' ? 'hire' : 'offer';
+                            const nameNorm = addName.trim().toLowerCase();
+                            const isDupe = manualEntries.some(e => e.type === entryType && e.name && e.name.toLowerCase() === nameNorm)
+                                         || (entryType === 'offer' && slackOffers.some(s => s.name && s.name.toLowerCase() === nameNorm));
+                            if (isDupe) {
+                              setAddError(`${typeLabel} already entered for ${addName.trim()}`);
+                              setShakeKey(stage.key);
+                              setTimeout(() => setShakeKey(null), 500);
+                              return;
+                            }
+                            const alreadyHasOffer = manualEntries.some(e => e.type === 'offer' && e.name && e.name.toLowerCase() === nameNorm)
+                                                      || slackOffers.some(s => s.name && s.name.toLowerCase() === nameNorm);
+                            const newEntries = stage.key === 'hires'
+                              ? [...(alreadyHasOffer ? [] : [{ type: 'offer', name: addName.trim(), date: addDate }]), { type: 'hire', name: addName.trim(), date: addDate }]
+                              : [{ type: 'offer', name: addName.trim(), date: addDate }];
+                            const updated = [...manualEntries, ...newEntries];
+                            setManualEntries(updated);
+                            try { localStorage.setItem('flipManualEntries_v2', JSON.stringify(updated)); } catch(e) {}
+                            setAddingFor(null); setAddDate(""); setAddName(""); setAddError("");
+                          };
+                          const canConfirm = addDate && addName.trim();
                           return (
                             <div key={stage.key} style={{ display: "flex", alignItems: "center", gap: 14 }}>
                               <div style={{ minWidth: 140, flexShrink: 0 }}>
@@ -1531,6 +1765,40 @@ window.getPdfBase64 = async function() {
                               <div key={"bar-" + selectedJob + "-" + stage.key} style={{ flex: 1, height: 28, background: "rgba(255,255,255,0.04)", borderRadius: 10, overflow: "hidden" }}>
                                 <div style={{ height: "100%", width: `${pct}%`, borderRadius: 10, background: `linear-gradient(90deg, ${stage.color}, ${stage.color}66)`, boxShadow: `0 0 20px ${stage.glow}`, animation: `barGrow 0.8s ease ${i * 0.08 + 0.2}s both`, transformOrigin: "left" }} />
                               </div>
+                              {isAddable && (
+                                <div style={{ display: "flex", flexDirection: "column", gap: 4, flexShrink: 0 }}>
+                                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                                    <button
+                                      onClick={() => { setAddingFor(isOpen ? null : stage.key); setAddDate(""); setAddName(""); setAddError(""); }}
+                                      title={`Add ${stage.label}`}
+                                      style={{ width: 26, height: 26, borderRadius: "50%", border: `1px solid ${stage.color}88`, background: isOpen ? stage.color + "33" : "transparent", color: stage.color, fontSize: 18, lineHeight: 1, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "transform 0.25s, background 0.2s", transform: isOpen ? "rotate(45deg)" : "rotate(0deg)", flexShrink: 0 }}
+                                    >+</button>
+                                    <div style={{ display: "flex", alignItems: "center", gap: 6, overflow: "hidden", maxWidth: isOpen ? 400 : 0, opacity: isOpen ? 1 : 0, transition: "max-width 0.35s ease, opacity 0.25s ease" }}>
+                                      <input
+                                        type="text"
+                                        placeholder="Candidate name"
+                                        value={addName}
+                                        onChange={e => { setAddName(e.target.value); setAddError(""); }}
+                                        style={{ background: "rgba(255,255,255,0.07)", border: `1px solid ${addError && addingFor === stage.key ? '#f87171' : 'rgba(255,255,255,0.15)'}`, borderRadius: 7, color: "#fff", padding: "3px 8px", fontSize: 12, outline: "none", width: 130, animation: shakeKey === stage.key ? 'shake 0.4s ease' : 'none', transition: "border-color 0.2s" }}
+                                      />
+                                      <input
+                                        type="date"
+                                        value={addDate}
+                                        onChange={e => setAddDate(e.target.value)}
+                                        style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 7, color: "#fff", padding: "3px 8px", fontSize: 12, fontFamily: "JetBrains Mono", outline: "none", width: 130 }}
+                                      />
+                                      <button
+                                        onClick={confirmAdd}
+                                        disabled={!canConfirm}
+                                        style={{ background: canConfirm ? stage.color : "rgba(255,255,255,0.1)", border: "none", borderRadius: 7, color: "#000", fontWeight: 700, fontSize: 12, padding: "4px 10px", cursor: canConfirm ? "pointer" : "not-allowed", opacity: canConfirm ? 1 : 0.4, transition: "background 0.2s, opacity 0.2s", whiteSpace: "nowrap" }}
+                                      >✓ Add</button>
+                                    </div>
+                                  </div>
+                                  {isOpen && addError && addingFor === stage.key && (
+                                    <div style={{ fontSize: 11, color: "#f87171", fontFamily: "JetBrains Mono", paddingLeft: 32, whiteSpace: "nowrap" }}>{addError}</div>
+                                  )}
+                                </div>
+                              )}
                             </div>
                           );
                         })}
