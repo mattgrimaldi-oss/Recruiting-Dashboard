@@ -1105,7 +1105,7 @@ window.getPdfBase64 = async function() {
           {/* Header */}
           <Glass style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
             <div>
-              <div style={{ fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 700, fontSize: 17, color: "#fff", marginBottom: 4 }}>Candidate Screening</div>
+              <div style={{ fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 700, fontSize: 17, color: "#fff", marginBottom: 4 }}>Candidate Hub</div>
               <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", fontFamily: "JetBrains Mono" }}>
                 {lastRun ? "Last run: " + new Date(lastRun).toLocaleString() : "No recent run recorded"}
                 {" · "}Results sent to <span style={{ color: "#a78bfa" }}>#candidate-alerts</span>
@@ -1210,6 +1210,102 @@ window.getPdfBase64 = async function() {
               )}
             </>
           )}
+        <div style={{ marginTop: 0 }}>
+          <Glass style={{ marginBottom: 20 }}>
+                    <h2 style={S.secTitle}>Top Candidate Industries</h2>
+                    <div style={{ position: "relative", borderRadius: 14, overflow: "hidden", marginTop: 16 }}>
+                      <svg viewBox="0 0 680 460" style={{ width: "100%", height: "auto", display: "block" }} ref={el => {
+                        if (!el || el.dataset.drawn) return;
+                        el.dataset.drawn = "1";
+                        const W = 680, H = 460, AMP = 5, STEP = 22;
+                        const sectors = [
+                          { name: "Other SaaS", pct: 16.5, color: "#a78bfa", icon: "M6 3a3 3 0 0 0-3 3v2.25a3 3 0 0 0 3 3h2.25a3 3 0 0 0 3-3V6a3 3 0 0 0-3-3H6ZM3.75 14.25a3 3 0 0 1 3-3h2.25a3 3 0 0 1 3 3v2.25a3 3 0 0 1-3 3H6.75a3 3 0 0 1-3-3v-2.25ZM14.25 3a3 3 0 0 0-3 3v2.25a3 3 0 0 0 3 3h2.25a3 3 0 0 0 3-3V6a3 3 0 0 0-3-3h-2.25ZM11.25 14.25a3 3 0 0 1 3-3h2.25a3 3 0 0 1 3 3v2.25a3 3 0 0 1-3 3h-2.25a3 3 0 0 1-3-3v-2.25Z" },
+                          { name: "Other", pct: 13.4, color: "#64748b", icon: "M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M12 3v1.5m4.5-1.5v1.5M9.75 21v-6.75a2.25 2.25 0 0 1 2.25-2.25h0a2.25 2.25 0 0 1 2.25 2.25V21" },
+                          { name: "AI & Data", pct: 10.4, color: "#818cf8", icon: "M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z" },
+                          { name: "Health Tech", pct: 8.5, color: "#c084fc", icon: "M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" },
+                          { name: "Sales Tech", pct: 8.5, color: "#7dd3fc", icon: "M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" },
+                          { name: "Fintech", pct: 6.1, color: "#2dd4bf", icon: "M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21" },
+                          { name: "Large Corp", pct: 6.1, color: "#f0abfc", icon: "M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" },
+                          { name: "Big Tech", pct: 4.9, color: "#34d399", icon: "M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" },
+                          { name: "PropTech", pct: 3.7, color: "#a5b4fc", icon: "M2.25 12l8.954-8.955a1.126 1.126 0 0 1 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" },
+                          { name: "Consulting", pct: 3.7, color: "#93c5fd", icon: "M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 0 1-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m7.5 0V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25v.894m7.5 0a48.667 48.667 0 0 0-7.5 0" },
+                          { name: "DevTools", pct: 3.0, color: "#c4b5fd", icon: "M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" },
+                          { name: "MarTech", pct: 2.4, color: "#e0e7ff", icon: "M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38a.997.997 0 0 1-1.177-.169 10.025 10.025 0 0 1-3.99-6.375M10.34 6.66a10.013 10.013 0 0 1 3.99-6.375.997.997 0 0 1 1.177-.169l.657.38c.524.3.71.96.462 1.511a12.636 12.636 0 0 0-.984 2.783m.78 6.06a12.6 12.6 0 0 1 0-6.06" },
+                          { name: "Logistics", pct: 2.4, color: "#6ee7b7", icon: "M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.072-.504.959-1.113a14.9 14.9 0 0 0-1.603-4.137m0 0c-1.012-1.747-2.46-3.266-4.231-4.397L14.25 6H5.25v8.25m11.206 0H14.25m0 0V6" },
+                        ];
+                        const ns = "http://www.w3.org/2000/svg";
+                        const defs = document.createElementNS(ns, "defs");
+                        const clip = document.createElementNS(ns, "clipPath");
+                        clip.id = "carto-clip";
+                        const clipRect = document.createElementNS(ns, "rect");
+                        clipRect.setAttribute("width", W); clipRect.setAttribute("height", H); clipRect.setAttribute("rx", 14);
+                        clip.appendChild(clipRect); defs.appendChild(clip); el.appendChild(defs);
+                        const g = document.createElementNS(ns, "g");
+                        g.setAttribute("clip-path", "url(#carto-clip)"); el.appendChild(g);
+                        const root = d3.hierarchy({ children: sectors }).sum(d => d.pct);
+                        d3.treemap().size([W, H]).padding(0).round(true).tile(d3.treemapSquarify)(root);
+                        const cells = root.leaves();
+                        function wave(p, f) { return AMP * Math.sin(p * 0.14 + f * 0.073); }
+                        function buildEdge(x0, y0, x1, y1) {
+                          const isH = Math.abs(y1 - y0) < 0.5;
+                          if (isH && (y0 < 1 || y0 > H - 1)) return [{ x: x1, y: y1 }];
+                          if (!isH && (x0 < 1 || x0 > W - 1)) return [{ x: x1, y: y1 }];
+                          const pts = [];
+                          if (isH) {
+                            const xA = Math.min(x0,x1), xB = Math.max(x0,x1), dir = x1>x0?1:-1;
+                            const gx = []; for (let v=Math.ceil(xA/STEP)*STEP;v<xB;v+=STEP){if(v>xA)gx.push(v)} if(dir<0)gx.reverse();
+                            gx.forEach(x=>pts.push({x,y:y0+wave(x,y0)})); pts.push({x:x1,y:y1});
+                          } else {
+                            const yA = Math.min(y0,y1), yB = Math.max(y0,y1), dir = y1>y0?1:-1;
+                            const gy = []; for (let v=Math.ceil(yA/STEP)*STEP;v<yB;v+=STEP){if(v>yA)gy.push(v)} if(dir<0)gy.reverse();
+                            gy.forEach(y=>pts.push({x:x0+wave(y,x0),y})); pts.push({x:x1,y:y1});
+                          }
+                          return pts;
+                        }
+                        function cellPath(d) {
+                          let p=`M${d.x0},${d.y0}`;
+                          [buildEdge(d.x0,d.y0,d.x1,d.y0),buildEdge(d.x1,d.y0,d.x1,d.y1),buildEdge(d.x1,d.y1,d.x0,d.y1),buildEdge(d.x0,d.y1,d.x0,d.y0)].forEach(pts=>pts.forEach(pt=>{p+=` L${pt.x.toFixed(1)},${pt.y.toFixed(1)}`}));
+                          return p+"Z";
+                        }
+                        cells.forEach(d => {
+                          const path = document.createElementNS(ns,"path");
+                          path.setAttribute("d",cellPath(d)); path.setAttribute("fill",d.data.color+"25");
+                          path.setAttribute("stroke",d.data.color+"44"); path.setAttribute("stroke-width","1.5");
+                          path.setAttribute("stroke-linejoin","round"); g.appendChild(path);
+                        });
+                        cells.forEach(d => {
+                          const cx=(d.x0+d.x1)/2, cy=(d.y0+d.y1)/2, w=d.x1-d.x0, h=d.y1-d.y0;
+                          const big=w>120&&h>60, med=w>80&&h>45;
+                          const fs=big?13:(med?11:(w>55&&h>35?10:8));
+                          const iconSize=big?18:(med?14:11);
+                          const totalH=iconSize+fs+(fs-2)+8, startY=cy-totalH/2;
+                          const ig=document.createElementNS(ns,"g");
+                          ig.setAttribute("transform",`translate(${cx-iconSize/2},${startY}) scale(${iconSize/24})`);
+                          const ip=document.createElementNS(ns,"path");
+                          ip.setAttribute("d",d.data.icon); ip.setAttribute("fill","none");
+                          ip.setAttribute("stroke",d.data.color); ip.setAttribute("stroke-width","1.5");
+                          ip.setAttribute("stroke-linecap","round"); ip.setAttribute("stroke-linejoin","round");
+                          ip.setAttribute("opacity","0.8"); ig.appendChild(ip); g.appendChild(ig);
+                          const t1=document.createElementNS(ns,"text");
+                          t1.setAttribute("x",cx); t1.setAttribute("y",startY+iconSize+4);
+                          t1.setAttribute("text-anchor","middle"); t1.setAttribute("dominant-baseline","hanging");
+                          t1.setAttribute("fill","rgba(255,255,255,0.85)"); t1.setAttribute("font-size",fs+"px");
+                          t1.setAttribute("font-weight","600"); t1.setAttribute("font-family","Plus Jakarta Sans, sans-serif");
+                          t1.textContent=d.data.name; g.appendChild(t1);
+                          const t2=document.createElementNS(ns,"text");
+                          t2.setAttribute("x",cx); t2.setAttribute("y",startY+iconSize+fs+6);
+                          t2.setAttribute("text-anchor","middle"); t2.setAttribute("dominant-baseline","hanging");
+                          t2.setAttribute("fill",d.data.color); t2.setAttribute("font-size",(fs-1)+"px");
+                          t2.setAttribute("font-family","JetBrains Mono, monospace");
+                          t2.textContent=d.data.pct+"%"; g.appendChild(t2);
+                        });
+                      }} />
+                    </div>
+                    <div style={{ textAlign: "center", marginTop: 12, fontSize: 11, color: "rgba(255,255,255,0.2)", fontFamily: "JetBrains Mono" }}>
+                      164 candidates with known companies · territory size = share of pipeline
+                    </div>
+                  </Glass>
+        </div>
         </div>
       );
     }
@@ -1417,7 +1513,7 @@ window.getPdfBase64 = async function() {
             <>
               {/* Tabs */}
               <div style={{ ...S.tabBar, animation: "fadeUp 0.5s ease 0.1s both" }}>
-                {[{ id: "funnel", label: "Pipeline" }, { id: "candidates", label: "Candidates" }, { id: "inmail", label: "InMail Analytics" }, { id: "offer", label: "Offer Letter Generator" }, { id: "chat", label: "Ask Flip AI" }, { id: "screening", label: "Candidate Screening" }].map(t => (
+                {[{ id: "funnel", label: "Pipeline" }, { id: "inmail", label: "InMail Analytics" }, { id: "offer", label: "Offer Letter Generator" }, { id: "chat", label: "Ask Flip AI" }, { id: "screening", label: "Candidate Hub" }].map(t => (
                   <button key={t.id} className="tab-btn" onClick={() => setActiveTab(t.id)} style={{ ...S.tab, ...(activeTab === t.id ? S.tabOn : {}) }}>{t.label}</button>
                 ))}
               </div>
@@ -1614,107 +1710,6 @@ window.getPdfBase64 = async function() {
               )}
 
               {/* ── CANDIDATES TAB ── */}
-              {activeTab === "candidates" && (
-                <>
-                  <Glass style={{ marginBottom: 20 }}>
-                    <h2 style={S.secTitle}>Top Candidate Industries</h2>
-                    <div style={{ position: "relative", borderRadius: 14, overflow: "hidden", marginTop: 16 }}>
-                      <svg viewBox="0 0 680 460" style={{ width: "100%", height: "auto", display: "block" }} ref={el => {
-                        if (!el || el.dataset.drawn) return;
-                        el.dataset.drawn = "1";
-                        const W = 680, H = 460, AMP = 5, STEP = 22;
-                        const sectors = [
-                          { name: "Other SaaS", pct: 16.5, color: "#a78bfa", icon: "M6 3a3 3 0 0 0-3 3v2.25a3 3 0 0 0 3 3h2.25a3 3 0 0 0 3-3V6a3 3 0 0 0-3-3H6ZM3.75 14.25a3 3 0 0 1 3-3h2.25a3 3 0 0 1 3 3v2.25a3 3 0 0 1-3 3H6.75a3 3 0 0 1-3-3v-2.25ZM14.25 3a3 3 0 0 0-3 3v2.25a3 3 0 0 0 3 3h2.25a3 3 0 0 0 3-3V6a3 3 0 0 0-3-3h-2.25ZM11.25 14.25a3 3 0 0 1 3-3h2.25a3 3 0 0 1 3 3v2.25a3 3 0 0 1-3 3h-2.25a3 3 0 0 1-3-3v-2.25Z" },
-                          { name: "Other", pct: 13.4, color: "#64748b", icon: "M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M12 3v1.5m4.5-1.5v1.5M9.75 21v-6.75a2.25 2.25 0 0 1 2.25-2.25h0a2.25 2.25 0 0 1 2.25 2.25V21" },
-                          { name: "AI & Data", pct: 10.4, color: "#818cf8", icon: "M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z" },
-                          { name: "Health Tech", pct: 8.5, color: "#c084fc", icon: "M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" },
-                          { name: "Sales Tech", pct: 8.5, color: "#7dd3fc", icon: "M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" },
-                          { name: "Fintech", pct: 6.1, color: "#2dd4bf", icon: "M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21" },
-                          { name: "Large Corp", pct: 6.1, color: "#f0abfc", icon: "M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" },
-                          { name: "Big Tech", pct: 4.9, color: "#34d399", icon: "M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" },
-                          { name: "PropTech", pct: 3.7, color: "#a5b4fc", icon: "M2.25 12l8.954-8.955a1.126 1.126 0 0 1 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" },
-                          { name: "Consulting", pct: 3.7, color: "#93c5fd", icon: "M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 0 1-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m7.5 0V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25v.894m7.5 0a48.667 48.667 0 0 0-7.5 0" },
-                          { name: "DevTools", pct: 3.0, color: "#c4b5fd", icon: "M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" },
-                          { name: "MarTech", pct: 2.4, color: "#e0e7ff", icon: "M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 1 1 0-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38a.997.997 0 0 1-1.177-.169 10.025 10.025 0 0 1-3.99-6.375M10.34 6.66a10.013 10.013 0 0 1 3.99-6.375.997.997 0 0 1 1.177-.169l.657.38c.524.3.71.96.462 1.511a12.636 12.636 0 0 0-.984 2.783m.78 6.06a12.6 12.6 0 0 1 0-6.06" },
-                          { name: "Logistics", pct: 2.4, color: "#6ee7b7", icon: "M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.072-.504.959-1.113a14.9 14.9 0 0 0-1.603-4.137m0 0c-1.012-1.747-2.46-3.266-4.231-4.397L14.25 6H5.25v8.25m11.206 0H14.25m0 0V6" },
-                        ];
-                        const ns = "http://www.w3.org/2000/svg";
-                        const defs = document.createElementNS(ns, "defs");
-                        const clip = document.createElementNS(ns, "clipPath");
-                        clip.id = "carto-clip";
-                        const clipRect = document.createElementNS(ns, "rect");
-                        clipRect.setAttribute("width", W); clipRect.setAttribute("height", H); clipRect.setAttribute("rx", 14);
-                        clip.appendChild(clipRect); defs.appendChild(clip); el.appendChild(defs);
-                        const g = document.createElementNS(ns, "g");
-                        g.setAttribute("clip-path", "url(#carto-clip)"); el.appendChild(g);
-                        const root = d3.hierarchy({ children: sectors }).sum(d => d.pct);
-                        d3.treemap().size([W, H]).padding(0).round(true).tile(d3.treemapSquarify)(root);
-                        const cells = root.leaves();
-                        function wave(p, f) { return AMP * Math.sin(p * 0.14 + f * 0.073); }
-                        function buildEdge(x0, y0, x1, y1) {
-                          const isH = Math.abs(y1 - y0) < 0.5;
-                          if (isH && (y0 < 1 || y0 > H - 1)) return [{ x: x1, y: y1 }];
-                          if (!isH && (x0 < 1 || x0 > W - 1)) return [{ x: x1, y: y1 }];
-                          const pts = [];
-                          if (isH) {
-                            const xA = Math.min(x0,x1), xB = Math.max(x0,x1), dir = x1>x0?1:-1;
-                            const gx = []; for (let v=Math.ceil(xA/STEP)*STEP;v<xB;v+=STEP){if(v>xA)gx.push(v)} if(dir<0)gx.reverse();
-                            gx.forEach(x=>pts.push({x,y:y0+wave(x,y0)})); pts.push({x:x1,y:y1});
-                          } else {
-                            const yA = Math.min(y0,y1), yB = Math.max(y0,y1), dir = y1>y0?1:-1;
-                            const gy = []; for (let v=Math.ceil(yA/STEP)*STEP;v<yB;v+=STEP){if(v>yA)gy.push(v)} if(dir<0)gy.reverse();
-                            gy.forEach(y=>pts.push({x:x0+wave(y,x0),y})); pts.push({x:x1,y:y1});
-                          }
-                          return pts;
-                        }
-                        function cellPath(d) {
-                          let p=`M${d.x0},${d.y0}`;
-                          [buildEdge(d.x0,d.y0,d.x1,d.y0),buildEdge(d.x1,d.y0,d.x1,d.y1),buildEdge(d.x1,d.y1,d.x0,d.y1),buildEdge(d.x0,d.y1,d.x0,d.y0)].forEach(pts=>pts.forEach(pt=>{p+=` L${pt.x.toFixed(1)},${pt.y.toFixed(1)}`}));
-                          return p+"Z";
-                        }
-                        cells.forEach(d => {
-                          const path = document.createElementNS(ns,"path");
-                          path.setAttribute("d",cellPath(d)); path.setAttribute("fill",d.data.color+"25");
-                          path.setAttribute("stroke",d.data.color+"44"); path.setAttribute("stroke-width","1.5");
-                          path.setAttribute("stroke-linejoin","round"); g.appendChild(path);
-                        });
-                        cells.forEach(d => {
-                          const cx=(d.x0+d.x1)/2, cy=(d.y0+d.y1)/2, w=d.x1-d.x0, h=d.y1-d.y0;
-                          const big=w>120&&h>60, med=w>80&&h>45;
-                          const fs=big?13:(med?11:(w>55&&h>35?10:8));
-                          const iconSize=big?18:(med?14:11);
-                          const totalH=iconSize+fs+(fs-2)+8, startY=cy-totalH/2;
-                          const ig=document.createElementNS(ns,"g");
-                          ig.setAttribute("transform",`translate(${cx-iconSize/2},${startY}) scale(${iconSize/24})`);
-                          const ip=document.createElementNS(ns,"path");
-                          ip.setAttribute("d",d.data.icon); ip.setAttribute("fill","none");
-                          ip.setAttribute("stroke",d.data.color); ip.setAttribute("stroke-width","1.5");
-                          ip.setAttribute("stroke-linecap","round"); ip.setAttribute("stroke-linejoin","round");
-                          ip.setAttribute("opacity","0.8"); ig.appendChild(ip); g.appendChild(ig);
-                          const t1=document.createElementNS(ns,"text");
-                          t1.setAttribute("x",cx); t1.setAttribute("y",startY+iconSize+4);
-                          t1.setAttribute("text-anchor","middle"); t1.setAttribute("dominant-baseline","hanging");
-                          t1.setAttribute("fill","rgba(255,255,255,0.85)"); t1.setAttribute("font-size",fs+"px");
-                          t1.setAttribute("font-weight","600"); t1.setAttribute("font-family","Plus Jakarta Sans, sans-serif");
-                          t1.textContent=d.data.name; g.appendChild(t1);
-                          const t2=document.createElementNS(ns,"text");
-                          t2.setAttribute("x",cx); t2.setAttribute("y",startY+iconSize+fs+6);
-                          t2.setAttribute("text-anchor","middle"); t2.setAttribute("dominant-baseline","hanging");
-                          t2.setAttribute("fill",d.data.color); t2.setAttribute("font-size",(fs-1)+"px");
-                          t2.setAttribute("font-family","JetBrains Mono, monospace");
-                          t2.textContent=d.data.pct+"%"; g.appendChild(t2);
-                        });
-                      }} />
-                    </div>
-                    <div style={{ textAlign: "center", marginTop: 12, fontSize: 11, color: "rgba(255,255,255,0.2)", fontFamily: "JetBrains Mono" }}>
-                      164 candidates with known companies · territory size = share of pipeline
-                    </div>
-                  </Glass>
-
-
-                </>
-              )}
-
               {/* ── INMAIL TAB ── */}
               {activeTab === "inmail" && (
                 <>
