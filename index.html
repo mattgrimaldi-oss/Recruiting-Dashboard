@@ -1105,7 +1105,7 @@ window.getPdfBase64 = async function() {
           {/* Header */}
           <Glass style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
             <div>
-              <div style={{ fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 700, fontSize: 17, color: "#fff", marginBottom: 4 }}>Candidate Hub</div>
+              <div style={{ fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 700, fontSize: 17, color: "#fff", marginBottom: 4 }}>Priority Applicant Screening</div>
               <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", fontFamily: "JetBrains Mono" }}>
                 {lastRun ? "Last run: " + new Date(lastRun).toLocaleString() : "No recent run recorded"}
                 {" · "}Results sent to <span style={{ color: "#a78bfa" }}>#candidate-alerts</span>
@@ -1210,7 +1210,7 @@ window.getPdfBase64 = async function() {
               )}
             </>
           )}
-        <div style={{ marginTop: 0 }}>
+        <div style={{ marginTop: 0, display: "none" }}>
           <Glass style={{ marginBottom: 20 }}>
                     <h2 style={S.secTitle}>Top Candidate Industries</h2>
                     <div style={{ position: "relative", borderRadius: 14, overflow: "hidden", marginTop: 16 }}>
