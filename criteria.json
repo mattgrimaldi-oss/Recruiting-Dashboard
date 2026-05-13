@@ -147,18 +147,6 @@
         "label": "AI Product Experience",
         "detail": "Experience working for an AI native company or on a product that involves AI",
         "status": "bonus"
-      },
-      {
-        "key": "startup_experience",
-        "label": "Startup Experience",
-        "detail": "At least one of the companies on the resume is sub 200 employees",
-        "status": "bonus"
-      },
-      {
-        "key": "location",
-        "label": "Location",
-        "detail": "Based in a 30 mile radius from Brooklyn, NY or Marina Del Rey, CA. OR states on the resume that they are open to relocation.",
-        "status": "required"
       }
     ]
   }
