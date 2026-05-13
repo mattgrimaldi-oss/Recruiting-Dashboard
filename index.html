@@ -1388,10 +1388,12 @@ window.getPdfBase64 = async function() {
               <>
                 <div>
                   <div style={{ fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 700, fontSize: 17, color: "#fff", marginBottom: 4 }}>Priority Applicant Screening</div>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", fontFamily: "JetBrains Mono" }}>
-                    {lastRun ? "Last run: " + new Date(lastRun).toLocaleString() : "No recent run recorded"}
-                    {" · "}Results sent to <span style={{ color: "#a78bfa" }}>#candidate-alerts</span>
-                  </div>
+                  {!triggerStatus && (
+                    <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", fontFamily: "JetBrains Mono" }}>
+                      {lastRun ? "Last run: " + new Date(lastRun).toLocaleString() : "No recent run recorded"}
+                      {" · "}Results sent to <span style={{ color: "#a78bfa" }}>#candidate-alerts</span>
+                    </div>
+                  )}
                 </div>
                 <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
                   {editing && <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", animation: "fadeIn 0.2s ease" }}>
