@@ -2,7 +2,7 @@
   "config": {
     "frequency": "every_2_days",
     "timeWindowHours": 48,
-    "cronRole": ""
+    "cronRole": "swe"
   },
   "ae": {
     "jobIds": [
