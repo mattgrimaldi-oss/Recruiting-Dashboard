@@ -822,22 +822,26 @@ window.getPdfBase64 = async function() {
         const index = {};
         let page = 1;
         let done = false;
+        let consecutiveErrors = 0;
         while (!done) {
-          const batchSize = 10;
+          const batchSize = 3;
           const promises = Array.from({ length: batchSize }, (_, i) =>
             fetch('/api/chat', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ getPage: page + i }),
-            }).then(r => r.json()).catch(() => ({ candidates: [], done: true }))
+            }).then(r => r.json()).catch(() => null)
           );
           const results = await Promise.all(promises);
           for (const result of results) {
+            if (!result || result.error) { consecutiveErrors++; continue; }
+            consecutiveErrors = 0;
             for (const c of (result.candidates || [])) {
               index[c.name] = { candidateId: c.id, applicationId: c.appId };
             }
             if (result.done) done = true;
           }
+          if (consecutiveErrors >= 6) done = true;
           page += batchSize;
           const count = Object.keys(index).length;
           setIndexStatus(`Loading candidates… ${count.toLocaleString()}`);
@@ -969,7 +973,7 @@ window.getPdfBase64 = async function() {
       not_required:{ bg: "rgba(255,255,255,0.08)",  color: "rgba(255,255,255,0.4)", border: "1px solid rgba(255,255,255,0.1)" },
     };
 
-    const RoleCard = React.memo(function RoleCard({ roleKey, roleConfig, editing, inputStyle, onToggle, onLabelChange, onDetailChange }) {
+    const RoleCard = React.memo(function RoleCard({ roleKey, roleConfig, editing, inputStyle, onToggle, onLabelChange, onDetailChange, onAdd, onRemove }) {
       return (
         <Glass style={{ flex: 1, minWidth: 280 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
@@ -1015,10 +1019,24 @@ window.getPdfBase64 = async function() {
                         </>
                       )}
                     </div>
+                    {editing && (
+                      <button onClick={() => onRemove(roleKey, i)} style={{
+                        background: "none", border: "none", cursor: "pointer", padding: "2px 4px",
+                        color: "rgba(248,113,113,0.5)", fontSize: 16, lineHeight: 1, flexShrink: 0,
+                      }}>×</button>
+                    )}
                   </div>
                 </div>
               );
             })}
+            {editing && (
+              <button onClick={() => onAdd(roleKey)} style={{
+                marginTop: 4, padding: "8px 14px", borderRadius: 8, cursor: "pointer",
+                background: "transparent", border: "1px dashed rgba(255,255,255,0.15)",
+                color: "rgba(255,255,255,0.4)", fontFamily: "Plus Jakarta Sans, sans-serif",
+                fontWeight: 600, fontSize: 12, textAlign: "left",
+              }}>+ Add Criteria</button>
+            )}
           </div>
         </Glass>
       );
@@ -1276,6 +1294,22 @@ window.getPdfBase64 = async function() {
         setDraft(prev => {
           const next = JSON.parse(JSON.stringify(prev));
           next[roleKey].criteria[idx].detail = value;
+          return next;
+        });
+      }, []);
+
+      const handleAddCriteria = React.useCallback((roleKey) => {
+        setDraft(prev => {
+          const next = JSON.parse(JSON.stringify(prev));
+          next[roleKey].criteria.push({ key: "criterion_" + Date.now(), label: "", detail: "", status: "required" });
+          return next;
+        });
+      }, []);
+
+      const handleRemoveCriteria = React.useCallback((roleKey, idx) => {
+        setDraft(prev => {
+          const next = JSON.parse(JSON.stringify(prev));
+          next[roleKey].criteria.splice(idx, 1);
           return next;
         });
       }, []);
@@ -1663,6 +1697,8 @@ window.getPdfBase64 = async function() {
                       onToggle={handleToggle}
                       onLabelChange={handleLabelChange}
                       onDetailChange={handleDetailChange}
+                      onAdd={handleAddCriteria}
+                      onRemove={handleRemoveCriteria}
                     />
                   )}
                 </>
@@ -1689,7 +1725,7 @@ window.getPdfBase64 = async function() {
       const [confirmReset, setConfirmReset] = useState(false);
       const [timeframe, setTimeframe] = useState("since_mc");
       const [manualEntries, setManualEntries] = useState(() => { try { return JSON.parse(localStorage.getItem('flipManualEntries_v2') || '[]'); } catch(e) { return []; } });
-      const [slackOffers, setSlackOffers] = useState([]);
+      const [slackOffers, setSlackOffers] = useState([{"name":"Ji Sun (Alyce) Hong","date":"2026-02-16"},{"name":"Jason Lobell","date":"2026-02-23"},{"name":"Elizabeth Youshaei","date":"2026-03-11"},{"name":"Jonah Epstein","date":"2026-03-20"},{"name":"Aleksandre Natchkebia","date":"2026-03-27"},{"name":"Beylem Zanagar","date":"2026-03-27"},{"name":"Alexandra Dehaemers","date":"2026-04-04"},{"name":"Eren Ocal","date":"2026-04-04"},{"name":"Amanda Anderson","date":"2026-04-16"},{"name":"Amy Ji","date":"2026-04-24"},{"name":"Devon Armogeda","date":"2026-04-24"},{"name":"Devin Patel","date":"2026-04-24"},{"name":"Rob Suttman","date":"2026-04-28"},{"name":"Joelle Valadez","date":"2026-04-29"},{"name":"Ryan Miller","date":"2026-05-04"},{"name":"Matt Molt","date":"2026-05-06"},{"name":"Ian Masse","date":"2026-05-08"},{"name":"Lee Jacobs","date":"2026-05-11"}]); // lastSync: 2026-05-12
       const [addingFor, setAddingFor] = useState(null);
       const [addDate, setAddDate] = useState("");
       const [addName, setAddName] = useState("");
@@ -1726,8 +1762,6 @@ window.getPdfBase64 = async function() {
           try { const j = await window.storage.get("recruiting-jobs"); if (j?.value) setJobData(JSON.parse(j.value)); } catch(e) {}
           setLoading(false);
         })();
-        // Load Slack offer data
-        (async () => { try { const r = await fetch('/slackOffers.json?t=' + Date.now()); if (r.ok) { const d = await r.json(); setSlackOffers(d.offers || []); } } catch(e) {} })();
       }, []);
 
       const saveWeeks = useCallback(async (nw) => {
