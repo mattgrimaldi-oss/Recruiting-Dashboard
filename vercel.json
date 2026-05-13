@@ -6,12 +6,14 @@
     "api/check-candidates-ae.js": { "maxDuration": 60 },
     "api/check-candidates-swe.js": { "maxDuration": 60 },
     "api/trigger-screening.js": { "maxDuration": 15 },
-    "api/criteria.js": { "maxDuration": 15 }
+    "api/criteria.js": { "maxDuration": 15 },
+    "api/screening-results.js": { "maxDuration": 15 }
   },
   "routes": [
     { "src": "/api/send-to-docusign", "dest": "/api/send-to-docusign.js", "methods": ["POST", "OPTIONS"] },
     { "src": "/api/trigger-screening", "dest": "/api/trigger-screening.js", "methods": ["GET", "POST", "OPTIONS"] },
     { "src": "/api/criteria", "dest": "/api/criteria.js", "methods": ["GET", "POST", "OPTIONS"] },
+    { "src": "/api/screening-results", "dest": "/api/screening-results.js", "methods": ["GET", "OPTIONS"] },
     { "src": "/api/chat", "dest": "/api/chat.js", "methods": ["POST", "OPTIONS"] },
     { "src": "/api/test-resume", "dest": "/api/test-resume.js", "methods": ["GET", "OPTIONS"] },
     { "src": "/api/check-candidates-ae", "dest": "/api/check-candidates-ae.js", "methods": ["GET", "OPTIONS"] },

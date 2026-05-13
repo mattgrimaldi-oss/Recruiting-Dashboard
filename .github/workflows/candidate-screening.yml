@@ -35,4 +35,5 @@ jobs:
           GREENHOUSE_API_KEY_V1: ${{ secrets.GREENHOUSE_API_KEY_V1 }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node scripts/run-screening.js "${{ github.event.inputs.role }}" "${{ github.event.inputs.time_window_hours }}"

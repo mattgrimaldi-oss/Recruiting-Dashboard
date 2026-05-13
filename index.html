@@ -1194,6 +1194,7 @@ window.getPdfBase64 = async function() {
       const [runMenuOpen, setRunMenuOpen] = React.useState(false);
       const [runRole, setRunRole] = React.useState("all");
       const [runTimeWindow, setRunTimeWindow] = React.useState(48);
+      const [screeningResults, setScreeningResults] = React.useState(null);
 
       React.useEffect(() => {
         fetch("/api/criteria").then(r => r.json()).then(d => {
@@ -1210,6 +1211,7 @@ window.getPdfBase64 = async function() {
         if (criteria.config) setConfigDraft({ ...criteria.config });
         setEditing(true);
         setSaveStatus(null);
+        setScreeningResults(null);
       }
       function cancelEdit() { setEditing(false); setDraft(null); setSaveStatus(null); }
 
@@ -1308,6 +1310,7 @@ window.getPdfBase64 = async function() {
                 if (d.createdAt && new Date(d.createdAt).getTime() > triggeredAt && d.status === "completed") {
                   clearInterval(pollRef.current);
                   setTriggerStatus("done");
+                  fetch("/api/screening-results").then(r => r.json()).then(d => { if (d.roles) setScreeningResults(d); }).catch(() => {});
                 }
               } catch {}
             }, 20000);
@@ -1447,7 +1450,7 @@ window.getPdfBase64 = async function() {
                           Check Slack ✓
                         </div>
                       ) : (
-                        <button onClick={() => { setRunMenuOpen(true); setTriggerStatus(null); }} className="primary-btn"
+                        <button onClick={() => { setRunMenuOpen(true); setTriggerStatus(null); setScreeningResults(null); }} className="primary-btn"
                           style={{ padding: "10px 22px", borderRadius: 12, border: "none", cursor: "pointer", background: "#620DEC", color: "#fff", fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 13 }}>
                           Run Screening Now
                         </button>
@@ -1461,6 +1464,39 @@ window.getPdfBase64 = async function() {
 
           {!display ? (
             <Glass><div style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, fontFamily: "JetBrains Mono" }}>Loading criteria…</div></Glass>
+          ) : runMenuOpen ? null
+          : triggerStatus === "running" ? (
+            <Glass><div style={{ color: "rgba(255,255,255,0.35)", fontSize: 13, fontFamily: "JetBrains Mono" }}>Screening in progress — candidates will appear here when complete…</div></Glass>
+          ) : screeningResults ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              {screeningResults.roles.map((role, ri) => (
+                <Glass key={ri}>
+                  <div style={{ fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 700, fontSize: 15, color: "#fff", marginBottom: 14 }}>
+                    {role.jobName}{role.passing.length > 0 ? ` — ${role.passing.length} passed` : ""}
+                  </div>
+                  {role.passing.length === 0 ? (
+                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.35)", fontFamily: "JetBrains Mono" }}>No candidates found</div>
+                  ) : (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {role.passing.map((c, i) => (
+                        <div key={i} style={{ fontSize: 13, fontFamily: "JetBrains Mono", color: "rgba(255,255,255,0.85)", animation: "fadeUp 0.45s ease both", animationDelay: `${ri * role.passing.length * 0.1 + i * 0.12}s` }}>
+                          <span style={{ color: "rgba(255,255,255,0.3)" }}>•</span>{" "}
+                          <a href={`https://app8.greenhouse.io/people/${c.id}`} target="_blank" rel="noreferrer"
+                            style={{ color: "#a78bfa", textDecoration: "none" }}>{c.name}</a>
+                          {c.location && <span style={{ color: "rgba(255,255,255,0.4)" }}> — {c.location}</span>}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </Glass>
+              ))}
+              <button onClick={() => setScreeningResults(null)} className="ghost-btn" style={{
+                alignSelf: "flex-start", padding: "9px 18px", borderRadius: 10,
+                border: "1px solid rgba(255,255,255,0.15)", background: "transparent",
+                color: "rgba(255,255,255,0.45)", fontFamily: "Plus Jakarta Sans, sans-serif",
+                fontWeight: 600, fontSize: 13, cursor: "pointer",
+              }}>← Back to Criteria</button>
+            </div>
           ) : creatingRole ? (
             <NewRoleForm onSave={saveNewRole} onCancel={() => setCreatingRole(false)} inputStyle={inputStyle} />
           ) : (
