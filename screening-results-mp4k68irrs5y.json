@@ -1,0 +1,24 @@
+{
+  "runAt": "2026-05-13T21:22:13.746Z",
+  "runId": "mp4k68irrs5y",
+  "roles": [
+    {
+      "roleKey": "swe",
+      "jobName": "Software Engineer",
+      "passing": [
+        {
+          "name": "Varun Kurri",
+          "id": 63487293008,
+          "location": "San Jose, CA"
+        },
+        {
+          "name": "Aditya Kumar",
+          "id": 26901300008,
+          "location": "Maryland"
+        }
+      ],
+      "checked": 37,
+      "notified": 0
+    }
+  ]
+}
