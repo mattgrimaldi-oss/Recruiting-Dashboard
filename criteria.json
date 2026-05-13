@@ -134,6 +134,12 @@
         "label": "SaaS Experience",
         "detail": "Experience selling a SaaS tool or working for a SaaS company",
         "status": "bonus"
+      },
+      {
+        "key": "criterion_1778704155844",
+        "label": "Employment Recency",
+        "detail": "Most recent job is until \"present\" or at max 3 months ago. A year without a month is treated as July of that year. ",
+        "status": "required"
       }
     ]
   }
