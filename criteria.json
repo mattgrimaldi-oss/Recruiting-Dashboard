@@ -26,7 +26,7 @@
         "key": "education",
         "label": "Education",
         "detail": "Note whether they have a bachelor's degree and when they graduated.",
-        "status": "not_required"
+        "status": "required"
       },
       {
         "key": "quota_attainment",
