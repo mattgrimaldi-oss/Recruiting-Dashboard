@@ -1,0 +1,19 @@
+{
+  "runAt": "2026-05-13T16:29:56.399Z",
+  "runId": "mp49yfkl1s3s",
+  "roles": [
+    {
+      "roleKey": "ae",
+      "jobName": "Account Executive",
+      "passing": [
+        {
+          "name": "Nicholas Simonelli",
+          "id": 62549538008,
+          "location": "Los Angeles, CA"
+        }
+      ],
+      "checked": 3,
+      "notified": 0
+    }
+  ]
+}
