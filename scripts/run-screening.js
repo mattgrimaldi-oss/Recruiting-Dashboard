@@ -46,6 +46,7 @@ async function main() {
   const roleArg = (process.argv[2] || '').trim();
   const timeArg  = (process.argv[3] || '').trim();
   const timeWindowHoursOverride = timeArg ? Number(timeArg) : null;
+  const isManual = !!(roleArg || timeArg);
 
   const allRoles = Object.keys(CRITERIA).filter(k => k !== 'config');
 
@@ -69,7 +70,7 @@ async function main() {
   for (const role of roles) {
     console.log(`\n--- Processing: ${role.toUpperCase()} ---`);
     try {
-      const results = await processJob(role, timeWindowHoursOverride);
+      const results = await processJob(role, timeWindowHoursOverride, { silent: isManual });
       allResults.push({
         roleKey:  role,
         jobName:  results.jobName || role,
