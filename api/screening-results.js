@@ -10,8 +10,7 @@ module.exports = async (req, res) => {
   if (!token) return res.status(500).json({ error: 'GITHUB_PAT not set' });
 
   try {
-    const url = new URL(req.url, `https://${req.headers.host}`);
-    const runId = url.searchParams.get('runId');
+    const runId = req.query?.runId || null;
     const filename = runId ? `screening-results-${runId}.json` : 'screening-results.json';
     const r = await fetch(
       `https://api.github.com/repos/${OWNER}/${REPO}/contents/${filename}?ref=main`,
