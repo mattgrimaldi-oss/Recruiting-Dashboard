@@ -1458,7 +1458,7 @@ window.getPdfBase64 = async function() {
                         </div>
                       ) : triggerStatus === "done" ? (
                         <div style={{ padding: "10px 22px", borderRadius: 12, background: "rgba(52,211,153,0.12)", border: "1px solid rgba(52,211,153,0.25)", color: "#34d399", fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 13, whiteSpace: "nowrap" }}>
-                          Check Slack ✓
+                          Done ✓
                         </div>
                       ) : (
                         <button onClick={() => { setRunMenuOpen(true); setTriggerStatus(null); setScreeningResults(null); }} className="primary-btn"
@@ -1504,12 +1504,12 @@ window.getPdfBase64 = async function() {
                   )}
                 </Glass>
               ))}
-              <button onClick={() => setScreeningResults(null)} className="ghost-btn" style={{
+              <button onClick={() => { setScreeningResults(null); setTriggerStatus(null); }} className="ghost-btn" style={{
                 alignSelf: "flex-start", padding: "9px 18px", borderRadius: 10,
                 border: "1px solid rgba(255,255,255,0.15)", background: "transparent",
                 color: "rgba(255,255,255,0.45)", fontFamily: "Plus Jakarta Sans, sans-serif",
                 fontWeight: 600, fontSize: 13, cursor: "pointer",
-              }}>← Back to Criteria</button>
+              }}>← Back</button>
             </div>
           ) : creatingRole ? (
             <NewRoleForm onSave={saveNewRole} onCancel={() => setCreatingRole(false)} inputStyle={inputStyle} />
