@@ -1167,10 +1167,15 @@ window.getPdfBase64 = async function() {
         { value: "weekly",       label: "Weekly",       cron: "0 9 * * 1",   runsPerMonth: 4  },
       ];
       const TIME_OPTIONS = [
-        { value: 24,  label: "Last 24 hrs", estCandidates: 8  },
-        { value: 48,  label: "Last 48 hrs", estCandidates: 17 },
-        { value: 72,  label: "Last 72 hrs", estCandidates: 25 },
-        { value: 168, label: "Last 7 days", estCandidates: 59 },
+        { value: 24,  label: "Last 24 hrs", estCandidates: 8   },
+        { value: 48,  label: "Last 48 hrs", estCandidates: 17  },
+        { value: 72,  label: "Last 72 hrs", estCandidates: 25  },
+        { value: 168, label: "Last 7 days", estCandidates: 59  },
+      ];
+      const RUN_TIME_OPTIONS = [
+        ...TIME_OPTIONS,
+        { value: 336, label: "Last 2 weeks", estCandidates: 112 },
+        { value: 720, label: "Last 1 month", estCandidates: 240 },
       ];
       const COST_PER = 0.0003;
 
@@ -1321,7 +1326,7 @@ window.getPdfBase64 = async function() {
       const cronRoleCount  = configDraft.cronRole ? 1 : Math.max(roleKeys.length, 1);
       const costPerRun     = estCandidates * COST_PER * cronRoleCount;
       const costPerMonth   = costPerRun * runsPerMonth;
-      const runEstCands    = (TIME_OPTIONS.find(t => t.value === runTimeWindow) || TIME_OPTIONS[1]).estCandidates;
+      const runEstCands    = (RUN_TIME_OPTIONS.find(t => t.value === runTimeWindow) || RUN_TIME_OPTIONS[1]).estCandidates;
       const runRoleCount   = runRole === "all" ? Math.max(roleKeys.length, 1) : 1;
       const runCostPerRun  = runEstCands * COST_PER * runRoleCount;
       const fmt = (n) => n < 0.1 ? `$${n.toFixed(4)}` : `$${n.toFixed(2)}`;
@@ -1431,7 +1436,7 @@ window.getPdfBase64 = async function() {
                 <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
                   <span style={{ fontSize: 10, fontFamily: "JetBrains Mono", color: "rgba(255,255,255,0.35)", letterSpacing: "0.06em", textTransform: "uppercase" }}>Search Window</span>
                   <select value={runTimeWindow} onChange={e => setRunTimeWindow(Number(e.target.value))} style={selectStyle}>
-                    {TIME_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                    {RUN_TIME_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                   </select>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
