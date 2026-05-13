@@ -4,7 +4,7 @@
     "timeWindowHours": 48
   },
   "ae": {
-    "jobId": "4462684008",
+    "jobIds": ["4462684008"],
     "jobName": "Account Executive",
     "criteria": [
       {
@@ -40,7 +40,7 @@
     ]
   },
   "swe": {
-    "jobId": "4203780008",
+    "jobIds": ["4203780008"],
     "jobName": "Software Engineer",
     "criteria": [
       {

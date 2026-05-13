@@ -974,10 +974,14 @@ window.getPdfBase64 = async function() {
         <Glass style={{ flex: 1, minWidth: 280 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
             <span style={{ fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 700, fontSize: 15, color: "#fff" }}>{roleConfig.jobName}</span>
-            <a href={"https://app8.greenhouse.io/sdash/" + roleConfig.jobId} target="_blank" rel="noreferrer"
-              style={{ fontSize: 12, color: "#a78bfa", fontFamily: "JetBrains Mono", textDecoration: "none" }}>
-              Greenhouse ↗
-            </a>
+            <div style={{ display: "flex", gap: 10 }}>
+              {(Array.isArray(roleConfig.jobIds) ? roleConfig.jobIds : [roleConfig.jobId]).map((id, i) => (
+                <a key={id} href={"https://app8.greenhouse.io/sdash/" + id} target="_blank" rel="noreferrer"
+                  style={{ fontSize: 12, color: "#a78bfa", fontFamily: "JetBrains Mono", textDecoration: "none" }}>
+                  Greenhouse{roleConfig.jobIds?.length > 1 ? " " + (i + 1) : ""} ↗
+                </a>
+              ))}
+            </div>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {roleConfig.criteria.map((c, i) => {
@@ -1022,7 +1026,7 @@ window.getPdfBase64 = async function() {
 
     const NewRoleForm = React.memo(function NewRoleForm({ onSave, onCancel, inputStyle }) {
       const [roleName, setRoleName] = React.useState("");
-      const [ghLink, setGhLink] = React.useState("");
+      const [ghLinks, setGhLinks] = React.useState([""]);
       const [rows, setRows] = React.useState([
         { label: "", detail: "", status: "required" },
         { label: "", detail: "", status: "required" },
@@ -1050,13 +1054,14 @@ window.getPdfBase64 = async function() {
       async function handleSave() {
         setError(null);
         if (!roleName.trim()) { setError("Role name is required."); return; }
-        if (!ghLink.trim()) { setError("Greenhouse link is required."); return; }
-        const jobId = parseJobId(ghLink);
-        if (!jobId) { setError("Couldn't find a job ID in that link — paste the full Greenhouse URL."); return; }
+        const filledLinks = ghLinks.filter(l => l.trim());
+        if (filledLinks.length === 0) { setError("At least one Greenhouse link is required."); return; }
+        const jobIds = filledLinks.map(parseJobId).filter(Boolean);
+        if (jobIds.length !== filledLinks.length) { setError("Couldn't find a job ID in one of the links — paste the full Greenhouse URL."); return; }
         const filled = rows.filter(c => c.label.trim());
         if (filled.length === 0) { setError("Add at least one criterion with a label."); return; }
         const roleData = {
-          jobId,
+          jobIds,
           jobName: roleName.trim(),
           criteria: filled.map(c => ({
             key: toKey(c.label),
@@ -1081,9 +1086,25 @@ window.getPdfBase64 = async function() {
                 style={{ ...inputStyle, fontSize: 13 }} />
             </div>
             <div style={{ flex: 1, minWidth: 200, display: "flex", flexDirection: "column", gap: 5 }}>
-              <span style={{ fontSize: 10, fontFamily: "JetBrains Mono", color: "rgba(255,255,255,0.35)", letterSpacing: "0.06em", textTransform: "uppercase" }}>Greenhouse Link</span>
-              <input value={ghLink} onChange={e => setGhLink(e.target.value)} placeholder="https://app8.greenhouse.io/sdash/..."
-                style={{ ...inputStyle, fontSize: 13 }} />
+              <span style={{ fontSize: 10, fontFamily: "JetBrains Mono", color: "rgba(255,255,255,0.35)", letterSpacing: "0.06em", textTransform: "uppercase" }}>Greenhouse Link{ghLinks.length > 1 ? "s" : ""}</span>
+              {ghLinks.map((link, i) => (
+                <div key={i} style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                  <input value={link} onChange={e => setGhLinks(p => p.map((v, idx) => idx === i ? e.target.value : v))}
+                    placeholder="https://app8.greenhouse.io/sdash/..."
+                    style={{ ...inputStyle, fontSize: 13, flex: 1 }} />
+                  {ghLinks.length > 1 && (
+                    <button onClick={() => setGhLinks(p => p.filter((_, idx) => idx !== i))}
+                      style={{ background: "none", border: "none", color: "rgba(255,255,255,0.25)", cursor: "pointer", fontSize: 18, padding: "0 4px", lineHeight: 1 }}>×</button>
+                  )}
+                </div>
+              ))}
+              {ghLinks.length < 5 && (
+                <button onClick={() => setGhLinks(p => [...p, ""])} style={{
+                  alignSelf: "flex-start", background: "none", border: "none", padding: 0,
+                  color: "rgba(255,255,255,0.35)", fontFamily: "Plus Jakarta Sans, sans-serif",
+                  fontSize: 12, fontWeight: 600, cursor: "pointer",
+                }}>+ Add second link</button>
+              )}
             </div>
           </div>
 
