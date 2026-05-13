@@ -72,12 +72,6 @@
         "status": "required"
       },
       {
-        "key": "startup_experience",
-        "label": "Startup Background",
-        "detail": "At least one employer was a startup or company with under 500 employees. Ideally 10–200 employees.",
-        "status": "required"
-      },
-      {
         "key": "education",
         "label": "Education",
         "detail": "Bachelor's degree in Computer Science, Information Management Systems, Applied Math, or a related technical/CS field. Must have graduated in 2020 or earlier.",
