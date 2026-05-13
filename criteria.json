@@ -37,7 +37,7 @@
         "key": "sales_experience",
         "label": "Sales Experience",
         "detail": "At least 2 years as an Account Executive OR at least 3 years as a BDR/SDR. SaaS experience preferred.",
-        "status": "not_required"
+        "status": "required"
       },
       {
         "key": "education",
@@ -49,7 +49,7 @@
         "key": "quota_attainment",
         "label": "Quota Attainment",
         "detail": "Resume explicitly mentions exceeding quota (e.g. '130% of quota', 'exceeded targets', '#1 rep').",
-        "status": "not_required"
+        "status": "required"
       }
     ]
   },
