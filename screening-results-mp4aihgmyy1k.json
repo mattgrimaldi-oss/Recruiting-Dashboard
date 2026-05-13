@@ -1,0 +1,29 @@
+{
+  "runAt": "2026-05-13T16:46:23.248Z",
+  "runId": "mp4aihgmyy1k",
+  "roles": [
+    {
+      "roleKey": "business_development_representative",
+      "jobName": "Business Development Representative",
+      "passing": [
+        {
+          "name": "Kaitlyn Williams",
+          "id": 63641177008,
+          "location": "Los Angeles, CA"
+        },
+        {
+          "name": "Yuxiao Zhang",
+          "id": 63651661008,
+          "location": "Los Angeles, CA"
+        },
+        {
+          "name": "Whitten Gibson",
+          "id": 63605005008,
+          "location": "Los Angeles, CA"
+        }
+      ],
+      "checked": 10,
+      "notified": 0
+    }
+  ]
+}
