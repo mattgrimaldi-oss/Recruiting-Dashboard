@@ -1,0 +1,23 @@
+{
+  "runAt": "2026-05-13T15:11:47.631Z",
+  "roles": [
+    {
+      "roleKey": "ae",
+      "jobName": "Account Executive",
+      "passing": [
+        {
+          "name": "Nicholas Simonelli",
+          "id": 62549538008,
+          "location": null
+        },
+        {
+          "name": "Kudus Edu",
+          "id": 63679025008,
+          "location": null
+        }
+      ],
+      "checked": 3,
+      "notified": 2
+    }
+  ]
+}
