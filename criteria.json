@@ -34,12 +34,6 @@
         "status": "not_required"
       },
       {
-        "key": "startup_experience",
-        "label": "Startup Background",
-        "detail": "At least one employer was a startup or company with under 200 employees. Ideally 10–100 employees.",
-        "status": "not_required"
-      },
-      {
         "key": "education",
         "label": "Education",
         "detail": "Note whether they have a bachelor's degree and when they graduated.",
