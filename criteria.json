@@ -1,7 +1,8 @@
 {
   "config": {
     "frequency": "every_2_days",
-    "timeWindowHours": 48
+    "timeWindowHours": 48,
+    "cronRole": ""
   },
   "ae": {
     "jobIds": ["4462684008"],

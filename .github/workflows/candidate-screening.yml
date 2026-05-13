@@ -3,7 +3,16 @@ name: Candidate Screening
 on:
   schedule:
     - cron: '0 9 */2 * *'  # Every 2 days at 9am UTC
-  workflow_dispatch:         # Enables manual "Run workflow" button in GitHub UI
+  workflow_dispatch:
+    inputs:
+      role:
+        description: 'Role key to screen (empty = use cron config / all roles)'
+        required: false
+        default: ''
+      time_window_hours:
+        description: 'Time window in hours (empty = use config)'
+        required: false
+        default: ''
 
 jobs:
   screen:
@@ -26,4 +35,4 @@ jobs:
           GREENHOUSE_API_KEY_V1: ${{ secrets.GREENHOUSE_API_KEY_V1 }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        run: node scripts/run-screening.js
+        run: node scripts/run-screening.js "${{ github.event.inputs.role }}" "${{ github.event.inputs.time_window_hours }}"

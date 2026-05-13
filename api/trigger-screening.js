@@ -30,6 +30,12 @@ module.exports = async (req, res) => {
 
   // POST — trigger workflow
   if (req.method === 'POST') {
+    let body = {};
+    try { body = req.body ? (typeof req.body === 'string' ? JSON.parse(req.body) : req.body) : {}; } catch {}
+    const inputs = {};
+    if (body.role && body.role !== 'all') inputs.role = body.role;
+    if (body.timeWindowHours) inputs.time_window_hours = String(body.timeWindowHours);
+
     const r = await fetch(
       `https://api.github.com/repos/${OWNER}/${REPO}/actions/workflows/${WORKFLOW}/dispatches`,
       {
@@ -39,7 +45,7 @@ module.exports = async (req, res) => {
           Accept: 'application/vnd.github+json',
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ ref: 'main' }),
+        body: JSON.stringify({ ref: 'main', inputs }),
       }
     );
     if (!r.ok) {
