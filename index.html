@@ -1167,17 +1167,17 @@ window.getPdfBase64 = async function() {
         { value: "weekly",       label: "Weekly",       cron: "0 9 * * 1",   runsPerMonth: 4  },
       ];
       const TIME_OPTIONS = [
-        { value: 24,  label: "Last 24 hrs", estCandidates: 8   },
-        { value: 48,  label: "Last 48 hrs", estCandidates: 17  },
-        { value: 72,  label: "Last 72 hrs", estCandidates: 25  },
-        { value: 168, label: "Last 7 days", estCandidates: 59  },
+        { value: 24,  label: "Last 24 hrs", estCandidates: 15  },
+        { value: 48,  label: "Last 48 hrs", estCandidates: 28  },
+        { value: 72,  label: "Last 72 hrs", estCandidates: 43  },
+        { value: 168, label: "Last 7 days", estCandidates: 100 },
       ];
       const RUN_TIME_OPTIONS = [
         ...TIME_OPTIONS,
-        { value: 336, label: "Last 2 weeks", estCandidates: 112 },
-        { value: 720, label: "Last 1 month", estCandidates: 240 },
+        { value: 336, label: "Last 2 weeks", estCandidates: 200 },
+        { value: 720, label: "Last 1 month", estCandidates: 430 },
       ];
-      const COST_PER = 0.0003;
+      const COST_PER = 0.0055;
 
       const [criteria, setCriteria] = React.useState(null);
       const [sha, setSha] = React.useState(null);
@@ -1310,7 +1310,7 @@ window.getPdfBase64 = async function() {
                 if (d.createdAt && new Date(d.createdAt).getTime() > triggeredAt && d.status === "completed") {
                   clearInterval(pollRef.current);
                   setTriggerStatus("done");
-                  fetch("/api/screening-results").then(r => r.json()).then(d => { if (d.roles) setScreeningResults(d); }).catch(() => {});
+                  fetch("/api/screening-results").then(r => r.json()).then(d => { setScreeningResults(d.roles ? d : { roles: [] }); }).catch(() => { setScreeningResults({ roles: [] }); });
                 }
               } catch {}
             }, 20000);
@@ -1443,7 +1443,7 @@ window.getPdfBase64 = async function() {
                       </button>
                       {triggerStatus === "running" ? (
                         <div style={{ padding: "10px 22px", borderRadius: 12, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.3)", fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 13, whiteSpace: "nowrap" }}>
-                          Running — est. ~2 min
+                          Running — est. ~{Math.max(2, Math.round(runEstCands * 0.17))} min
                         </div>
                       ) : triggerStatus === "done" ? (
                         <div style={{ padding: "10px 22px", borderRadius: 12, background: "rgba(52,211,153,0.12)", border: "1px solid rgba(52,211,153,0.25)", color: "#34d399", fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 13, whiteSpace: "nowrap" }}>
@@ -1465,10 +1465,13 @@ window.getPdfBase64 = async function() {
           {!display ? (
             <Glass><div style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, fontFamily: "JetBrains Mono" }}>Loading criteria…</div></Glass>
           ) : runMenuOpen ? null
-          : triggerStatus === "running" ? (
+          : (triggerStatus === "running" || triggerStatus === "done") && !screeningResults ? (
             <Glass><div style={{ color: "rgba(255,255,255,0.35)", fontSize: 13, fontFamily: "JetBrains Mono" }}>Screening in progress — candidates will appear here when complete…</div></Glass>
           ) : screeningResults ? (
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              {screeningResults.roles.length === 0 && (
+                <Glass><div style={{ fontSize: 13, color: "rgba(255,255,255,0.35)", fontFamily: "JetBrains Mono" }}>No candidates found</div></Glass>
+              )}
               {screeningResults.roles.map((role, ri) => (
                 <Glass key={ri}>
                   <div style={{ fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 700, fontSize: 15, color: "#fff", marginBottom: 14 }}>
