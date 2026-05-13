@@ -1460,7 +1460,7 @@ window.getPdfBase64 = async function() {
                         <span style={labelStyle}>Role</span>
                         <select value={runRole} onChange={e => setRunRole(e.target.value)} style={selectStyle}>
                           <option value="all">All Roles</option>
-                          {roleKeys.map(k => <option key={k} value={k}>{criteria[k].jobName}</option>)}
+                          {roleKeys.filter(k => k !== "_global").map(k => <option key={k} value={k}>{criteria[k].jobName}</option>)}
                         </select>
                       </div>
                       <div style={{ display: "flex", flexDirection: "column", gap: 3, padding: "0 4px" }}>
@@ -1577,7 +1577,7 @@ window.getPdfBase64 = async function() {
                       <span style={labelStyle}>Role</span>
                       <select value={configDraft.cronRole || ""} onChange={e => setConfigDraft(p => ({ ...p, cronRole: e.target.value }))} style={selectStyle}>
                         <option value="">All Roles</option>
-                        {roleKeys.map(k => <option key={k} value={k}>{criteria?.[k]?.jobName || k}</option>)}
+                        {roleKeys.filter(k => k !== "_global").map(k => <option key={k} value={k}>{criteria?.[k]?.jobName || k}</option>)}
                       </select>
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 3, padding: "0 4px" }}>

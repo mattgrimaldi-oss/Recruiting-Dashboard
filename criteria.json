@@ -1,4 +1,8 @@
 {
+  "_global": {
+    "jobName": "All Jobs",
+    "criteria": []
+  },
   "config": {
     "frequency": "every_2_days",
     "timeWindowHours": 48,
