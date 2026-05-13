@@ -10,8 +10,11 @@ module.exports = async (req, res) => {
   if (!token) return res.status(500).json({ error: 'GITHUB_PAT not set' });
 
   try {
+    const url = new URL(req.url, `https://${req.headers.host}`);
+    const runId = url.searchParams.get('runId');
+    const filename = runId ? `screening-results-${runId}.json` : 'screening-results.json';
     const r = await fetch(
-      `https://api.github.com/repos/${OWNER}/${REPO}/contents/screening-results.json?ref=main`,
+      `https://api.github.com/repos/${OWNER}/${REPO}/contents/${filename}?ref=main`,
       { headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' } }
     );
     if (!r.ok) return res.status(r.status).json({ error: 'Results not found' });

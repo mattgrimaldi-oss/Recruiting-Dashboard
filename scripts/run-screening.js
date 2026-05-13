@@ -4,29 +4,30 @@ const CRITERIA = require('../criteria.json');
 const OWNER = 'mattgrimaldi-oss';
 const REPO  = 'Recruiting-Dashboard';
 
-async function saveScreeningResults(roles) {
+async function saveScreeningResults(roles, runId) {
   const token = process.env.GITHUB_TOKEN;
   if (!token) { console.log('No GITHUB_TOKEN — skipping results save'); return; }
 
-  const payload = { runAt: new Date().toISOString(), roles };
+  const filename = runId ? `screening-results-${runId}.json` : 'screening-results.json';
+  const payload = { runAt: new Date().toISOString(), runId: runId || null, roles };
 
   let sha;
   try {
-    const r = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/screening-results.json?ref=main`, {
+    const r = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${filename}?ref=main`, {
       headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' },
     });
     if (r.ok) { const d = await r.json(); sha = d.sha; }
   } catch {}
 
   const body = {
-    message: 'Update screening results',
+    message: `Update screening results${runId ? ` (${runId})` : ''}`,
     content: Buffer.from(JSON.stringify(payload, null, 2)).toString('base64'),
     branch: 'main',
   };
   if (sha) body.sha = sha;
 
   try {
-    const putRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/screening-results.json`, {
+    const putRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${filename}`, {
       method: 'PUT',
       headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -35,7 +36,7 @@ async function saveScreeningResults(roles) {
       const errText = await putRes.text();
       console.error(`Failed to save results (${putRes.status}): ${errText}`);
     } else {
-      console.log('✅ Results saved to screening-results.json');
+      console.log(`✅ Results saved to ${filename}`);
     }
   } catch (e) {
     console.error('Failed to save results:', e.message);
@@ -45,6 +46,7 @@ async function saveScreeningResults(roles) {
 async function main() {
   const roleArg = (process.argv[2] || '').trim();
   const timeArg  = (process.argv[3] || '').trim();
+  const runId    = (process.argv[4] || '').trim() || null;
   const timeWindowHoursOverride = timeArg ? Number(timeArg) : null;
   const isManual = !!(roleArg || timeArg);
 
@@ -91,7 +93,7 @@ async function main() {
     }
   }
 
-  await saveScreeningResults(allResults);
+  await saveScreeningResults(allResults, runId);
 
   console.log('\n✅ Screening complete.\n');
 }

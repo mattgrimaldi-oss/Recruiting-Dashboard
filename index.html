@@ -1289,12 +1289,12 @@ window.getPdfBase64 = async function() {
         if (pollRef.current) clearInterval(pollRef.current);
         setTriggerStatus("running");
         setRunMenuOpen(false);
-        const triggeredAt = Date.now();
+        const runId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
         try {
           const r = await fetch("/api/trigger-screening", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ role: role || null, timeWindowHours }),
+            body: JSON.stringify({ role: role || null, timeWindowHours, runId }),
           });
           if (!r.ok) {
             setTriggerStatus("error");
@@ -1305,23 +1305,13 @@ window.getPdfBase64 = async function() {
           setTimeout(() => {
             pollRef.current = setInterval(async () => {
               try {
-                const res = await fetch("/api/trigger-screening");
+                const res = await fetch(`/api/screening-results?runId=${runId}`);
+                if (res.status === 404) return;
                 const d = await res.json();
-                if (d.createdAt && new Date(d.createdAt).getTime() > triggeredAt && d.status === "completed") {
+                if (d.roles) {
                   clearInterval(pollRef.current);
                   setTriggerStatus("done");
-                  (async function fetchFresh(attempt) {
-                    try {
-                      const rr = await fetch("/api/screening-results");
-                      const dd = await rr.json();
-                      if (dd.runAt && new Date(dd.runAt).getTime() > triggeredAt) {
-                        setScreeningResults(dd.roles ? dd : { roles: [] });
-                        return;
-                      }
-                    } catch {}
-                    if (attempt < 10) setTimeout(() => fetchFresh(attempt + 1), 3000);
-                    else setScreeningResults({ roles: [] });
-                  })(0);
+                  setScreeningResults(d);
                 }
               } catch {}
             }, 20000);

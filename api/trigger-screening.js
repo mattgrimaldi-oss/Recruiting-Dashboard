@@ -35,6 +35,7 @@ module.exports = async (req, res) => {
     const inputs = {};
     if (body.role && body.role !== 'all') inputs.role = body.role;
     if (body.timeWindowHours) inputs.time_window_hours = String(body.timeWindowHours);
+    if (body.runId) inputs.run_id = body.runId;
 
     const r = await fetch(
       `https://api.github.com/repos/${OWNER}/${REPO}/actions/workflows/${WORKFLOW}/dispatches`,
