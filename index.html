@@ -1195,6 +1195,18 @@ window.getPdfBase64 = async function() {
       const [runRole, setRunRole] = React.useState("all");
       const [runTimeWindow, setRunTimeWindow] = React.useState(48);
       const [screeningResults, setScreeningResults] = React.useState(null);
+      const [screeningMode, setScreeningMode] = React.useState("auto");
+
+      function switchMode(mode) {
+        setScreeningMode(mode);
+        if (mode === "auto") {
+          setTriggerStatus(null);
+          setScreeningResults(null);
+          setRunMenuOpen(false);
+        } else {
+          setEditing(false);
+        }
+      }
 
       React.useEffect(() => {
         fetch("/api/criteria").then(r => r.json()).then(d => {
@@ -1347,77 +1359,167 @@ window.getPdfBase64 = async function() {
         fontFamily: "Plus Jakarta Sans, sans-serif", outline: "none", width: "100%",
       };
 
+      const labelStyle = {
+        fontSize: 10, fontFamily: "JetBrains Mono", color: "rgba(255,255,255,0.35)",
+        letterSpacing: "0.06em", textTransform: "uppercase",
+      };
+
       return (
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-          <Glass style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
-            {runMenuOpen ? (
-              <div style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12, animation: "fadeIn 0.2s ease" }}>
-                <div style={{ display: "flex", gap: 10, alignItems: "flex-end", flexWrap: "wrap" }}>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                    <span style={{ fontSize: 10, fontFamily: "JetBrains Mono", color: "rgba(255,255,255,0.35)", letterSpacing: "0.06em", textTransform: "uppercase" }}>Search Window</span>
-                    <select value={runTimeWindow} onChange={e => setRunTimeWindow(Number(e.target.value))} style={selectStyle}>
-                      {RUN_TIME_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-                    </select>
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                    <span style={{ fontSize: 10, fontFamily: "JetBrains Mono", color: "rgba(255,255,255,0.35)", letterSpacing: "0.06em", textTransform: "uppercase" }}>Role</span>
-                    <select value={runRole} onChange={e => setRunRole(e.target.value)} style={selectStyle}>
-                      <option value="all">All Roles</option>
-                      {roleKeys.map(k => <option key={k} value={k}>{display[k].jobName}</option>)}
-                    </select>
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 3, padding: "0 4px" }}>
-                    <span style={{ fontSize: 10, fontFamily: "JetBrains Mono", color: "rgba(255,255,255,0.35)", letterSpacing: "0.06em", textTransform: "uppercase" }}>Est. Cost</span>
-                    <div style={{ fontSize: 13, fontFamily: "JetBrains Mono", color: "#a78bfa", whiteSpace: "nowrap" }}>
-                      {fmt(runCostPerRun)}<span style={{ color: "rgba(255,255,255,0.3)" }}>/run</span>
+
+          {/* Mode switcher */}
+          <div style={{ display: "flex", gap: 8 }}>
+            {[["auto", "Auto Screening"], ["manual", "Manual Screening"]].map(([mode, label]) => (
+              <button key={mode} onClick={() => switchMode(mode)}
+                style={{
+                  padding: "9px 20px", borderRadius: 10, border: "none", cursor: "pointer",
+                  fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 13,
+                  background: screeningMode === mode ? "#620DEC" : "rgba(255,255,255,0.06)",
+                  color: screeningMode === mode ? "#fff" : "rgba(255,255,255,0.45)",
+                  transition: "all 0.15s ease",
+                }}>{label}</button>
+            ))}
+          </div>
+
+          {screeningMode === "manual" ? (
+            /* ── MANUAL SCREENING ── */
+            <>
+              <Glass style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+                {runMenuOpen ? (
+                  <div style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12, animation: "fadeIn 0.2s ease" }}>
+                    <div style={{ display: "flex", gap: 10, alignItems: "flex-end", flexWrap: "wrap" }}>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                        <span style={labelStyle}>Search Window</span>
+                        <select value={runTimeWindow} onChange={e => setRunTimeWindow(Number(e.target.value))} style={selectStyle}>
+                          {RUN_TIME_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                        </select>
+                      </div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                        <span style={labelStyle}>Role</span>
+                        <select value={runRole} onChange={e => setRunRole(e.target.value)} style={selectStyle}>
+                          <option value="all">All Roles</option>
+                          {roleKeys.map(k => <option key={k} value={k}>{criteria[k].jobName}</option>)}
+                        </select>
+                      </div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 3, padding: "0 4px" }}>
+                        <span style={labelStyle}>Est. Cost</span>
+                        <div style={{ fontSize: 13, fontFamily: "JetBrains Mono", color: "#a78bfa", whiteSpace: "nowrap" }}>
+                          {fmt(runCostPerRun)}<span style={{ color: "rgba(255,255,255,0.3)" }}>/run</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                      <button onClick={() => setRunMenuOpen(false)} className="ghost-btn"
+                        style={{ padding: "10px 18px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.15)", background: "transparent", color: "rgba(255,255,255,0.6)", fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 13, cursor: "pointer" }}>
+                        Cancel
+                      </button>
+                      <button onClick={() => trigger(runRole === "all" ? null : runRole, runTimeWindow)} className="primary-btn"
+                        style={{ padding: "10px 22px", borderRadius: 12, border: "none", cursor: "pointer", background: "#620DEC", color: "#fff", fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 13 }}>
+                        Run Screening
+                      </button>
                     </div>
                   </div>
-                </div>
-                <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                  <button onClick={() => setRunMenuOpen(false)} className="ghost-btn"
-                    style={{ padding: "10px 18px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.15)", background: "transparent", color: "rgba(255,255,255,0.6)", fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 13, cursor: "pointer" }}>
-                    Cancel
-                  </button>
-                  <button onClick={() => trigger(runRole === "all" ? null : runRole, runTimeWindow)} className="primary-btn"
-                    style={{ padding: "10px 22px", borderRadius: 12, border: "none", cursor: "pointer", background: "#620DEC", color: "#fff", fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 13 }}>
-                    Run Screening
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <>
-                <div>
-                  <div style={{ fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 700, fontSize: 17, color: "#fff", marginBottom: 4 }}>Priority Applicant Screening</div>
-                  {!triggerStatus && (
-                    <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", fontFamily: "JetBrains Mono" }}>
-                      {lastRun ? "Last run: " + new Date(lastRun).toLocaleString() : "No recent run recorded"}
-                      {" · "}Results sent to <span style={{ color: "#a78bfa" }}>#candidate-alerts</span>
+                ) : (
+                  <>
+                    <div>
+                      <div style={{ fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 700, fontSize: 17, color: "#fff", marginBottom: 4 }}>Manual Screening</div>
+                      {!triggerStatus && (
+                        <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", fontFamily: "JetBrains Mono" }}>
+                          Run a one-off screen — results appear here, no Slack notification
+                        </div>
+                      )}
                     </div>
+                    <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                      {triggerStatus === "running" ? (
+                        <div style={{ padding: "10px 22px", borderRadius: 12, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.3)", fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 13, whiteSpace: "nowrap" }}>
+                          Running — est. ~{Math.max(2, Math.round(runEstCands * 0.17))} min
+                        </div>
+                      ) : triggerStatus === "done" ? (
+                        <div style={{ padding: "10px 22px", borderRadius: 12, background: "rgba(52,211,153,0.12)", border: "1px solid rgba(52,211,153,0.25)", color: "#34d399", fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 13, whiteSpace: "nowrap" }}>
+                          Done ✓
+                        </div>
+                      ) : (
+                        <button onClick={() => { setRunMenuOpen(true); setTriggerStatus(null); setScreeningResults(null); }} className="primary-btn"
+                          style={{ padding: "10px 22px", borderRadius: 12, border: "none", cursor: "pointer", background: "#620DEC", color: "#fff", fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 13 }}>
+                          Run Screening Now
+                        </button>
+                      )}
+                    </div>
+                  </>
+                )}
+              </Glass>
+
+              {(triggerStatus === "running" || triggerStatus === "done") && !screeningResults ? (
+                <Glass><div style={{ color: "rgba(255,255,255,0.35)", fontSize: 13, fontFamily: "JetBrains Mono" }}>Screening in progress — candidates will appear here when complete…</div></Glass>
+              ) : screeningResults ? (
+                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                  {screeningResults.roles.length === 0 && (
+                    <Glass><div style={{ fontSize: 13, color: "rgba(255,255,255,0.35)", fontFamily: "JetBrains Mono" }}>No candidates found</div></Glass>
                   )}
+                  {screeningResults.roles.map((role, ri) => (
+                    <Glass key={ri}>
+                      <div style={{ fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 700, fontSize: 15, color: "#fff", marginBottom: 14 }}>
+                        {role.jobName}{role.passing.length > 0 ? ` — ${role.passing.length} passed` : ""}
+                      </div>
+                      {role.passing.length === 0 ? (
+                        <div style={{ fontSize: 13, color: "rgba(255,255,255,0.35)", fontFamily: "JetBrains Mono" }}>No candidates found</div>
+                      ) : (
+                        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                          {role.passing.map((c, i) => (
+                            <div key={i} style={{ fontSize: 13, fontFamily: "JetBrains Mono", color: "rgba(255,255,255,0.85)", animation: "fadeUp 0.45s ease both", animationDelay: `${ri * role.passing.length * 0.1 + i * 0.12}s` }}>
+                              <span style={{ color: "rgba(255,255,255,0.3)" }}>•</span>{" "}
+                              <a href={`https://app8.greenhouse.io/people/${c.id}`} target="_blank" rel="noreferrer"
+                                style={{ color: "#a78bfa", textDecoration: "none" }}>{c.name}</a>
+                              {c.location && <span style={{ color: "rgba(255,255,255,0.4)" }}> — {c.location}</span>}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </Glass>
+                  ))}
+                  <button onClick={() => { setScreeningResults(null); setTriggerStatus(null); }} className="ghost-btn" style={{
+                    alignSelf: "flex-start", padding: "9px 18px", borderRadius: 10,
+                    border: "1px solid rgba(255,255,255,0.15)", background: "transparent",
+                    color: "rgba(255,255,255,0.45)", fontFamily: "Plus Jakarta Sans, sans-serif",
+                    fontWeight: 600, fontSize: 13, cursor: "pointer",
+                  }}>← Back</button>
+                </div>
+              ) : null}
+            </>
+          ) : (
+            /* ── AUTO SCREENING ── */
+            <>
+              <Glass style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+                <div>
+                  <div style={{ fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 700, fontSize: 17, color: "#fff", marginBottom: 4 }}>Auto Screening</div>
+                  <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", fontFamily: "JetBrains Mono" }}>
+                    {lastRun ? "Last run: " + new Date(lastRun).toLocaleString() : "No recent run recorded"}
+                    {" · "}Results sent to <span style={{ color: "#a78bfa" }}>#candidate-alerts</span>
+                  </div>
                 </div>
                 <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-                  {editing && !screeningResults && <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", animation: "fadeIn 0.2s ease" }}>
+                  {editing && <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", animation: "fadeIn 0.2s ease" }}>
                     <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                      <span style={{ fontSize: 10, fontFamily: "JetBrains Mono", color: "rgba(255,255,255,0.35)", letterSpacing: "0.06em", textTransform: "uppercase" }}>Frequency</span>
+                      <span style={labelStyle}>Frequency</span>
                       <select value={configDraft.frequency} onChange={e => setConfigDraft(p => ({ ...p, frequency: e.target.value }))} style={selectStyle}>
                         {FREQ_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                       </select>
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                      <span style={{ fontSize: 10, fontFamily: "JetBrains Mono", color: "rgba(255,255,255,0.35)", letterSpacing: "0.06em", textTransform: "uppercase" }}>Search Window</span>
+                      <span style={labelStyle}>Search Window</span>
                       <select value={configDraft.timeWindowHours} onChange={e => setConfigDraft(p => ({ ...p, timeWindowHours: Number(e.target.value) }))} style={selectStyle}>
                         {TIME_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                       </select>
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                      <span style={{ fontSize: 10, fontFamily: "JetBrains Mono", color: "rgba(255,255,255,0.35)", letterSpacing: "0.06em", textTransform: "uppercase" }}>Role</span>
+                      <span style={labelStyle}>Role</span>
                       <select value={configDraft.cronRole || ""} onChange={e => setConfigDraft(p => ({ ...p, cronRole: e.target.value }))} style={selectStyle}>
                         <option value="">All Roles</option>
-                        {roleKeys.map(k => <option key={k} value={k}>{(editing ? draft : criteria)?.[k]?.jobName || k}</option>)}
+                        {roleKeys.map(k => <option key={k} value={k}>{draft?.[k]?.jobName || k}</option>)}
                       </select>
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 3, padding: "0 4px" }}>
-                      <span style={{ fontSize: 10, fontFamily: "JetBrains Mono", color: "rgba(255,255,255,0.35)", letterSpacing: "0.06em", textTransform: "uppercase" }}>Est. Cost</span>
+                      <span style={labelStyle}>Est. Cost</span>
                       <div style={{ fontSize: 13, fontFamily: "JetBrains Mono", color: "#a78bfa", whiteSpace: "nowrap" }}>
                         {fmt(costPerRun)}<span style={{ color: "rgba(255,255,255,0.3)" }}>/run</span>
                         <span style={{ margin: "0 6px", color: "rgba(255,255,255,0.2)" }}>·</span>
@@ -1439,137 +1541,83 @@ window.getPdfBase64 = async function() {
                       </button>
                     </>
                   ) : (
-                    <>
-                      {!(triggerStatus === "running" || (triggerStatus === "done" && !screeningResults)) && (
-                        <button onClick={startEdit} className="ghost-btn"
-                          style={{ padding: "10px 18px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.15)", background: "transparent", color: "rgba(255,255,255,0.6)", fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 13, cursor: "pointer", transition: "opacity 0.2s ease, transform 0.2s ease" }}>
-                          Edit Criteria
-                        </button>
-                      )}
-                      {triggerStatus === "running" ? (
-                        <div style={{ padding: "10px 22px", borderRadius: 12, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.3)", fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 13, whiteSpace: "nowrap" }}>
-                          Running — est. ~{Math.max(2, Math.round(runEstCands * 0.17))} min
-                        </div>
-                      ) : triggerStatus === "done" ? (
-                        <div style={{ padding: "10px 22px", borderRadius: 12, background: "rgba(52,211,153,0.12)", border: "1px solid rgba(52,211,153,0.25)", color: "#34d399", fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 13, whiteSpace: "nowrap" }}>
-                          Done ✓
-                        </div>
-                      ) : (
-                        <button onClick={() => { setRunMenuOpen(true); setTriggerStatus(null); setScreeningResults(null); }} className="primary-btn"
-                          style={{ padding: "10px 22px", borderRadius: 12, border: "none", cursor: "pointer", background: "#620DEC", color: "#fff", fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 13 }}>
-                          Run Screening Now
-                        </button>
-                      )}
-                    </>
+                    <button onClick={startEdit} className="ghost-btn"
+                      style={{ padding: "10px 18px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.15)", background: "transparent", color: "rgba(255,255,255,0.6)", fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 13, cursor: "pointer", transition: "opacity 0.2s ease, transform 0.2s ease" }}>
+                      Edit Criteria
+                    </button>
                   )}
                 </div>
-              </>
-            )}
-          </Glass>
+              </Glass>
 
-          {!display ? (
-            <Glass><div style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, fontFamily: "JetBrains Mono" }}>Loading criteria…</div></Glass>
-          ) : runMenuOpen ? null
-          : (triggerStatus === "running" || triggerStatus === "done") && !screeningResults ? (
-            <Glass><div style={{ color: "rgba(255,255,255,0.35)", fontSize: 13, fontFamily: "JetBrains Mono" }}>Screening in progress — candidates will appear here when complete…</div></Glass>
-          ) : screeningResults ? (
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              {screeningResults.roles.length === 0 && (
-                <Glass><div style={{ fontSize: 13, color: "rgba(255,255,255,0.35)", fontFamily: "JetBrains Mono" }}>No candidates found</div></Glass>
-              )}
-              {screeningResults.roles.map((role, ri) => (
-                <Glass key={ri}>
-                  <div style={{ fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 700, fontSize: 15, color: "#fff", marginBottom: 14 }}>
-                    {role.jobName}{role.passing.length > 0 ? ` — ${role.passing.length} passed` : ""}
-                  </div>
-                  {role.passing.length === 0 ? (
-                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.35)", fontFamily: "JetBrains Mono" }}>No candidates found</div>
-                  ) : (
-                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                      {role.passing.map((c, i) => (
-                        <div key={i} style={{ fontSize: 13, fontFamily: "JetBrains Mono", color: "rgba(255,255,255,0.85)", animation: "fadeUp 0.45s ease both", animationDelay: `${ri * role.passing.length * 0.1 + i * 0.12}s` }}>
-                          <span style={{ color: "rgba(255,255,255,0.3)" }}>•</span>{" "}
-                          <a href={`https://app8.greenhouse.io/people/${c.id}`} target="_blank" rel="noreferrer"
-                            style={{ color: "#a78bfa", textDecoration: "none" }}>{c.name}</a>
-                          {c.location && <span style={{ color: "rgba(255,255,255,0.4)" }}> — {c.location}</span>}
-                        </div>
+              {!display ? (
+                <Glass><div style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, fontFamily: "JetBrains Mono" }}>Loading criteria…</div></Glass>
+              ) : creatingRole ? (
+                <NewRoleForm onSave={saveNewRole} onCancel={() => setCreatingRole(false)} inputStyle={inputStyle} />
+              ) : (
+                <>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                    <select
+                      value={selectedRole || ""}
+                      onChange={e => { setSelectedRole(e.target.value); setConfirmDelete(false); }}
+                      style={{
+                        background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)",
+                        borderRadius: 10, padding: "10px 16px", color: "#fff", fontSize: 14,
+                        fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, outline: "none", cursor: "pointer",
+                      }}
+                    >
+                      {roleKeys.map(roleKey => (
+                        <option key={roleKey} value={roleKey}>{display[roleKey].jobName}</option>
                       ))}
-                    </div>
-                  )}
-                </Glass>
-              ))}
-              <button onClick={() => { setScreeningResults(null); setTriggerStatus(null); }} className="ghost-btn" style={{
-                alignSelf: "flex-start", padding: "9px 18px", borderRadius: 10,
-                border: "1px solid rgba(255,255,255,0.15)", background: "transparent",
-                color: "rgba(255,255,255,0.45)", fontFamily: "Plus Jakarta Sans, sans-serif",
-                fontWeight: 600, fontSize: 13, cursor: "pointer",
-              }}>← Back</button>
-            </div>
-          ) : creatingRole ? (
-            <NewRoleForm onSave={saveNewRole} onCancel={() => setCreatingRole(false)} inputStyle={inputStyle} />
-          ) : (
-            <>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-                <select
-                  value={selectedRole || ""}
-                  onChange={e => { setSelectedRole(e.target.value); setConfirmDelete(false); }}
-                  style={{
-                    background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)",
-                    borderRadius: 10, padding: "10px 16px", color: "#fff", fontSize: 14,
-                    fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, outline: "none", cursor: "pointer",
-                  }}
-                >
-                  {roleKeys.map(roleKey => (
-                    <option key={roleKey} value={roleKey}>{display[roleKey].jobName}</option>
-                  ))}
-                </select>
+                    </select>
 
-                {!editing && (
-                  <button onClick={() => { setCreatingRole(true); setConfirmDelete(false); }} className="ghost-btn" style={{
-                    padding: "10px 16px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.15)",
-                    background: "transparent", color: "rgba(255,255,255,0.6)",
-                    fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 13, cursor: "pointer",
-                  }}>+ Add Role</button>
-                )}
+                    {!editing && (
+                      <button onClick={() => { setCreatingRole(true); setConfirmDelete(false); }} className="ghost-btn" style={{
+                        padding: "10px 16px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.15)",
+                        background: "transparent", color: "rgba(255,255,255,0.6)",
+                        fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 13, cursor: "pointer",
+                      }}>+ Add Role</button>
+                    )}
 
-                {!editing && selectedRole && !confirmDelete && (
-                  <button onClick={() => setConfirmDelete(true)} style={{
-                    padding: "10px 14px", borderRadius: 10, border: "1px solid rgba(248,113,113,0.2)",
-                    background: "transparent", color: "rgba(248,113,113,0.55)",
-                    fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 13, cursor: "pointer",
-                  }}>Delete Role</button>
-                )}
+                    {!editing && selectedRole && !confirmDelete && (
+                      <button onClick={() => setConfirmDelete(true)} style={{
+                        padding: "10px 14px", borderRadius: 10, border: "1px solid rgba(248,113,113,0.2)",
+                        background: "transparent", color: "rgba(248,113,113,0.55)",
+                        fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 13, cursor: "pointer",
+                      }}>Delete Role</button>
+                    )}
 
-                {confirmDelete && (
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, animation: "fadeIn 0.15s ease" }}>
-                    <span style={{ fontSize: 12, color: "#fca5a5", fontFamily: "JetBrains Mono" }}>
-                      Delete "{display[selectedRole]?.jobName}"?
-                    </span>
-                    <button onClick={deleteRole} style={{
-                      padding: "7px 14px", borderRadius: 8, border: "none",
-                      background: "rgba(248,113,113,0.2)", color: "#fca5a5",
-                      fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 12, cursor: "pointer",
-                    }}>Yes, delete</button>
-                    <button onClick={() => setConfirmDelete(false)} className="ghost-btn" style={{
-                      padding: "7px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.15)",
-                      background: "transparent", color: "rgba(255,255,255,0.5)",
-                      fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 12, cursor: "pointer",
-                    }}>Cancel</button>
+                    {confirmDelete && (
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, animation: "fadeIn 0.15s ease" }}>
+                        <span style={{ fontSize: 12, color: "#fca5a5", fontFamily: "JetBrains Mono" }}>
+                          Delete "{display[selectedRole]?.jobName}"?
+                        </span>
+                        <button onClick={deleteRole} style={{
+                          padding: "7px 14px", borderRadius: 8, border: "none",
+                          background: "rgba(248,113,113,0.2)", color: "#fca5a5",
+                          fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 12, cursor: "pointer",
+                        }}>Yes, delete</button>
+                        <button onClick={() => setConfirmDelete(false)} className="ghost-btn" style={{
+                          padding: "7px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.15)",
+                          background: "transparent", color: "rgba(255,255,255,0.5)",
+                          fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, fontSize: 12, cursor: "pointer",
+                        }}>Cancel</button>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
 
-              {selectedRole && display[selectedRole] && (
-                <RoleCard
-                  key={selectedRole}
-                  roleKey={selectedRole}
-                  roleConfig={display[selectedRole]}
-                  editing={editing}
-                  inputStyle={inputStyle}
-                  onToggle={handleToggle}
-                  onLabelChange={handleLabelChange}
-                  onDetailChange={handleDetailChange}
-                />
+                  {selectedRole && display[selectedRole] && (
+                    <RoleCard
+                      key={selectedRole}
+                      roleKey={selectedRole}
+                      roleConfig={display[selectedRole]}
+                      editing={editing}
+                      inputStyle={inputStyle}
+                      onToggle={handleToggle}
+                      onLabelChange={handleLabelChange}
+                      onDetailChange={handleDetailChange}
+                    />
+                  )}
+                </>
               )}
             </>
           )}
