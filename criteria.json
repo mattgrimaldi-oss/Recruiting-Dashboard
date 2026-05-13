@@ -74,8 +74,8 @@
       },
       {
         "key": "employment_recency",
-        "label": "Employment Recency",
-        "detail": "Currently employed OR most recent role ended within 2 months of today. Year-only end dates are treated as December of that year.",
+        "label": "Location",
+        "detail": "Must be in commuting distance (30 miles) of Marina Del Rey, CA",
         "status": "required"
       },
       {
