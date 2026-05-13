@@ -78,12 +78,6 @@
         "status": "required"
       },
       {
-        "key": "employment_recency",
-        "label": "Location",
-        "detail": "Must be in commuting distance (30 miles) of Marina Del Rey, CA",
-        "status": "required"
-      },
-      {
         "key": "react",
         "label": "React",
         "detail": "React experience noted on resume.",
