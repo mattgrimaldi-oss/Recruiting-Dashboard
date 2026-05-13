@@ -1,37 +1,7 @@
 {
-  "runAt": "2026-05-13T16:02:29.390Z",
+  "runAt": "2026-05-13T16:07:19.374Z",
+  "runId": null,
   "roles": [
-    {
-      "roleKey": "ae",
-      "jobName": "Account Executive",
-      "passing": [
-        {
-          "name": "Nicholas Simonelli",
-          "id": 62549538008,
-          "location": "Los Angeles, CA"
-        }
-      ],
-      "checked": 4,
-      "notified": 0
-    },
-    {
-      "roleKey": "swe",
-      "jobName": "Software Engineer",
-      "passing": [
-        {
-          "name": "Aditya Kumar",
-          "id": 26901300008,
-          "location": "Maryland"
-        },
-        {
-          "name": "Karanvir Singh Ghumaan",
-          "id": 63640401008,
-          "location": "New York, NY"
-        }
-      ],
-      "checked": 28,
-      "notified": 0
-    },
     {
       "roleKey": "business_development_representative",
       "jobName": "Business Development Representative",
@@ -45,11 +15,6 @@
           "name": "Meagan Moky",
           "id": 63585630008,
           "location": "New York, NY"
-        },
-        {
-          "name": "Kaitlyn Williams",
-          "id": 63641177008,
-          "location": "Los Angeles, CA"
         },
         {
           "name": "Yuxiao Zhang",
