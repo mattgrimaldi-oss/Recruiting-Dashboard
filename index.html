@@ -1310,7 +1310,18 @@ window.getPdfBase64 = async function() {
                 if (d.createdAt && new Date(d.createdAt).getTime() > triggeredAt && d.status === "completed") {
                   clearInterval(pollRef.current);
                   setTriggerStatus("done");
-                  fetch("/api/screening-results").then(r => r.json()).then(d => { setScreeningResults(d.roles ? d : { roles: [] }); }).catch(() => { setScreeningResults({ roles: [] }); });
+                  (async function fetchFresh(attempt) {
+                    try {
+                      const rr = await fetch("/api/screening-results");
+                      const dd = await rr.json();
+                      if (dd.runAt && new Date(dd.runAt).getTime() > triggeredAt) {
+                        setScreeningResults(dd.roles ? dd : { roles: [] });
+                        return;
+                      }
+                    } catch {}
+                    if (attempt < 10) setTimeout(() => fetchFresh(attempt + 1), 3000);
+                    else setScreeningResults({ roles: [] });
+                  })(0);
                 }
               } catch {}
             }, 20000);
