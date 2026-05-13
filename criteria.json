@@ -13,6 +13,12 @@
         "label": "Work Recency",
         "detail": "Most recent position is up until the present or at most  ended 3 months ago. A year without a month is considered July of that year.",
         "status": "required"
+      },
+      {
+        "key": "criterion_1778706120374",
+        "label": "Location",
+        "detail": "Based in a 30 mile radius from Brooklyn, NY or Marina Del Rey, CA. OR states on the resume that they are open to relocation.",
+        "status": "required"
       }
     ]
   },
