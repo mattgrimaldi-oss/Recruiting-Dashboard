@@ -50,12 +50,6 @@
         "label": "Quota Attainment",
         "detail": "Resume explicitly mentions exceeding quota (e.g. '130% of quota', 'exceeded targets', '#1 rep').",
         "status": "not_required"
-      },
-      {
-        "key": "employment_recency",
-        "label": "Employment Recency",
-        "detail": "Currently employed OR most recent role ended within 2 months of today. Year-only end dates are treated as December of that year.",
-        "status": "not_required"
       }
     ]
   },
