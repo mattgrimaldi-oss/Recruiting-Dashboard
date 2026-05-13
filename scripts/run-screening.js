@@ -26,12 +26,17 @@ async function saveScreeningResults(roles) {
   if (sha) body.sha = sha;
 
   try {
-    await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/screening-results.json`, {
+    const putRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/screening-results.json`, {
       method: 'PUT',
       headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     });
-    console.log('✅ Results saved to screening-results.json');
+    if (!putRes.ok) {
+      const errText = await putRes.text();
+      console.error(`Failed to save results (${putRes.status}): ${errText}`);
+    } else {
+      console.log('✅ Results saved to screening-results.json');
+    }
   } catch (e) {
     console.error('Failed to save results:', e.message);
   }
