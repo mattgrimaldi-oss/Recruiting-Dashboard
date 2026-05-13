@@ -1,7 +1,20 @@
 {
   "_global": {
     "jobName": "All Jobs",
-    "criteria": []
+    "criteria": [
+      {
+        "key": "criterion_1778705777027",
+        "label": "Startup Experience",
+        "detail": "At least one of the companies worked for is 10-200 employees",
+        "status": "bonus"
+      },
+      {
+        "key": "criterion_1778705811144",
+        "label": "Work Recency",
+        "detail": "Most recent position is up until the present or at most  ended 3 months ago",
+        "status": "required"
+      }
+    ]
   },
   "config": {
     "frequency": "every_2_days",
