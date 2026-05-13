@@ -5,20 +5,22 @@
     "cronRole": ""
   },
   "ae": {
-    "jobIds": ["4462684008"],
+    "jobIds": [
+      "4462684008"
+    ],
     "jobName": "Account Executive",
     "criteria": [
       {
         "key": "sales_experience",
         "label": "Sales Experience",
         "detail": "At least 1 year as an Account Executive OR at least 3 years as a BDR/SDR. SaaS experience preferred.",
-        "status": "required"
+        "status": "not_required"
       },
       {
         "key": "startup_experience",
         "label": "Startup Background",
         "detail": "At least one employer was a startup or company with under 200 employees. Ideally 10–100 employees.",
-        "status": "required"
+        "status": "not_required"
       },
       {
         "key": "education",
@@ -30,18 +32,20 @@
         "key": "quota_attainment",
         "label": "Quota Attainment",
         "detail": "Resume explicitly mentions exceeding quota (e.g. '130% of quota', 'exceeded targets', '#1 rep').",
-        "status": "required"
+        "status": "not_required"
       },
       {
         "key": "employment_recency",
         "label": "Employment Recency",
         "detail": "Currently employed OR most recent role ended within 2 months of today. Year-only end dates are treated as December of that year.",
-        "status": "required"
+        "status": "not_required"
       }
     ]
   },
   "swe": {
-    "jobIds": ["4203780008"],
+    "jobIds": [
+      "4203780008"
+    ],
     "jobName": "Software Engineer",
     "criteria": [
       {
