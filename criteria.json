@@ -11,7 +11,7 @@
       {
         "key": "criterion_1778705811144",
         "label": "Work Recency",
-        "detail": "Most recent position is up until the present or at most  ended 3 months ago",
+        "detail": "Most recent position is up until the present or at most  ended 3 months ago. A year without a month is considered July of that year.",
         "status": "required"
       }
     ]
