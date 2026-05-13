@@ -4,10 +4,8 @@ const BRANCH  = 'main';
 const GH_BASE = `https://api.github.com/repos/${OWNER}/${REPO}/contents`;
 
 const FREQ_CRON = {
-  daily:        '0 9 * * *',
-  every_2_days: '0 9 */2 * *',
-  every_3_days: '0 9 */3 * *',
-  weekly:       '0 9 * * 1',
+  every_2_days: '0 15 * * 1,3,5',
+  weekly:       '0 15 * * 1',
 };
 
 async function ghGet(path, token) {

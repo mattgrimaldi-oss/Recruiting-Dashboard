@@ -1161,10 +1161,8 @@ window.getPdfBase64 = async function() {
 
     function ScreeningTab() {
       const FREQ_OPTIONS = [
-        { value: "daily",        label: "Daily",        cron: "0 9 * * *",   runsPerMonth: 30 },
-        { value: "every_2_days", label: "Every 2 days", cron: "0 9 */2 * *", runsPerMonth: 15 },
-        { value: "every_3_days", label: "Every 3 days", cron: "0 9 */3 * *", runsPerMonth: 10 },
-        { value: "weekly",       label: "Weekly",       cron: "0 9 * * 1",   runsPerMonth: 4  },
+        { value: "every_2_days", label: "Mon / Wed / Fri", cron: "0 15 * * 1,3,5", runsPerMonth: 13 },
+        { value: "weekly",       label: "Weekly (Mon)",    cron: "0 15 * * 1",      runsPerMonth: 4  },
       ];
       const TIME_OPTIONS = [
         { value: 24,  label: "Last 24 hrs", estCandidates: 15  },
