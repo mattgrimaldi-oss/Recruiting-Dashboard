@@ -1,0 +1,13 @@
+{
+  "runAt": "2026-05-13T16:46:20.983Z",
+  "runId": "mp4aicbgn7yv",
+  "roles": [
+    {
+      "roleKey": "swe",
+      "jobName": "Software Engineer",
+      "passing": [],
+      "checked": 8,
+      "notified": 0
+    }
+  ]
+}
