@@ -1,37 +1,17 @@
 {
-  "runAt": "2026-05-13T15:53:46.648Z",
+  "runAt": "2026-05-13T15:59:14.231Z",
   "roles": [
     {
       "roleKey": "business_development_representative",
       "jobName": "Business Development Representative",
       "passing": [
         {
-          "name": "Joshua Lilly",
-          "id": 63523410008,
-          "location": "New York, NY"
-        },
-        {
-          "name": "Alexis Esomonu",
-          "id": 63538714008,
-          "location": "Woodland Hills, Los Angeles, CA"
-        },
-        {
-          "name": "Meagan Moky",
-          "id": 63585630008,
-          "location": "New York, NY"
-        },
-        {
-          "name": "Kaitlyn Williams",
-          "id": 63641177008,
-          "location": "Los Angeles, CA"
-        },
-        {
-          "name": "Yuxiao Zhang",
-          "id": 63651661008,
+          "name": "Whitten Gibson",
+          "id": 63605005008,
           "location": "Los Angeles, CA"
         }
       ],
-      "checked": 16,
+      "checked": 12,
       "notified": 0
     }
   ]
