@@ -25,7 +25,10 @@
   "config": {
     "frequency": "every_2_days",
     "timeWindowHours": 48,
-    "cronRole": []
+    "cronRole": [
+      "ae",
+      "business_development_representative"
+    ]
   },
   "ae": {
     "jobIds": [
