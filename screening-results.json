@@ -1,13 +1,76 @@
 {
-  "runAt": "2026-05-13T17:28:10.171Z",
+  "runAt": "2026-05-15T20:28:19.886Z",
   "runId": null,
   "roles": [
+    {
+      "roleKey": "ae",
+      "jobName": "Account Executive",
+      "passing": [],
+      "checked": 2,
+      "notified": 0
+    },
     {
       "roleKey": "swe",
       "jobName": "Software Engineer",
       "passing": [],
-      "checked": 24,
+      "checked": 100,
       "notified": 0
+    },
+    {
+      "roleKey": "business_development_representative",
+      "jobName": "Business Development Representative",
+      "passing": [
+        {
+          "name": "Widmy Joseph",
+          "id": 63748778008,
+          "location": "New York City, NY"
+        },
+        {
+          "name": "Jonathan Santos - Febus",
+          "id": 63771354008,
+          "location": "Bronx, NY"
+        },
+        {
+          "name": "Michael Kang",
+          "id": 63876329008,
+          "location": "New York, NY"
+        }
+      ],
+      "checked": 7,
+      "notified": 3
+    },
+    {
+      "roleKey": "product_manager",
+      "jobName": "Product Manager",
+      "passing": [
+        {
+          "name": "Evan Mitchell",
+          "id": 63760611008,
+          "location": "New York, NY"
+        },
+        {
+          "name": "Sneha Kripa Tirchy Shekar",
+          "id": 59088288008,
+          "location": "New York, NY"
+        },
+        {
+          "name": "Jennifer Liu",
+          "id": 63840359008,
+          "location": "Brooklyn, NY"
+        },
+        {
+          "name": "Meelit Meelit",
+          "id": 63862544008,
+          "location": "NY, USA"
+        },
+        {
+          "name": "Wendy Xie",
+          "id": 53769845008,
+          "location": "Queens, NY"
+        }
+      ],
+      "checked": 33,
+      "notified": 5
     }
   ]
 }
