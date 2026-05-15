@@ -50,7 +50,7 @@ async function main() {
   const timeWindowHoursOverride = timeArg ? Number(timeArg) : null;
   const isManual = !!(roleArg || timeArg);
 
-  const allRoles = Object.keys(CRITERIA).filter(k => k !== 'config');
+  const allRoles = Object.keys(CRITERIA).filter(k => k !== 'config' && k !== '_global');
 
   let roles;
   if (roleArg && roleArg !== 'all') {
