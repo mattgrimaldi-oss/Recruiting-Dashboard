@@ -55,8 +55,8 @@ async function main() {
   let roles;
   if (roleArg && roleArg !== 'all') {
     roles = [roleArg];
-  } else if (!roleArg && CRITERIA.config?.cronRole) {
-    roles = [CRITERIA.config.cronRole];
+  } else if (!roleArg && CRITERIA.config?.cronRole?.length) {
+    roles = Array.isArray(CRITERIA.config.cronRole) ? CRITERIA.config.cronRole : [CRITERIA.config.cronRole];
   } else {
     roles = allRoles;
   }

@@ -1199,7 +1199,7 @@ window.getPdfBase64 = async function() {
       const [sha, setSha] = React.useState(null);
       const [editing, setEditing] = React.useState(false);
       const [draft, setDraft] = React.useState(null);
-      const [configDraft, setConfigDraft] = React.useState({ frequency: "every_2_days", timeWindowHours: 48, cronRole: "" });
+      const [configDraft, setConfigDraft] = React.useState({ frequency: "every_2_days", timeWindowHours: 48, cronRole: [] });
       const [saveStatus, setSaveStatus] = React.useState(null);
       const [triggerStatus, setTriggerStatus] = React.useState(null);
       const [lastRun, setLastRun] = React.useState(null);
@@ -1401,7 +1401,7 @@ window.getPdfBase64 = async function() {
 
       const estCandidates  = (TIME_OPTIONS.find(t => t.value === configDraft.timeWindowHours) || TIME_OPTIONS[1]).estCandidates;
       const runsPerMonth   = (FREQ_OPTIONS.find(f => f.value === configDraft.frequency) || FREQ_OPTIONS[1]).runsPerMonth;
-      const cronRoleCount  = configDraft.cronRole ? 1 : Math.max(roleKeys.length, 1);
+      const cronRoleCount  = (configDraft.cronRole?.length > 0) ? configDraft.cronRole.length : Math.max(roleKeys.length, 1);
       const costPerRun     = estCandidates * COST_PER * cronRoleCount;
       const costPerMonth   = costPerRun * runsPerMonth;
       const runEstCands    = (RUN_TIME_OPTIONS.find(t => t.value === runTimeWindow) || RUN_TIME_OPTIONS[1]).estCandidates;
@@ -1573,12 +1573,33 @@ window.getPdfBase64 = async function() {
                         {TIME_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                       </select>
                     </div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
                       <span style={labelStyle}>Role</span>
-                      <select value={configDraft.cronRole || ""} onChange={e => setConfigDraft(p => ({ ...p, cronRole: e.target.value }))} style={selectStyle}>
-                        <option value="">All Roles</option>
-                        {roleKeys.filter(k => k !== "_global").map(k => <option key={k} value={k}>{criteria?.[k]?.jobName || k}</option>)}
-                      </select>
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                        {(() => {
+                          const selectedRoles = Array.isArray(configDraft.cronRole) ? configDraft.cronRole : (configDraft.cronRole ? [configDraft.cronRole] : []);
+                          const allSelected = selectedRoles.length === 0;
+                          const toggleRole = (k) => {
+                            const cur = Array.isArray(configDraft.cronRole) ? configDraft.cronRole : (configDraft.cronRole ? [configDraft.cronRole] : []);
+                            const next = cur.includes(k) ? cur.filter(r => r !== k) : [...cur, k];
+                            setConfigDraft(p => ({ ...p, cronRole: next }));
+                          };
+                          const pillStyle = (active) => ({
+                            padding: "4px 10px", borderRadius: 20, fontSize: 11, fontFamily: "JetBrains Mono",
+                            cursor: "pointer", border: active ? "1px solid #a78bfa" : "1px solid rgba(255,255,255,0.15)",
+                            background: active ? "rgba(167,139,250,0.15)" : "transparent",
+                            color: active ? "#a78bfa" : "rgba(255,255,255,0.45)", whiteSpace: "nowrap",
+                          });
+                          return [
+                            <span key="all" onClick={() => setConfigDraft(p => ({ ...p, cronRole: [] }))} style={pillStyle(allSelected)}>All</span>,
+                            ...roleKeys.filter(k => k !== "_global").map(k => (
+                              <span key={k} onClick={() => toggleRole(k)} style={pillStyle(selectedRoles.includes(k))}>
+                                {criteria?.[k]?.jobName || k}
+                              </span>
+                            ))
+                          ];
+                        })()}
+                      </div>
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 3, padding: "0 4px" }}>
                       <span style={labelStyle}>Est. Cost</span>
