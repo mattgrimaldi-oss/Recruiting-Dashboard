@@ -1,76 +1,55 @@
 {
-  "runAt": "2026-05-15T20:28:19.886Z",
+  "runAt": "2026-05-18T20:29:58.789Z",
   "runId": null,
   "roles": [
     {
       "roleKey": "ae",
       "jobName": "Account Executive",
-      "passing": [],
-      "checked": 2,
-      "notified": 0
-    },
-    {
-      "roleKey": "swe",
-      "jobName": "Software Engineer",
-      "passing": [],
-      "checked": 100,
-      "notified": 0
+      "passing": [
+        {
+          "name": "Evan Rosen",
+          "id": 64185749008,
+          "location": "Los Angeles, CA"
+        }
+      ],
+      "checked": 4,
+      "notified": 1
     },
     {
       "roleKey": "business_development_representative",
       "jobName": "Business Development Representative",
       "passing": [
         {
-          "name": "Widmy Joseph",
-          "id": 63748778008,
-          "location": "New York City, NY"
-        },
-        {
-          "name": "Jonathan Santos - Febus",
-          "id": 63771354008,
-          "location": "Bronx, NY"
-        },
-        {
-          "name": "Michael Kang",
-          "id": 63876329008,
-          "location": "New York, NY"
+          "name": "Vandette Brandon Carter Jr.",
+          "id": 61434292008,
+          "location": "College Pt, NY"
         }
       ],
-      "checked": 7,
-      "notified": 3
+      "checked": 17,
+      "notified": 1
     },
     {
-      "roleKey": "product_manager",
-      "jobName": "Product Manager",
+      "roleKey": "swe",
+      "jobName": "Software Engineer",
       "passing": [
         {
-          "name": "Evan Mitchell",
-          "id": 63760611008,
-          "location": "New York, NY"
+          "name": "Sri Maniteja Chinnam",
+          "id": 64130246008,
+          "location": "Los Angeles, CA"
         },
         {
-          "name": "Sneha Kripa Tirchy Shekar",
-          "id": 59088288008,
-          "location": "New York, NY"
+          "name": "Rajesh Bobba",
+          "id": 64133781008,
+          "location": "Los Angeles, CA"
         },
         {
-          "name": "Jennifer Liu",
-          "id": 63840359008,
-          "location": "Brooklyn, NY"
-        },
-        {
-          "name": "Meelit Meelit",
-          "id": 63862544008,
-          "location": "NY, USA"
-        },
-        {
-          "name": "Wendy Xie",
-          "id": 53769845008,
-          "location": "Queens, NY"
+          "name": "Hemanth Gopi Katla",
+          "id": 64178380008,
+          "location": "Los Angeles, CA"
         }
       ],
-      "checked": 33,
-      "notified": 5
+      "checked": 27,
+      "notified": 3
     }
   ]
 }
