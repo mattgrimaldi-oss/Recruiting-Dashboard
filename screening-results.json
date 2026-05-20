@@ -1,55 +1,20 @@
 {
-  "runAt": "2026-05-18T20:29:58.789Z",
+  "runAt": "2026-05-20T21:25:10.057Z",
   "runId": null,
   "roles": [
     {
       "roleKey": "ae",
       "jobName": "Account Executive",
-      "passing": [
-        {
-          "name": "Evan Rosen",
-          "id": 64185749008,
-          "location": "Los Angeles, CA"
-        }
-      ],
-      "checked": 4,
-      "notified": 1
+      "passing": [],
+      "checked": 3,
+      "notified": 0
     },
     {
       "roleKey": "business_development_representative",
       "jobName": "Business Development Representative",
-      "passing": [
-        {
-          "name": "Vandette Brandon Carter Jr.",
-          "id": 61434292008,
-          "location": "College Pt, NY"
-        }
-      ],
-      "checked": 17,
-      "notified": 1
-    },
-    {
-      "roleKey": "swe",
-      "jobName": "Software Engineer",
-      "passing": [
-        {
-          "name": "Sri Maniteja Chinnam",
-          "id": 64130246008,
-          "location": "Los Angeles, CA"
-        },
-        {
-          "name": "Rajesh Bobba",
-          "id": 64133781008,
-          "location": "Los Angeles, CA"
-        },
-        {
-          "name": "Hemanth Gopi Katla",
-          "id": 64178380008,
-          "location": "Los Angeles, CA"
-        }
-      ],
-      "checked": 27,
-      "notified": 3
+      "passing": [],
+      "checked": 7,
+      "notified": 0
     }
   ]
 }
