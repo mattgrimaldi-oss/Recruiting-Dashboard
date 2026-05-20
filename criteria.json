@@ -27,8 +27,7 @@
     "timeWindowHours": 48,
     "cronRole": [
       "ae",
-      "business_development_representative",
-      "swe"
+      "business_development_representative"
     ]
   },
   "ae": {
