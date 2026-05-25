@@ -1,12 +1,12 @@
 {
-  "runAt": "2026-05-22T20:49:55.871Z",
+  "runAt": "2026-05-25T17:10:59.476Z",
   "runId": null,
   "roles": [
     {
       "roleKey": "ae",
       "jobName": "Account Executive",
       "passing": [],
-      "checked": 4,
+      "checked": 1,
       "notified": 0
     },
     {
@@ -14,12 +14,12 @@
       "jobName": "Business Development Representative",
       "passing": [
         {
-          "name": "Do Hyun Kim",
-          "id": 64554638008,
-          "location": "Santa Clara, CA"
+          "name": "Hannah Arndt",
+          "id": 64783995008,
+          "location": "New York, NY"
         }
       ],
-      "checked": 9,
+      "checked": 7,
       "notified": 1
     }
   ]
