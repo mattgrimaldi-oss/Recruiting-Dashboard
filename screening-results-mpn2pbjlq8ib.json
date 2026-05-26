@@ -1,0 +1,39 @@
+{
+  "runAt": "2026-05-26T20:17:52.628Z",
+  "runId": "mpn2pbjlq8ib",
+  "roles": [
+    {
+      "roleKey": "product_manager",
+      "jobName": "Product Manager",
+      "passing": [
+        {
+          "name": "RISHITA BUTANI",
+          "id": 64818147008,
+          "location": "Jersey City, NJ"
+        },
+        {
+          "name": "Roshan KG",
+          "id": 52680636008,
+          "location": "Brooklyn, New York"
+        },
+        {
+          "name": "Dipti Mahamuni",
+          "id": 64860577008,
+          "location": null
+        },
+        {
+          "name": "Windell Camp",
+          "id": 64931284008,
+          "location": "New York, NY"
+        },
+        {
+          "name": "Samhitha Samhitha",
+          "id": 64962356008,
+          "location": "Chicago, IL"
+        }
+      ],
+      "checked": 25,
+      "notified": 0
+    }
+  ]
+}
