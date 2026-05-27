@@ -1,26 +1,29 @@
 {
-  "runAt": "2026-05-25T17:10:59.476Z",
+  "runAt": "2026-05-27T18:04:00.167Z",
   "runId": null,
   "roles": [
     {
-      "roleKey": "ae",
-      "jobName": "Account Executive",
-      "passing": [],
-      "checked": 1,
-      "notified": 0
-    },
-    {
-      "roleKey": "business_development_representative",
-      "jobName": "Business Development Representative",
+      "roleKey": "product_manager",
+      "jobName": "Product Manager",
       "passing": [
         {
-          "name": "Hannah Arndt",
-          "id": 64783995008,
+          "name": "Windell Camp",
+          "id": 64931284008,
+          "location": "New York, NY"
+        },
+        {
+          "name": "Siddhartha Hemchand Nidiginti",
+          "id": 65024609008,
+          "location": "United States (currently at Walmart); California State University Northridge suggests CA connection"
+        },
+        {
+          "name": "Amy Chan",
+          "id": 65073147008,
           "location": "New York, NY"
         }
       ],
-      "checked": 7,
-      "notified": 1
+      "checked": 27,
+      "notified": 3
     }
   ]
 }
