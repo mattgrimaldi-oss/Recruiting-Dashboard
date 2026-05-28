@@ -54,8 +54,7 @@ module.exports = async (req, res) => {
 
   try {
 
-  const { pdfBase64, candidateName, candidateEmail } = req.body || {};
-  console.log('Received:', { candidateName, candidateEmail, hasPdf: !!pdfBase64 });
+  const { pdfBase64, candidateName, candidateEmail, sender } = req.body || {};
   if (!pdfBase64 || !candidateEmail || !candidateName) {
     return res.status(400).json({ error: 'Missing required fields: pdfBase64, candidateName, candidateEmail' });
   }
@@ -64,6 +63,8 @@ module.exports = async (req, res) => {
     DOCUSIGN_ACCOUNT_ID,
     DOCUSIGN_INTEGRATION_KEY,
     DOCUSIGN_USER_ID,
+    DOCUSIGN_USER_ID_CONNOR,
+    DOCUSIGN_USER_ID_MEGHAN,
     DOCUSIGN_PRIVATE_KEY,
     DOCUSIGN_BASE_URL = 'demo.docusign.net',
     DOCUSIGN_TEMPLATE_ID,
@@ -74,12 +75,15 @@ module.exports = async (req, res) => {
     return res.status(500).json({ error: 'Missing DocuSign environment variables' });
   }
 
+  const userIdMap = { matt: DOCUSIGN_USER_ID, connor: DOCUSIGN_USER_ID_CONNOR, meghan: DOCUSIGN_USER_ID_MEGHAN };
+  const selectedUserId = userIdMap[sender] || DOCUSIGN_USER_ID;
+
   const isSandbox = DOCUSIGN_BASE_URL.includes('demo');
   const authHost = isSandbox ? 'account-d.docusign.com' : 'account.docusign.com';
   const privateKeyPem = DOCUSIGN_PRIVATE_KEY.replace(/\\n/g, '\n');
 
   // Exchange JWT for access token
-  const jwt = makeJwt(DOCUSIGN_INTEGRATION_KEY, DOCUSIGN_USER_ID, authHost, privateKeyPem);
+  const jwt = makeJwt(DOCUSIGN_INTEGRATION_KEY, selectedUserId, authHost, privateKeyPem);
   const tokenBody = `grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=${jwt}`;
 
   const tokenResp = await httpsPost(authHost, '/oauth/token', { 'Content-Type': 'application/x-www-form-urlencoded' }, tokenBody);

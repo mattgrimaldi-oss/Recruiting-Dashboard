@@ -120,6 +120,7 @@
       const [letterHtml, setLetterHtml] = useState(null);
       const [docuSignStatus, setDocuSignStatus] = useState(null);
       const [docuSignUrl, setDocuSignUrl] = useState(null);
+      const [docuSignSender, setDocuSignSender] = useState('matt');
       const set = k => e => setForm(f => ({ ...f, [k]: e.target.value }));
 
       const fmtDate = d => {
@@ -298,9 +299,9 @@ body{font-family:'Poppins',sans-serif;background:#e5e5e5;-webkit-print-color-adj
 .leg-h{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
 .leg-h h1{font-size:16px;font-weight:700;color:#620DEC}
 .leg-h .addr{font-size:7.5px;color:#666;text-align:right;line-height:1.5}
-.legal p{margin-bottom:5px}
-.legal ol{padding-left:16px;margin:4px 0 6px}
-.legal li{margin-bottom:4px}
+.legal p{margin-bottom:3px}
+.legal ol{padding-left:16px;margin:3px 0 4px}
+.legal li{margin-bottom:2px}
 .sub{display:block;padding-left:12px;margin:2px 0}
 .sg{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:12px}
 .sl{border-bottom:1px solid #111;width:160px;margin:12px 0 3px}
@@ -621,6 +622,12 @@ window.getPdfBase64 = async function() {
                 <div style={{ display:'flex', gap:10 }}>
                   <button onClick={() => { const f = document.getElementById('offer-iframe'); f.contentWindow.savePdf(); }}
                     style={{ ...S.btnPrimary, padding:'8px 20px', fontSize:13 }}>⬇ Save PDF</button>
+                  <select value={docuSignSender} onChange={e => { setDocuSignSender(e.target.value); setDocuSignStatus(null); setDocuSignUrl(null); }}
+                    style={{ background:'#2e2a5e', color:'white', border:'1px solid rgba(255,255,255,0.2)', borderRadius:8, padding:'8px 12px', fontSize:13, cursor:'pointer' }}>
+                    <option value="matt">Matt Grimaldi</option>
+                    <option value="connor">Connor McDermott</option>
+                    <option value="meghan">Meghan Dwyer</option>
+                  </select>
                   <button
                     disabled={docuSignStatus === 'loading' || docuSignStatus === 'success'}
                     onClick={async () => {
@@ -633,7 +640,7 @@ window.getPdfBase64 = async function() {
                         const resp = await fetch('/api/send-to-docusign', {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ pdfBase64: base64, candidateName: form.name, candidateEmail: form.email }),
+                          body: JSON.stringify({ pdfBase64: base64, candidateName: form.name, candidateEmail: form.email, sender: docuSignSender }),
                         });
                         const data = await resp.json();
                         if (resp.ok && data.senderViewUrl) { setDocuSignStatus('success'); setDocuSignUrl(data.senderViewUrl); }
