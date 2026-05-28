@@ -1948,7 +1948,7 @@ window.getPdfBase64 = async function() {
             <>
               {/* Tabs */}
               <div style={{ ...S.tabBar, animation: "fadeUp 0.5s ease 0.1s both" }}>
-                {[{ id: "funnel", label: "Pipeline" }, { id: "inmail", label: "InMail Analytics" }, { id: "offer", label: "Offer Letter Generator" }, { id: "chat", label: "Ask Flip AI" }, { id: "screening", label: "Candidate Hub" }].map(t => (
+                {[{ id: "funnel", label: "Pipeline" }, { id: "inmail", label: "InMail Analytics" }, { id: "offer", label: "Offer Letter Generator" }, { id: "chat", label: "Ask Flip AI" }, { id: "screening", label: "Applicant Screening" }].map(t => (
                   <button key={t.id} className="tab-btn" onClick={() => setActiveTab(t.id)} style={{ ...S.tab, ...(activeTab === t.id ? S.tabOn : {}) }}>{t.label}</button>
                 ))}
               </div>
