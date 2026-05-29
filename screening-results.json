@@ -1,29 +1,13 @@
 {
-  "runAt": "2026-05-27T18:04:00.167Z",
+  "runAt": "2026-05-29T18:15:46.945Z",
   "runId": null,
   "roles": [
     {
       "roleKey": "product_manager",
       "jobName": "Product Manager",
-      "passing": [
-        {
-          "name": "Windell Camp",
-          "id": 64931284008,
-          "location": "New York, NY"
-        },
-        {
-          "name": "Siddhartha Hemchand Nidiginti",
-          "id": 65024609008,
-          "location": "United States (currently at Walmart); California State University Northridge suggests CA connection"
-        },
-        {
-          "name": "Amy Chan",
-          "id": 65073147008,
-          "location": "New York, NY"
-        }
-      ],
-      "checked": 27,
-      "notified": 3
+      "passing": [],
+      "checked": 12,
+      "notified": 0
     }
   ]
 }
