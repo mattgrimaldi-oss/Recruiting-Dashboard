@@ -1,12 +1,12 @@
 {
-  "runAt": "2026-05-29T18:15:46.945Z",
+  "runAt": "2026-06-01T19:58:40.006Z",
   "runId": null,
   "roles": [
     {
       "roleKey": "product_manager",
       "jobName": "Product Manager",
       "passing": [],
-      "checked": 12,
+      "checked": 14,
       "notified": 0
     }
   ]
