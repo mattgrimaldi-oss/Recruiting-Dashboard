@@ -1,13 +1,29 @@
 {
-  "runAt": "2026-06-03T18:53:27.976Z",
+  "runAt": "2026-06-05T17:29:25.018Z",
   "runId": null,
   "roles": [
     {
       "roleKey": "product_manager",
       "jobName": "Product Manager",
-      "passing": [],
-      "checked": 35,
-      "notified": 0
+      "passing": [
+        {
+          "name": "Jeet Ghodasara",
+          "id": 58410872008,
+          "location": "California, USA"
+        },
+        {
+          "name": "Prathamesh Kothavale",
+          "id": 65966756008,
+          "location": "San Bruno, CA"
+        },
+        {
+          "name": "Kelly Bean",
+          "id": 65971167008,
+          "location": "Redondo Beach, CA"
+        }
+      ],
+      "checked": 46,
+      "notified": 3
     }
   ]
 }
