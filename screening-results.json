@@ -1,5 +1,5 @@
 {
-  "runAt": "2026-06-05T17:29:25.018Z",
+  "runAt": "2026-06-08T17:59:45.159Z",
   "runId": null,
   "roles": [
     {
@@ -7,22 +7,22 @@
       "jobName": "Product Manager",
       "passing": [
         {
-          "name": "Jeet Ghodasara",
-          "id": 58410872008,
-          "location": "California, USA"
+          "name": "Kyle Newman",
+          "id": 66160759008,
+          "location": "New York, NY"
         },
         {
-          "name": "Prathamesh Kothavale",
-          "id": 65966756008,
-          "location": "San Bruno, CA"
+          "name": "Antonio Pontarelli",
+          "id": 66167625008,
+          "location": "Los Angeles, CA"
         },
         {
-          "name": "Kelly Bean",
-          "id": 65971167008,
-          "location": "Redondo Beach, CA"
+          "name": "Oliver Vilches",
+          "id": 66256449008,
+          "location": "Los Angeles, CA"
         }
       ],
-      "checked": 46,
+      "checked": 14,
       "notified": 3
     }
   ]
