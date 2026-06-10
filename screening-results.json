@@ -1,5 +1,5 @@
 {
-  "runAt": "2026-06-08T17:59:45.159Z",
+  "runAt": "2026-06-10T18:08:35.961Z",
   "runId": null,
   "roles": [
     {
@@ -7,22 +7,22 @@
       "jobName": "Product Manager",
       "passing": [
         {
-          "name": "Kyle Newman",
-          "id": 66160759008,
+          "name": "Sai Kamal",
+          "id": 66291280008,
           "location": "New York, NY"
         },
         {
-          "name": "Antonio Pontarelli",
-          "id": 66167625008,
-          "location": "Los Angeles, CA"
+          "name": "Tau Solaiman",
+          "id": 66342561008,
+          "location": "New York, NY"
         },
         {
-          "name": "Oliver Vilches",
-          "id": 66256449008,
-          "location": "Los Angeles, CA"
+          "name": "Liz Pitman",
+          "id": 66473131008,
+          "location": "New York, NY"
         }
       ],
-      "checked": 14,
+      "checked": 15,
       "notified": 3
     }
   ]
