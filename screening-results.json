@@ -1,5 +1,5 @@
 {
-  "runAt": "2026-06-10T18:08:35.961Z",
+  "runAt": "2026-06-12T17:42:29.328Z",
   "runId": null,
   "roles": [
     {
@@ -7,23 +7,28 @@
       "jobName": "Product Manager",
       "passing": [
         {
-          "name": "Sai Kamal",
-          "id": 66291280008,
-          "location": "New York, NY"
+          "name": "Jenny Morton",
+          "id": 66529872008,
+          "location": "Santa Monica, CA"
         },
         {
-          "name": "Tau Solaiman",
-          "id": 66342561008,
-          "location": "New York, NY"
+          "name": "Ausar Mcgruder",
+          "id": 66538098008,
+          "location": "Los Angeles, California"
         },
         {
-          "name": "Liz Pitman",
-          "id": 66473131008,
-          "location": "New York, NY"
+          "name": "Sagar Joshi",
+          "id": 66646478008,
+          "location": "Anaheim, CA"
+        },
+        {
+          "name": "Sai Banda",
+          "id": 66679865008,
+          "location": "NJ"
         }
       ],
-      "checked": 15,
-      "notified": 3
+      "checked": 24,
+      "notified": 4
     }
   ]
 }
