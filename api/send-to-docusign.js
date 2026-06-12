@@ -82,24 +82,32 @@ module.exports = async (req, res) => {
   const authHost = isSandbox ? 'account-d.docusign.com' : 'account.docusign.com';
   const privateKeyPem = DOCUSIGN_PRIVATE_KEY.replace(/\\n/g, '\n');
 
-  // Exchange JWT for access token
-  const jwt = makeJwt(DOCUSIGN_INTEGRATION_KEY, selectedUserId, authHost, privateKeyPem);
-  const tokenBody = `grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=${jwt}`;
-
-  const tokenResp = await httpsPost(authHost, '/oauth/token', { 'Content-Type': 'application/x-www-form-urlencoded' }, tokenBody);
-  if (tokenResp.status !== 200) {
-    console.error('DocuSign auth failed:', JSON.stringify(tokenResp.body));
-    return res.status(502).json({ error: 'DocuSign authentication failed', detail: tokenResp.body });
+  // Auth as selected sender for envelope creation + sender view
+  const senderJwt = makeJwt(DOCUSIGN_INTEGRATION_KEY, selectedUserId, authHost, privateKeyPem);
+  const senderTokenBody = `grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=${senderJwt}`;
+  const senderTokenResp = await httpsPost(authHost, '/oauth/token', { 'Content-Type': 'application/x-www-form-urlencoded' }, senderTokenBody);
+  if (senderTokenResp.status !== 200) {
+    console.error('DocuSign sender auth failed:', JSON.stringify(senderTokenResp.body));
+    return res.status(502).json({ error: 'DocuSign authentication failed', detail: senderTokenResp.body });
   }
-  const accessToken = tokenResp.body.access_token;
+  const accessToken = senderTokenResp.body.access_token;
+
+  // Auth as admin (Matt) for template fetch — DS Sender accounts lack template read permissions
+  let adminToken = accessToken;
+  if (selectedUserId !== DOCUSIGN_USER_ID) {
+    const adminJwt = makeJwt(DOCUSIGN_INTEGRATION_KEY, DOCUSIGN_USER_ID, authHost, privateKeyPem);
+    const adminTokenBody = `grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=${adminJwt}`;
+    const adminTokenResp = await httpsPost(authHost, '/oauth/token', { 'Content-Type': 'application/x-www-form-urlencoded' }, adminTokenBody);
+    if (adminTokenResp.status === 200) adminToken = adminTokenResp.body.access_token;
+  }
 
   const apiBase = `/restapi/v2.1/accounts/${DOCUSIGN_ACCOUNT_ID}`;
   const authHeader = { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' };
 
-  // Fetch tab positions from the template so placement is always correct
+  // Fetch tab positions from the template using admin token
   const tmplResp = await httpsRequest('GET', DOCUSIGN_BASE_URL,
     `${apiBase}/templates/${DOCUSIGN_TEMPLATE_ID}/recipients?include_tabs=true`,
-    { Authorization: `Bearer ${accessToken}` });
+    { Authorization: `Bearer ${adminToken}` });
 
   if (tmplResp.status !== 200) {
     console.error('Template fetch error:', JSON.stringify(tmplResp.body));

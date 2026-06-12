@@ -221,6 +221,7 @@
       };
 
       const displayOTE = calcOTE(roleData.compType, form.salary, form.bonus);
+      const effectiveOTE = parseSal(form.ote) || displayOTE;
 
       const generate = () => {
         try { localStorage.setItem('lastOfferForm', JSON.stringify(form)); } catch(e) {}
@@ -430,7 +431,7 @@ body{font-family:'Poppins',sans-serif;background:#e5e5e5;-webkit-print-color-adj
       <li>You will be employed to serve on a full-time, exempt basis as ${rd.intro} ${form.position||'[Position]'}, effective ${fmtDate(form.startDate)} reporting to ${form.manager||'[Manager]'}. As ${rd.intro} ${form.position||'[Position]'}, ${rd.duty}.</li>
       <li>You will be paid a base salary of ${fmtSalary(form.salary)} annually, which will be subject to tax and other withholdings as required by law. Your compensation will be paid on a semi-monthly basis.${rd.salaryAdj?' Such base salary may be adjusted from time to time in accordance with normal business practice and in the sole discretion of the Company.':''}${form.salaryAfter6?' After six (6) months of employment, your base salary will increase to '+fmtSalary(form.salaryAfter6)+' annually.':''}</li>
       ${rd.compType==='base_bonus'?`<li>In addition to your base salary, you will be eligible to earn an uncapped variable bonus in the annual amount of ${fmtSalary(form.bonus)} based on achieving specific performance goals or targets, subject to tax and other withholdings as required by law. Such bonus shall be paid on a quarterly basis within 45 days following the end of each quarterly period.</li>`:''}
-      ${rd.compType==='base_commission_ote'?`<li>In addition, you will also be eligible to earn uncapped quarterly commissions. Your OTE is estimated to be ${fmtSalary(Math.round((parseSal(form.salary)||0)*10/7))}, which includes both your base salary and anticipated commissions. This figure is based on meeting or exceeding sales targets outlined in your performance metrics. Such commissions will be paid out pursuant to the terms of the Flip CX Sales Incentive Plan that you will sign and are subject to tax and other withholdings as required by law.</li>`:''}
+      ${rd.compType==='base_commission_ote'?`<li>In addition, you will also be eligible to earn uncapped quarterly commissions. Your OTE is estimated to be ${fmtSalary(effectiveOTE || Math.round((parseSal(form.salary)||0)*10/7))}, which includes both your base salary and anticipated commissions. This figure is based on meeting or exceeding sales targets outlined in your performance metrics. Such commissions will be paid out pursuant to the terms of the Flip CX Sales Incentive Plan that you will sign and are subject to tax and other withholdings as required by law.</li>`:''}
       ${rd.compType==='base_commission_monthly'?`<li>In addition, you will also be eligible to earn monthly commissions. Such commissions will be paid out pursuant to the terms of the Flip CX Sales Incentive Plan that you will sign and are subject to tax and other withholdings as required by law.</li>`:''}
       <li>Subject to the approval of the Board of Directors of the Company, the Company may grant to you an incentive stock option (the "Option") under the Company's 2016 Stock Incentive Plan (the "Plan") for the purchase of an aggregate of ${fmtShares(form.shares)} shares of common stock of the Company at a price per share equal to the fair market value at the time of Board approval. The Option shall be subject to all terms, vesting schedules and other provisions set forth in the Plan and in a separate option agreement.</li>
       <li>During your employment with the Company, you shall accrue time off according to the Company's standard time off policies. Such time off shall be scheduled and taken in accordance with the Company's standard policies. You shall also be entitled to all other paid holiday and sick leave as generally made available to employees.</li>
@@ -443,7 +444,7 @@ body{font-family:'Poppins',sans-serif;background:#e5e5e5;-webkit-print-color-adj
       <li>This offer letter is your formal offer of employment and supersedes any and all prior or contemporaneous agreements, discussions and understandings, whether written or oral, relating to the subject matter of this letter or your employment with the Company. The resolution of any disputes under this letter will be governed by the laws of the State of New York.</li>
     </ol>
     <p>If you agree with the provisions of this letter, please sign this letter in the space provided below and return it to Human Resources, by ${fmtDate(form.offerExpiry)}. If you do not accept this offer by then, this offer will be revoked.</p>
-    <div style="margin-top:16px;display:flex;justify-content:space-between;gap:40px">
+    <div style="position:absolute;bottom:52px;left:44px;right:44px;display:flex;justify-content:space-between;gap:40px;font-size:8.5px;color:#111">
       <div style="flex:1">
         <div>ACCEPTED &amp; AGREED:</div>
         <div style="margin-top:4px;font-weight:700">${form.name||''}</div>
@@ -700,15 +701,18 @@ window.getPdfBase64 = async function() {
                   </div>
                   <div style={{ display:'flex', background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:10, overflow:'hidden' }}>
                     <input
-                      type="text" value={form.salary} onChange={set('salary')} placeholder="140000"
+                      type="text" value={form.salary} onChange={e => { set('salary')(e); setForm(f => ({...f, ote: ''})); }} placeholder="140000"
                       style={{ ...inp, flex:1, background:'transparent', border:'none', borderRadius:0 }}
                     />
                     {displayOTE !== null && (
                       <>
                         <div style={{ width:1, background:'rgba(255,255,255,0.12)', alignSelf:'stretch' }} />
-                        <div style={{ flex:1, padding:'11px 14px', color:'rgba(255,255,255,0.55)', fontSize:14, fontFamily:'Plus Jakarta Sans, sans-serif', display:'flex', alignItems:'center' }}>
-                          {fmtSalary(displayOTE)}
-                        </div>
+                        <input
+                          type="text" value={form.ote}
+                          onChange={set('ote')}
+                          placeholder={displayOTE !== null ? fmtSalary(displayOTE) : ''}
+                          style={{ ...inp, flex:1, background:'transparent', border:'none', borderRadius:0, color: form.ote ? '#fff' : 'rgba(255,255,255,0.45)' }}
+                        />
                       </>
                     )}
                   </div>
@@ -730,7 +734,7 @@ window.getPdfBase64 = async function() {
                 {roleData.compType === 'base_bonus' && (
                   <div style={{ gridColumn: 'span 1' }}>
                     <label style={lbl}>Variable Bonus ($)</label>
-                    <input type="text" value={form.bonus} onChange={set('bonus')} placeholder="30000" style={inp} />
+                    <input type="text" value={form.bonus} onChange={e => { set('bonus')(e); setForm(f => ({...f, ote: ''})); }} placeholder="30000" style={inp} />
                   </div>
                 )}
                 <div style={{ gridColumn: 'span 1' }}>
