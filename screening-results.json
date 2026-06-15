@@ -1,34 +1,13 @@
 {
-  "runAt": "2026-06-12T17:42:29.328Z",
+  "runAt": "2026-06-15T19:05:58.896Z",
   "runId": null,
   "roles": [
     {
       "roleKey": "product_manager",
       "jobName": "Product Manager",
-      "passing": [
-        {
-          "name": "Jenny Morton",
-          "id": 66529872008,
-          "location": "Santa Monica, CA"
-        },
-        {
-          "name": "Ausar Mcgruder",
-          "id": 66538098008,
-          "location": "Los Angeles, California"
-        },
-        {
-          "name": "Sagar Joshi",
-          "id": 66646478008,
-          "location": "Anaheim, CA"
-        },
-        {
-          "name": "Sai Banda",
-          "id": 66679865008,
-          "location": "NJ"
-        }
-      ],
-      "checked": 24,
-      "notified": 4
+      "passing": [],
+      "checked": 4,
+      "notified": 0
     }
   ]
 }
