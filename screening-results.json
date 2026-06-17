@@ -1,13 +1,34 @@
 {
-  "runAt": "2026-06-15T19:05:58.896Z",
+  "runAt": "2026-06-17T17:53:09.018Z",
   "runId": null,
   "roles": [
     {
       "roleKey": "product_manager",
       "jobName": "Product Manager",
-      "passing": [],
-      "checked": 4,
-      "notified": 0
+      "passing": [
+        {
+          "name": "Nehru Chowhan Lavudya",
+          "id": 63946005008,
+          "location": "New York City, NY"
+        },
+        {
+          "name": "Benjamin Raifman",
+          "id": 67008584008,
+          "location": "Los Angeles, CA"
+        },
+        {
+          "name": "SONY KUMAR",
+          "id": 67028119008,
+          "location": "New York, NY"
+        },
+        {
+          "name": "Janhavi Chafekar",
+          "id": 67106376008,
+          "location": "New York, NY"
+        }
+      ],
+      "checked": 19,
+      "notified": 4
     }
   ]
 }
