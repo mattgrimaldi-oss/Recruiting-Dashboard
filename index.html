@@ -1819,18 +1819,12 @@ window.getPdfBase64 = async function() {
       const tfCutoff = TIMEFRAMES.find(t => t.id === timeframe)?.cutoff() || new Date("2026-02-02");
       const pipelineWeeks = activeWeeks.filter(w => new Date(w.weekOf) >= tfCutoff);
       const rawTotals = pipelineWeeks.reduce((a, w) => { ALL_STAGES.forEach(s => { a[s.key] = (a[s.key]||0) + (w[s.key]||0); }); return a; }, { ...EMPTY_WEEK });
-      // Manual overrides for timeframes where Greenhouse data is incomplete
-      const MANUAL_OVERRIDES = {
-        since_mc: { hires: 14 }, // offers now sourced from Slack via slackOffers.json
-      };
+      // Hires are sourced from Greenhouse (status=hired, by start date) via
+      // data.json; offers from Slack via slackOffers.json. Both rolled up here.
       const slackOffersInPeriod = slackOffers.filter(e => new Date(e.date) >= tfCutoff).length;
       const manualOffers = manualEntries.filter(e => e.type === 'offer' && new Date(e.date) >= tfCutoff && !slackOffers.some(s => s.name.toLowerCase() === (e.name||'').toLowerCase())).length;
-      const manualHires  = manualEntries.filter(e => e.type === 'hire'  && new Date(e.date) >= tfCutoff).length;
       const totalOffersInPeriod = slackOffersInPeriod + manualOffers;
-      const baseOverride = MANUAL_OVERRIDES[timeframe] || {};
-      const totals = (timeframe === 'last_week' || timeframe === 'last_month')
-        ? { ...rawTotals, offers: totalOffersInPeriod, hires: manualHires }
-        : { ...rawTotals, ...baseOverride, offers: totalOffersInPeriod, hires: (baseOverride.hires ?? rawTotals.hires ?? 0) + manualHires };
+      const totals = { ...rawTotals, offers: totalOffersInPeriod };
       const conv = (f, t) => totals[f] ? ((totals[t] / totals[f]) * 100).toFixed(1) : "0.0";
 
       const startNewWeek = () => { setEditingWeek(null); setFormData({ ...EMPTY_WEEK, weekOf: getCurrentMonday() }); setActiveView("entry"); };

@@ -34,8 +34,9 @@ V3_SECRET = os.environ.get("GREENHOUSE_V3_SECRET", "YOUR_SECRET_HERE")
 # v1 key — used for funnel and stages commands (proven to work)
 V1_API_KEY = os.environ.get("GREENHOUSE_API_KEY", "YOUR_V1_KEY_HERE")
 
-# How many weeks of history to pull (default: 12)
-WEEKS_BACK = 12
+# How many weeks of history to pull. 24 so the dashboard's default
+# "Since Matt & Connor" view (cutoff 2026-02-02) is fully covered.
+WEEKS_BACK = 24
 
 # ============================================================
 # STAGE MAPPING — Your actual Greenhouse stage names
