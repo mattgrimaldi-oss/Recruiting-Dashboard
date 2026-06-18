@@ -996,7 +996,7 @@ window.getPdfBase64 = async function() {
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
             <span style={{ fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 700, fontSize: 15, color: "#fff" }}>{roleConfig.jobName}</span>
             <div style={{ display: "flex", gap: 10 }}>
-              {(Array.isArray(roleConfig.jobIds) ? roleConfig.jobIds : [roleConfig.jobId]).map((id, i) => (
+              {(Array.isArray(roleConfig.jobIds) ? roleConfig.jobIds : roleConfig.jobId ? [roleConfig.jobId] : []).map((id, i) => (
                 <a key={id} href={"https://app8.greenhouse.io/sdash/" + id} target="_blank" rel="noreferrer"
                   style={{ fontSize: 12, color: "#a78bfa", fontFamily: "JetBrains Mono", textDecoration: "none" }}>
                   Greenhouse{roleConfig.jobIds?.length > 1 ? " " + (i + 1) : ""} ↗
@@ -1274,7 +1274,7 @@ window.getPdfBase64 = async function() {
         fetch("/api/criteria").then(r => r.json()).then(d => {
           setCriteria(d.criteria);
           setSha(d.sha);
-          setSelectedRole(k => k || Object.keys(d.criteria).filter(k => k !== "config")[0]);
+          setSelectedRole(k => k || Object.keys(d.criteria).filter(k => k !== "config" && k !== "_global")[0]);
           if (d.criteria.config) setConfigDraft(d.criteria.config);
         }).catch(() => {});
         fetch("/api/trigger-screening").then(r => r.json()).then(d => { if (d.lastRun) setLastRun(d.lastRun); }).catch(() => {});
@@ -1477,7 +1477,7 @@ window.getPdfBase64 = async function() {
                         <span style={labelStyle}>Role</span>
                         <select value={runRole} onChange={e => setRunRole(e.target.value)} style={selectStyle}>
                           <option value="all">All Roles</option>
-                          {roleKeys.filter(k => k !== "_global").map(k => <option key={k} value={k}>{criteria[k].jobName}</option>)}
+                          {roleKeys.filter(k => k !== "_global").map(k => <option key={k} value={k}>{criteria?.[k]?.jobName || k}</option>)}
                         </select>
                       </div>
                       <div style={{ display: "flex", flexDirection: "column", gap: 3, padding: "0 4px" }}>
