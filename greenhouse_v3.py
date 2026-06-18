@@ -935,8 +935,11 @@ def cmd_funnel(token):
     # Cumulative: a candidate at takehome is counted in screens AND takehomes.
 
     current_week = get_monday(datetime.now())
+    window_start = get_monday(cutoff)
 
-    stage_apps = active_apps + rejected_apps
+    # Active + rejected + hired. Hired candidates have null current_stage but
+    # cleared the full funnel, so they count at every stage bucket.
+    stage_apps = active_apps + rejected_apps + hired_apps
     for app in stage_apps:
         aid = app.get("id")
         status = app.get("status", "active")
@@ -944,6 +947,21 @@ def cmd_funnel(token):
         job_name = get_job_name(app)
         if aid not in app_to_job:
             app_to_job[aid] = job_name
+
+        if status == "hired":
+            date_str = app.get("last_activity_at")
+            if not date_str:
+                continue
+            try:
+                stage_week = get_monday(datetime.fromisoformat(date_str.replace("Z", "+00:00")))
+            except (ValueError, TypeError):
+                continue
+            if stage_week < window_start or stage_week > current_week:
+                continue
+            for b in STAGE_BUCKETS:
+                weekly_total[stage_week][b] += 1
+                weekly_by_job[job_name][stage_week][b] += 1
+            continue
 
         cs = app.get("current_stage") or {}
         if not isinstance(cs, dict) or not cs.get("name"):
@@ -958,35 +976,25 @@ def cmd_funnel(token):
         level = BUCKET_LEVEL[bucket]
 
         if status == "rejected":
-            # rejected_at = when they were rejected at this exact stage
             date_str = app.get("rejected_at") or app.get("last_activity_at")
-            if not date_str:
-                continue
-            try:
-                stage_week = get_monday(datetime.fromisoformat(date_str.replace("Z", "+00:00")))
-            except (ValueError, TypeError):
-                continue
         else:
-            # Active: last_activity_at ≈ when they were moved to their current stage
             date_str = app.get("last_activity_at")
-            if not date_str:
-                continue
-            try:
-                stage_week = get_monday(datetime.fromisoformat(date_str.replace("Z", "+00:00")))
-            except (ValueError, TypeError):
-                continue
 
-        # Skip if outside our window
-        if stage_week < get_monday(cutoff):
+        if not date_str:
+            continue
+        try:
+            stage_week = get_monday(datetime.fromisoformat(date_str.replace("Z", "+00:00")))
+        except (ValueError, TypeError):
             continue
 
-        # Count at EXACT stage only (no cumulative backdating).
-        # A candidate rejected at "Take Home" is counted in takehomes for that week,
-        # not retroactively in screens (we don't know when the screen happened).
-        # The screen shows up separately when that candidate was still at screen stage.
-        b = STAGE_BUCKETS[level - 1]
-        weekly_total[stage_week][b] += 1
-        weekly_by_job[job_name][stage_week][b] += 1
+        if stage_week < window_start or stage_week > current_week:
+            continue
+
+        # Cumulative: a candidate at level N counts at every stage 1 through N.
+        for i in range(level):
+            b = STAGE_BUCKETS[i]
+            weekly_total[stage_week][b] += 1
+            weekly_by_job[job_name][stage_week][b] += 1
 
     # ── 3. Offers (count) — by offer created_at week ──
     for offer in offers:
