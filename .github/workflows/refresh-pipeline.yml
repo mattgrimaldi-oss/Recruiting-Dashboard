@@ -41,5 +41,8 @@ jobs:
       - name: Commit refreshed data
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: 'chore: refresh pipeline data [skip ci]'
+          # No [skip ci] — Vercel honors it and would skip redeploying the
+          # refreshed data. This workflow runs on schedule/dispatch only (not
+          # push), so there is no CI loop to avoid.
+          commit_message: 'chore: refresh pipeline data'
           file_pattern: data.json
