@@ -1272,6 +1272,7 @@ window.getPdfBase64 = async function() {
 
       React.useEffect(() => {
         fetch("/api/criteria").then(r => r.json()).then(d => {
+          if (!d.criteria) return;
           setCriteria(d.criteria);
           setSha(d.sha);
           setSelectedRole(k => k || Object.keys(d.criteria).filter(k => k !== "config" && k !== "_global")[0]);
