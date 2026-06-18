@@ -34,8 +34,9 @@ V3_SECRET = os.environ.get("GREENHOUSE_V3_SECRET", "YOUR_SECRET_HERE")
 # v1 key — used for funnel and stages commands (proven to work)
 V1_API_KEY = os.environ.get("GREENHOUSE_API_KEY", "YOUR_V1_KEY_HERE")
 
-# How many weeks of history to pull (default: 12)
-WEEKS_BACK = 12
+# How many weeks of history to pull. 24 so the dashboard's default
+# "Since Matt & Connor" view (cutoff 2026-02-02) is fully covered.
+WEEKS_BACK = 24
 
 # ============================================================
 # STAGE MAPPING — Your actual Greenhouse stage names
@@ -811,7 +812,9 @@ def cmd_funnel(token):
       - Date used: rejected_at for rejected candidates, last_activity_at for active
       - Active apps pulled without date cutoff (catches long-pipeline candidates)
       - Rejected apps filtered to last_activity_at within our window
-      - offers / hires: by offer created_at / resolved_at week
+      - offers: by offer created_at week
+      - hires:  applications with status "hired", bucketed by offer starts_at
+                (start date); future start dates excluded
     """
     if not V1_API_KEY:
         print("ERROR: The funnel command needs your v1 API key.")
@@ -823,9 +826,10 @@ def cmd_funnel(token):
     print(f"Pulling Greenhouse data for the last {WEEKS_BACK} weeks...")
     print(f"(Since {cutoff.strftime('%B %d, %Y')})\n")
 
-    # Pull jobs
+    # Pull jobs (all statuses — hires may land on reqs that are now closed,
+    # so we need closed job names too for attribution).
     print("Fetching jobs...")
-    jobs = v1_get("jobs", {"status": "open"})
+    jobs = v1_get("jobs")
     job_names = {j["id"]: j["name"] for j in jobs if "id" in j}
     print(f"  Found {len(jobs)} jobs")
 
@@ -844,13 +848,30 @@ def cmd_funnel(token):
     new_apps = v1_get("applications", {"created_after": cutoff_str})
     print(f"  Found {len(new_apps)} new applications")
 
-    # Pull offers
+    # Hired applications — source of truth for hires (status flips to "hired")
+    print("Fetching hired applications...")
+    hired_apps = v1_get("applications", {"status": "hired"})
+    print(f"  Found {len(hired_apps)} hired applications")
+
+    # Pull offers. Wide window (52w) so a recently-started hire whose offer was
+    # created months earlier still has a start date available. We build the
+    # latest accepted offer per application for hire dates, and separately
+    # window-filter for the weekly "offers" count.
     print("Fetching offers...")
-    offers_cutoff = (datetime.now() - timedelta(weeks=20)).strftime("%Y-%m-%dT00:00:00Z")
-    offers = v1_get("offers", {"created_after": offers_cutoff})
-    offers = [o for o in offers if o.get("created_at", "") >= cutoff_str]
-    print(f"  Found {len(offers)} offers")
-    print(f"  Accepted: {len([o for o in offers if o.get('status') == 'accepted'])}")
+    offers_cutoff = (datetime.now() - timedelta(weeks=52)).strftime("%Y-%m-%dT00:00:00Z")
+    all_offers = v1_get("offers", {"created_after": offers_cutoff})
+    offer_by_app = {}
+    for o in all_offers:
+        if o.get("status") != "accepted":
+            continue
+        aid = o.get("application_id")
+        if aid is None:
+            continue
+        prev = offer_by_app.get(aid)
+        if not prev or o.get("created_at", "") > prev.get("created_at", ""):
+            offer_by_app[aid] = o
+    offers = [o for o in all_offers if o.get("created_at", "") >= cutoff_str]
+    print(f"  Found {len(offers)} offers in window, {len(offer_by_app)} accepted (for hires)")
 
     BLANK = lambda: {
         "inmails": 0, "responses": 0, "application_review": 0,
@@ -967,7 +988,7 @@ def cmd_funnel(token):
         weekly_total[stage_week][b] += 1
         weekly_by_job[job_name][stage_week][b] += 1
 
-    # ── 3. Offers and hires ──
+    # ── 3. Offers (count) — by offer created_at week ──
     for offer in offers:
         created = offer.get("created_at", "")
         if not created:
@@ -976,18 +997,34 @@ def cmd_funnel(token):
             week = get_monday(datetime.fromisoformat(created.replace("Z", "+00:00")))
         except (ValueError, TypeError):
             continue
-        app_id = offer.get("application_id")
-        offer_job = app_to_job.get(app_id, "Unknown")
+        offer_job = app_to_job.get(offer.get("application_id"), "Unknown")
         weekly_total[week]["offers"] += 1
         weekly_by_job[offer_job][week]["offers"] += 1
-        if offer.get("status") == "accepted":
-            resolved = offer.get("resolved_at", created)
-            try:
-                hw = get_monday(datetime.fromisoformat(resolved.replace("Z", "+00:00")))
-            except (ValueError, TypeError):
-                hw = week
-            weekly_total[hw]["hires"] += 1
-            weekly_by_job[offer_job][hw]["hires"] += 1
+
+    # ── 4. Hires — from applications with status "hired" ──
+    # Greenhouse flips the application status to "hired", which is the source of
+    # truth. Bucket by the offer's START date (starts_at) so a hire counts in the
+    # week they actually start; fall back to resolved_at, then last_activity_at.
+    # Skip future start dates — someone who hasn't started yet isn't a hire yet.
+    # Attributed to the application's job.
+    window_start = get_monday(cutoff)
+    for app in hired_apps:
+        aid = app.get("id")
+        job_name = get_job_name(app)
+        if aid not in app_to_job:
+            app_to_job[aid] = job_name
+        off = offer_by_app.get(aid, {})
+        date_str = off.get("starts_at") or off.get("resolved_at") or app.get("last_activity_at")
+        if not date_str:
+            continue
+        try:
+            hw = get_monday(datetime.fromisoformat(date_str.replace("Z", "+00:00")))
+        except (ValueError, TypeError):
+            continue
+        if hw < window_start or hw > current_week:
+            continue
+        weekly_total[hw]["hires"] += 1
+        weekly_by_job[job_name][hw]["hires"] += 1
 
     # Format output
     output = {"All": []}
