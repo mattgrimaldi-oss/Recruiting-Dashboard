@@ -26,7 +26,8 @@
     "frequency": "every_2_days",
     "timeWindowHours": 48,
     "cronRole": [
-      "product_manager"
+      "product_manager",
+      "customer_success_manager"
     ]
   },
   "ae": {
