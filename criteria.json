@@ -151,5 +151,20 @@
         "status": "required"
       }
     ]
+  },
+  "customer_success_manager": {
+    "jobIds": [
+      "4366207008",
+      "4444768008"
+    ],
+    "jobName": "Customer Success Manager",
+    "criteria": [
+      {
+        "key": "experience",
+        "label": "Experience",
+        "detail": "3+ years of either Customer Success, Client Success, Implementation Manager, Implementation Specialist, Solutions Engineer, or similar roles.",
+        "status": "required"
+      }
+    ]
   }
 }
