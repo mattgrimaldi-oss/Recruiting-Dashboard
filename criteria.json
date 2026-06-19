@@ -19,6 +19,12 @@
         "label": "Location",
         "detail": "Based in a 30 mile radius from Brooklyn, NY or Marina Del Rey, CA. ",
         "status": "required"
+      },
+      {
+        "key": "criterion_1781891265496",
+        "label": "Rejection",
+        "detail": "Not previously rejected more than once in greenhouse. ",
+        "status": "required"
       }
     ]
   },
