@@ -167,7 +167,7 @@ def v1_get(endpoint, params=None):
     all_results = []
     page = 1
     while True:
-        p = {"per_page": 100, "page": page}
+        p = {"per_page": 500, "page": page}
         if params:
             p.update(params)
         resp = requests.get(f"{V1_BASE}/{endpoint}", headers=v1_get_auth(), params=p)
@@ -177,11 +177,9 @@ def v1_get(endpoint, params=None):
         if not data:
             break
         all_results.extend(data)
-        if len(data) < 100:
+        if len(data) < 500:
             break
         page += 1
-        if len(all_results) >= 10000:
-            break
     return all_results
 
 
