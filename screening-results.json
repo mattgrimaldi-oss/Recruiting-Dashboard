@@ -1,5 +1,5 @@
 {
-  "runAt": "2026-06-17T17:53:09.018Z",
+  "runAt": "2026-06-19T17:23:49.303Z",
   "runId": null,
   "roles": [
     {
@@ -7,28 +7,23 @@
       "jobName": "Product Manager",
       "passing": [
         {
-          "name": "Nehru Chowhan Lavudya",
-          "id": 63946005008,
-          "location": "New York City, NY"
-        },
-        {
-          "name": "Benjamin Raifman",
-          "id": 67008584008,
+          "name": "Janice Chung",
+          "id": 67138619008,
           "location": "Los Angeles, CA"
         },
         {
-          "name": "SONY KUMAR",
-          "id": 67028119008,
+          "name": "Namaswini Teegala",
+          "id": 54758225008,
           "location": "New York, NY"
         },
         {
-          "name": "Janhavi Chafekar",
-          "id": 67106376008,
-          "location": "New York, NY"
+          "name": "Max Levitt",
+          "id": 67299871008,
+          "location": "Los Angeles, CA"
         }
       ],
       "checked": 19,
-      "notified": 4
+      "notified": 3
     }
   ]
 }
