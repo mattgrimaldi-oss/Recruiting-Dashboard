@@ -1,0 +1,29 @@
+{
+  "runAt": "2026-06-23T17:25:19.135Z",
+  "runId": "mqqwgbxv9wxe",
+  "roles": [
+    {
+      "roleKey": "product_manager",
+      "jobName": "Product Manager",
+      "passing": [
+        {
+          "name": "Windell Camp",
+          "id": 64931284008,
+          "location": "New York, NY"
+        },
+        {
+          "name": "Roshan KG",
+          "id": 52680636008,
+          "location": "Brooklyn, New York"
+        },
+        {
+          "name": "Christian Shields",
+          "id": 65739612008,
+          "location": "New York, NY"
+        }
+      ],
+      "checked": 100,
+      "notified": 0
+    }
+  ]
+}
