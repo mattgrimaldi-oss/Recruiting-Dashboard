@@ -1,5 +1,5 @@
 {
-  "runAt": "2026-06-22T18:56:22.942Z",
+  "runAt": "2026-06-24T17:12:43.301Z",
   "runId": null,
   "roles": [
     {
@@ -7,51 +7,18 @@
       "jobName": "Product Manager",
       "passing": [
         {
-          "name": "Mehrangiz Olimjanova",
-          "id": 67404880008,
-          "location": "Los Angeles, CA"
-        },
-        {
-          "name": "Elena Kalinka",
-          "id": 67417497008,
-          "location": "Los Angeles, CA"
-        }
-      ],
-      "checked": 28,
-      "notified": 2
-    },
-    {
-      "roleKey": "customer_success_manager",
-      "jobName": "Customer Success Manager",
-      "passing": [
-        {
-          "name": "Renee Tng",
-          "id": 67509919008,
+          "name": "Cindy Yen",
+          "id": 65130894008,
           "location": "Santa Monica, CA"
         },
         {
-          "name": "John Stiens",
-          "id": 67517125008,
+          "name": "Jake Craven",
+          "id": 67661875008,
           "location": "Los Angeles, CA"
-        },
-        {
-          "name": "Ishmael Checkley",
-          "id": 67428359008,
-          "location": "New York, NY"
-        },
-        {
-          "name": "Abhishek Sehjpal",
-          "id": 67446274008,
-          "location": "Los Angeles, CA"
-        },
-        {
-          "name": "ZOSIMO GELUZ",
-          "id": 67454632008,
-          "location": "Los Angeles, California"
         }
       ],
-      "checked": 20,
-      "notified": 5
+      "checked": 26,
+      "notified": 2
     }
   ]
 }
