@@ -1,5 +1,5 @@
 {
-  "runAt": "2026-06-24T17:12:43.301Z",
+  "runAt": "2026-06-26T17:07:48.021Z",
   "runId": null,
   "roles": [
     {
@@ -7,18 +7,41 @@
       "jobName": "Product Manager",
       "passing": [
         {
-          "name": "Cindy Yen",
-          "id": 65130894008,
-          "location": "Santa Monica, CA"
+          "name": "Samuel Hamway",
+          "id": 67889747008,
+          "location": "New York, NY"
+        }
+      ],
+      "checked": 15,
+      "notified": 1
+    },
+    {
+      "roleKey": "customer_success_manager",
+      "jobName": "Customer Success Manager",
+      "passing": [
+        {
+          "name": "Donna Marr",
+          "id": 52298408008,
+          "location": "Los Angeles, California"
         },
         {
-          "name": "Jake Craven",
-          "id": 67661875008,
+          "name": "Jorden Pong",
+          "id": 67780509008,
+          "location": "New York City, NY"
+        },
+        {
+          "name": "Jordan Diggs",
+          "id": 67796020008,
+          "location": "Los Angeles, CA"
+        },
+        {
+          "name": "Jayme Della Bella",
+          "id": 67921759008,
           "location": "Los Angeles, CA"
         }
       ],
-      "checked": 26,
-      "notified": 2
+      "checked": 15,
+      "notified": 4
     }
   ]
 }
