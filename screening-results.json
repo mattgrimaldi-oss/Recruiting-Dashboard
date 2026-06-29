@@ -1,5 +1,5 @@
 {
-  "runAt": "2026-06-26T17:07:48.021Z",
+  "runAt": "2026-06-29T17:44:42.169Z",
   "runId": null,
   "roles": [
     {
@@ -7,41 +7,25 @@
       "jobName": "Product Manager",
       "passing": [
         {
-          "name": "Samuel Hamway",
-          "id": 67889747008,
+          "name": "Kyoo Jo",
+          "id": 68109875008,
+          "location": "Brooklyn, NY"
+        },
+        {
+          "name": "Shruti Dey",
+          "id": 68133171008,
           "location": "New York, NY"
         }
       ],
-      "checked": 15,
-      "notified": 1
+      "checked": 13,
+      "notified": 2
     },
     {
       "roleKey": "customer_success_manager",
       "jobName": "Customer Success Manager",
-      "passing": [
-        {
-          "name": "Donna Marr",
-          "id": 52298408008,
-          "location": "Los Angeles, California"
-        },
-        {
-          "name": "Jorden Pong",
-          "id": 67780509008,
-          "location": "New York City, NY"
-        },
-        {
-          "name": "Jordan Diggs",
-          "id": 67796020008,
-          "location": "Los Angeles, CA"
-        },
-        {
-          "name": "Jayme Della Bella",
-          "id": 67921759008,
-          "location": "Los Angeles, CA"
-        }
-      ],
-      "checked": 15,
-      "notified": 4
+      "passing": [],
+      "checked": 8,
+      "notified": 0
     }
   ]
 }
