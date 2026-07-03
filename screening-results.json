@@ -1,5 +1,5 @@
 {
-  "runAt": "2026-07-01T17:25:41.567Z",
+  "runAt": "2026-07-03T16:43:08.756Z",
   "runId": null,
   "roles": [
     {
@@ -7,36 +7,30 @@
       "jobName": "Product Manager",
       "passing": [
         {
-          "name": "Akshat Kumar",
-          "id": 68206108008,
-          "location": "New York City, NY"
+          "name": "Samantha Herzog",
+          "id": 68418508008,
+          "location": "Los Angeles, CA"
+        },
+        {
+          "name": "Jack Y. Hillel",
+          "id": 68490662008,
+          "location": "New York, NY"
+        },
+        {
+          "name": "Tiffany Moran",
+          "id": 68507077008,
+          "location": "New York, NY"
         }
       ],
-      "checked": 15,
-      "notified": 1
+      "checked": 23,
+      "notified": 3
     },
     {
       "roleKey": "customer_success_manager",
       "jobName": "Customer Success Manager",
-      "passing": [
-        {
-          "name": "Christian Santiago",
-          "id": 68186672008,
-          "location": "Los Angeles, CA"
-        },
-        {
-          "name": "Ariel White",
-          "id": 67823128008,
-          "location": "Los Angeles, CA"
-        },
-        {
-          "name": "Brandon Allen",
-          "id": 68263703008,
-          "location": "West Hollywood, CA"
-        }
-      ],
-      "checked": 22,
-      "notified": 3
+      "passing": [],
+      "checked": 12,
+      "notified": 0
     }
   ]
 }
