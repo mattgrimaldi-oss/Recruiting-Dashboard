@@ -1,31 +1,57 @@
 {
-  "runAt": "2026-07-06T17:49:17.904Z",
+  "runAt": "2026-07-08T16:50:03.430Z",
   "runId": null,
   "roles": [
     {
       "roleKey": "product_manager",
       "jobName": "Product Manager",
-      "passing": [],
-      "checked": 13,
-      "notified": 0
+      "passing": [
+        {
+          "name": "Yang Lin",
+          "id": 52733432008,
+          "location": "Los Angeles, CA"
+        },
+        {
+          "name": "Ria Mavinkurve",
+          "id": 68860490008,
+          "location": "New York, NY"
+        },
+        {
+          "name": "Ameya Chander",
+          "id": 68887087008,
+          "location": "New York, NY"
+        }
+      ],
+      "checked": 29,
+      "notified": 3
     },
     {
       "roleKey": "customer_success_manager",
       "jobName": "Customer Success Manager",
       "passing": [
         {
-          "name": "Dave Chokshi",
-          "id": 68715016008,
+          "name": "Sheila-Jane Shelton",
+          "id": 55750785008,
+          "location": "Santa Monica, CA"
+        },
+        {
+          "name": "Robert Witenski",
+          "id": 68916662008,
           "location": "New York, NY"
         },
         {
-          "name": "Juan Isaacs",
-          "id": 68668554008,
-          "location": "East Northport, NY"
+          "name": "Gabriela Albavera",
+          "id": 68790678008,
+          "location": "Covina, CA"
+        },
+        {
+          "name": "Mailon Williams",
+          "id": 62571444008,
+          "location": "Los Angeles, CA"
         }
       ],
-      "checked": 7,
-      "notified": 2
+      "checked": 14,
+      "notified": 4
     }
   ]
 }
