@@ -171,6 +171,12 @@
         "label": "Experience",
         "detail": "3+ years of either Customer Success, Client Success, Implementation Manager, Implementation Specialist, Solutions Engineer, or similar roles.",
         "status": "required"
+      },
+      {
+        "key": "criterion_1783540471144",
+        "label": "Technical Ability",
+        "detail": "Some sort of technical aptitude - IE coming from a technical background or a computer related degree or any indication of like SQL or something like that. ",
+        "status": "required"
       }
     ]
   }
