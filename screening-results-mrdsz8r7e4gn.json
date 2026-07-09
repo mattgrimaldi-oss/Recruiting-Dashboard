@@ -1,0 +1,24 @@
+{
+  "runAt": "2026-07-09T17:56:07.069Z",
+  "runId": "mrdsz8r7e4gn",
+  "roles": [
+    {
+      "roleKey": "product_manager",
+      "jobName": "Product Manager",
+      "passing": [
+        {
+          "name": "Ria Mavinkurve",
+          "id": 68860490008,
+          "location": "New York, NY"
+        },
+        {
+          "name": "Ameya Chander",
+          "id": 68887087008,
+          "location": "New York, NY"
+        }
+      ],
+      "checked": 30,
+      "notified": 0
+    }
+  ]
+}
