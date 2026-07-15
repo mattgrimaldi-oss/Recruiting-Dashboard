@@ -1822,7 +1822,7 @@ window.getPdfBase64 = async function() {
       const [selectedJob, setSelectedJob] = useState("All");
       const [chartMetric, setChartMetric] = useState("offers");
       const [confirmReset, setConfirmReset] = useState(false);
-      const [timeframe, setTimeframe] = useState("last_3_months");
+      const [timeframe, setTimeframe] = useState("all_time");
       const [manualEntries, setManualEntries] = useState(() => { try { return JSON.parse(localStorage.getItem('flipManualEntries_v2') || '[]'); } catch(e) { return []; } });
       const [slackOffers, setSlackOffers] = useState([{"name":"Ji Sun (Alyce) Hong","date":"2026-02-16"},{"name":"Jason Lobell","date":"2026-02-23"},{"name":"Elizabeth Youshaei","date":"2026-03-11"},{"name":"Jonah Epstein","date":"2026-03-20"},{"name":"Aleksandre Natchkebia","date":"2026-03-27"},{"name":"Beylem Zanagar","date":"2026-03-27"},{"name":"Alexandra Dehaemers","date":"2026-04-04"},{"name":"Eren Ocal","date":"2026-04-04"},{"name":"Amanda Anderson","date":"2026-04-16"},{"name":"Amy Ji","date":"2026-04-24"},{"name":"Devon Armogeda","date":"2026-04-24"},{"name":"Devin Patel","date":"2026-04-24"},{"name":"Rob Suttman","date":"2026-04-28"},{"name":"Joelle Valadez","date":"2026-04-29"},{"name":"Ryan Miller","date":"2026-05-04"},{"name":"Matt Molt","date":"2026-05-06"},{"name":"Ian Masse","date":"2026-05-08"},{"name":"Lee Jacobs","date":"2026-05-11"},{"name":"Naina Thangada","date":"2026-05-22"},{"name":"Victor Moreno","date":"2026-05-22"},{"name":"Ben Linden","date":"2026-05-28"},{"name":"Jessica Jimenez","date":"2026-06-02"},{"name":"Matthew Young","date":"2026-06-10"},{"name":"Daniel Kolodney","date":"2026-06-12"},{"name":"Dan Seo","date":"2026-06-12"},{"name":"Vince Little","date":"2026-06-12"},{"name":"Kim Karston Bush","date":"2026-06-15"},{"name":"Mira Karande","date":"2026-06-24"},{"name":"Michael Downs","date":"2026-07-09"},{"name":"Charlotte Otremba","date":"2026-07-10"},{"name":"Iain Ferguson","date":"2026-07-10"}]); // lastSync: 2026-07-15
       const [addingFor, setAddingFor] = useState(null);
@@ -1835,6 +1835,7 @@ window.getPdfBase64 = async function() {
         { id: "last_week",     label: "Last Week",       cutoff: () => { const d = new Date(); d.setDate(d.getDate() - 7);  return d; } },
         { id: "last_month",    label: "Last Month",      cutoff: () => { const d = new Date(); d.setDate(d.getDate() - 30); return d; } },
         { id: "last_3_months", label: "Last 3 Months",   cutoff: () => { const d = new Date(); d.setDate(d.getDate() - 90); return d; } },
+        { id: "all_time",      label: "All Time",        cutoff: () => new Date("2000-01-01") },
       ];
 
       useEffect(() => {
