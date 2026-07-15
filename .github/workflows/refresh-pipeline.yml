@@ -44,7 +44,8 @@ jobs:
       - name: Refresh data.json from Greenhouse + Calendar
         run: python3 refresh_dashboard.py
         env:
-          GREENHOUSE_API_KEY: ${{ secrets.GREENHOUSE_API_KEY }}
+          # Reuse the Harvest v1 secret already configured for candidate-screening.
+          GREENHOUSE_API_KEY: ${{ secrets.GREENHOUSE_API_KEY_V1 }}
           GREENHOUSE_V3_KEY: ${{ secrets.GREENHOUSE_V3_KEY }}
           GREENHOUSE_V3_SECRET: ${{ secrets.GREENHOUSE_V3_SECRET }}
 
