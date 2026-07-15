@@ -85,9 +85,16 @@
       { week: "2026-04-20", sends: 346, inmailResponses: 71,  accepts: 62,  responseRate: 20.5, acceptRate: 17.9 },
       { week: "2026-04-27", sends: 317, inmailResponses: 72,  accepts: 68,  responseRate: 22.7, acceptRate: 21.5 },
       { week: "2026-05-04", sends: 177, inmailResponses: 25,  accepts: 24,  responseRate: 14.1, acceptRate: 13.6 },
+      { week: "2026-05-11", sends: 288, inmailResponses: 76,  accepts: 67,  responseRate: 26.4, acceptRate: 23.3 },
+      { week: "2026-05-18", sends: 177, inmailResponses: 68,  accepts: 53,  responseRate: 38.4, acceptRate: 29.9 },
+      { week: "2026-05-25", sends: 78,  inmailResponses: 30,  accepts: 27,  responseRate: 38.5, acceptRate: 34.6 },
+      { week: "2026-06-01", sends: 122, inmailResponses: 32,  accepts: 28,  responseRate: 26.2, acceptRate: 23.0 },
+      { week: "2026-06-08", sends: 177, inmailResponses: 59,  accepts: 45,  responseRate: 33.3, acceptRate: 25.4 },
+      { week: "2026-06-15", sends: 284, inmailResponses: 75,  accepts: 58,  responseRate: 26.4, acceptRate: 20.4 },
+      { week: "2026-06-22", sends: 28,  inmailResponses: 8,   accepts: 8,   responseRate: 28.6, acceptRate: 28.6 },
+      { week: "2026-06-29", sends: 20,  inmailResponses: 3,   accepts: 2,   responseRate: 15.0, acceptRate: 10.0 },
     ];
     const RECRUITERS = [
-      { name: "Connor McDermott", sends: 814, responseRate: 41.8, acceptRate: 37.6 },
       { name: "Meghan Dwyer", sends: 292, responseRate: 32.5, acceptRate: 29.5 },
       { name: "Matthew Grimaldi", sends: 2168, responseRate: 23.9, acceptRate: 20.9 },
     ];
@@ -655,7 +662,6 @@ window.getPdfBase64 = async function() {
                   <select value={docuSignSender} onChange={e => { setDocuSignSender(e.target.value); setDocuSignStatus(null); setDocuSignUrl(null); }}
                     style={{ background:'#2e2a5e', color:'white', border:'1px solid rgba(255,255,255,0.2)', borderRadius:8, padding:'8px 12px', fontSize:13, cursor:'pointer' }}>
                     <option value="matt">Matt Grimaldi</option>
-                    <option value="connor">Connor McDermott</option>
                     <option value="meghan">Meghan Dwyer</option>
                   </select>
                   <button
