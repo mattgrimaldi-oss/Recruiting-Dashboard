@@ -1,5 +1,5 @@
 {
-  "runAt": "2026-07-13T17:22:23.879Z",
+  "runAt": "2026-07-15T16:34:06.823Z",
   "runId": null,
   "roles": [
     {
@@ -7,46 +7,40 @@
       "jobName": "Product Manager",
       "passing": [
         {
-          "name": "Lea Horwitz",
-          "id": 69362410008,
-          "location": "New York, New York"
+          "name": "Olivia Chen",
+          "id": 69398483008,
+          "location": "Los Angeles, CA"
         },
         {
-          "name": "Vamshi Krishna Sai Myneni",
-          "id": 69362860008,
-          "location": "CA, USA"
+          "name": "Mohitha C.",
+          "id": 60144647008,
+          "location": "CA"
         },
         {
-          "name": "Valmicki Tulsee",
-          "id": 69374934008,
-          "location": "Astoria, NY"
+          "name": "Sandeep Varma",
+          "id": 69423466008,
+          "location": "United States (no specific city found)"
         },
         {
-          "name": "Sukanya Salvi",
-          "id": 62059698008,
-          "location": "New York, USA"
+          "name": "Rosie Ali",
+          "id": 69441580008,
+          "location": "New York, NY"
+        },
+        {
+          "name": "Manas Malviya",
+          "id": 69475496008,
+          "location": "Monterey Park, CA"
         }
       ],
-      "checked": 34,
-      "notified": 4
+      "checked": 77,
+      "notified": 5
     },
     {
       "roleKey": "customer_success_manager",
       "jobName": "Customer Success Manager",
-      "passing": [
-        {
-          "name": "Victoria Meyerovich",
-          "id": 69277015008,
-          "location": "Brooklyn, NY"
-        },
-        {
-          "name": "Kristen Chiarello",
-          "id": 69320799008,
-          "location": "Los Angeles, CA"
-        }
-      ],
-      "checked": 6,
-      "notified": 2
+      "passing": [],
+      "checked": 7,
+      "notified": 0
     }
   ]
 }
