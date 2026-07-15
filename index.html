@@ -115,13 +115,28 @@
       const [form, setForm] = useState({
         name: '', email: '', position: '', manager: '',
         salary: '', shares: '', startDate: '', offerDate: today, offerExpiry: '',
-        bonus: '', ote: '', salaryAfter6: ''
+        bonus: '', ote: '', salaryAfter6: '',
+        // Greenhouse linkage — set by the candidate picker below. Stamped onto the
+        // DocuSign envelope so the hire webhook can map back to the candidate.
+        ghCandidateId: '', ghApplicationId: ''
       });
       const [letterHtml, setLetterHtml] = useState(null);
       const [docuSignStatus, setDocuSignStatus] = useState(null);
       const [docuSignUrl, setDocuSignUrl] = useState(null);
       const [docuSignSender, setDocuSignSender] = useState('matt');
       const set = k => e => setForm(f => ({ ...f, [k]: e.target.value }));
+
+      // Greenhouse candidate picker. Reads the name->id index the Pipeline tab
+      // already builds and caches in localStorage (flipCandidateIndex_v1).
+      const [ghIndex] = useState(() => {
+        try { const s = localStorage.getItem('flipCandidateIndex_v1'); return s ? (JSON.parse(s).index || {}) : {}; }
+        catch (e) { return {}; }
+      });
+      const [ghQuery, setGhQuery] = useState('');
+      const [ghFocus, setGhFocus] = useState(false);
+      const ghMatches = ghQuery.trim().length >= 2
+        ? Object.keys(ghIndex).filter(n => n.toLowerCase().includes(ghQuery.trim().toLowerCase())).slice(0, 8)
+        : [];
 
       const fmtDate = d => {
         if (!d) return '___________';
@@ -655,7 +670,7 @@ window.getPdfBase64 = async function() {
                         const resp = await fetch('/api/send-to-docusign', {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ pdfBase64: base64, candidateName: form.name, candidateEmail: form.email, sender: docuSignSender }),
+                          body: JSON.stringify({ pdfBase64: base64, candidateName: form.name, candidateEmail: form.email, sender: docuSignSender, startDate: form.startDate, candidateId: form.ghCandidateId, applicationId: form.ghApplicationId }),
                         });
                         const data = await resp.json();
                         if (resp.ok && data.senderViewUrl) { setDocuSignStatus('success'); setDocuSignUrl(data.senderViewUrl); }
@@ -688,6 +703,43 @@ window.getPdfBase64 = async function() {
                 )}
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginTop: 16 }}>
+                {/* Greenhouse candidate picker — links this offer to a Greenhouse
+                    candidate so the background check + auto-hire fire on signing. */}
+                <div style={{ gridColumn: 'span 2', position: 'relative' }}>
+                  <label style={lbl}>
+                    Greenhouse Candidate{' '}
+                    {form.ghCandidateId
+                      ? <span style={{ color:'#22c55e' }}>✓ linked (candidate {form.ghCandidateId})</span>
+                      : <span style={{ color:'rgba(255,255,255,0.4)' }}>— links background check + auto-hire</span>}
+                  </label>
+                  <input
+                    type="text"
+                    value={ghQuery}
+                    onChange={e => { setGhQuery(e.target.value); setForm(f => ({ ...f, ghCandidateId:'', ghApplicationId:'' })); }}
+                    onFocus={() => setGhFocus(true)}
+                    onBlur={() => setTimeout(() => setGhFocus(false), 150)}
+                    placeholder={Object.keys(ghIndex).length ? 'Search candidate name…' : 'Open the Pipeline tab once to load candidates'}
+                    style={inp}
+                  />
+                  {ghFocus && ghMatches.length > 0 && (
+                    <div style={{ position:'absolute', zIndex:30, left:0, right:0, marginTop:4, background:'#221f4d', border:'1px solid rgba(255,255,255,0.2)', borderRadius:10, maxHeight:220, overflowY:'auto', boxShadow:'0 8px 24px rgba(0,0,0,0.45)' }}>
+                      {ghMatches.map(n => (
+                        <div key={n}
+                          onMouseDown={() => {
+                            const hit = ghIndex[n] || {};
+                            setGhQuery(n);
+                            setForm(f => ({ ...f, name: n, ghCandidateId: String(hit.candidateId || ''), ghApplicationId: String(hit.applicationId || '') }));
+                            setGhFocus(false);
+                          }}
+                          onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
+                          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                          style={{ padding:'8px 12px', cursor:'pointer', fontSize:13, color:'white' }}>
+                          {n}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 {[
                   { k:'name',        label:'Candidate Name',   span:2 },
                   { k:'email',       label:'Email',            span:2 },
@@ -1770,9 +1822,9 @@ window.getPdfBase64 = async function() {
       const [selectedJob, setSelectedJob] = useState("All");
       const [chartMetric, setChartMetric] = useState("offers");
       const [confirmReset, setConfirmReset] = useState(false);
-      const [timeframe, setTimeframe] = useState("since_mc");
+      const [timeframe, setTimeframe] = useState("last_3_months");
       const [manualEntries, setManualEntries] = useState(() => { try { return JSON.parse(localStorage.getItem('flipManualEntries_v2') || '[]'); } catch(e) { return []; } });
-      const [slackOffers, setSlackOffers] = useState([{"name":"Ji Sun (Alyce) Hong","date":"2026-02-16"},{"name":"Jason Lobell","date":"2026-02-23"},{"name":"Elizabeth Youshaei","date":"2026-03-11"},{"name":"Jonah Epstein","date":"2026-03-20"},{"name":"Aleksandre Natchkebia","date":"2026-03-27"},{"name":"Beylem Zanagar","date":"2026-03-27"},{"name":"Alexandra Dehaemers","date":"2026-04-04"},{"name":"Eren Ocal","date":"2026-04-04"},{"name":"Amanda Anderson","date":"2026-04-16"},{"name":"Amy Ji","date":"2026-04-24"},{"name":"Devon Armogeda","date":"2026-04-24"},{"name":"Devin Patel","date":"2026-04-24"},{"name":"Rob Suttman","date":"2026-04-28"},{"name":"Joelle Valadez","date":"2026-04-29"},{"name":"Ryan Miller","date":"2026-05-04"},{"name":"Matt Molt","date":"2026-05-06"},{"name":"Ian Masse","date":"2026-05-08"},{"name":"Lee Jacobs","date":"2026-05-11"}]); // lastSync: 2026-05-12
+      const [slackOffers, setSlackOffers] = useState([{"name":"Ji Sun (Alyce) Hong","date":"2026-02-16"},{"name":"Jason Lobell","date":"2026-02-23"},{"name":"Elizabeth Youshaei","date":"2026-03-11"},{"name":"Jonah Epstein","date":"2026-03-20"},{"name":"Aleksandre Natchkebia","date":"2026-03-27"},{"name":"Beylem Zanagar","date":"2026-03-27"},{"name":"Alexandra Dehaemers","date":"2026-04-04"},{"name":"Eren Ocal","date":"2026-04-04"},{"name":"Amanda Anderson","date":"2026-04-16"},{"name":"Amy Ji","date":"2026-04-24"},{"name":"Devon Armogeda","date":"2026-04-24"},{"name":"Devin Patel","date":"2026-04-24"},{"name":"Rob Suttman","date":"2026-04-28"},{"name":"Joelle Valadez","date":"2026-04-29"},{"name":"Ryan Miller","date":"2026-05-04"},{"name":"Matt Molt","date":"2026-05-06"},{"name":"Ian Masse","date":"2026-05-08"},{"name":"Lee Jacobs","date":"2026-05-11"},{"name":"Naina Thangada","date":"2026-05-22"},{"name":"Victor Moreno","date":"2026-05-22"},{"name":"Ben Linden","date":"2026-05-28"},{"name":"Jessica Jimenez","date":"2026-06-02"},{"name":"Matthew Young","date":"2026-06-10"},{"name":"Daniel Kolodney","date":"2026-06-12"},{"name":"Dan Seo","date":"2026-06-12"},{"name":"Vince Little","date":"2026-06-12"},{"name":"Kim Karston Bush","date":"2026-06-15"},{"name":"Mira Karande","date":"2026-06-24"},{"name":"Michael Downs","date":"2026-07-09"},{"name":"Charlotte Otremba","date":"2026-07-10"},{"name":"Iain Ferguson","date":"2026-07-10"}]); // lastSync: 2026-07-15
       const [addingFor, setAddingFor] = useState(null);
       const [addDate, setAddDate] = useState("");
       const [addName, setAddName] = useState("");
@@ -1783,7 +1835,6 @@ window.getPdfBase64 = async function() {
         { id: "last_week",     label: "Last Week",       cutoff: () => { const d = new Date(); d.setDate(d.getDate() - 7);  return d; } },
         { id: "last_month",    label: "Last Month",      cutoff: () => { const d = new Date(); d.setDate(d.getDate() - 30); return d; } },
         { id: "last_3_months", label: "Last 3 Months",   cutoff: () => { const d = new Date(); d.setDate(d.getDate() - 90); return d; } },
-        { id: "since_mc",      label: "Since Matt & Connor", cutoff: () => new Date("2026-02-02") },
       ];
 
       useEffect(() => {
