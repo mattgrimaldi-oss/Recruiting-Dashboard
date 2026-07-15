@@ -95,9 +95,12 @@
       { week: "2026-06-29", sends: 20,  inmailResponses: 3,   accepts: 2,   responseRate: 15.0, acceptRate: 10.0 },
       { week: "2026-07-06", sends: 54,  inmailResponses: 4,   accepts: 2,   responseRate: 7.4,  acceptRate: 3.7 },
     ];
+    // sends/responses/accepts are cumulative since 2026-02-02 (when weekly tracking began).
+    // responseRate/acceptRate are derived: responses/sends*100 and accepts/sends*100.
+    // RECRUITERS cumulative through 2026-07-11
     const RECRUITERS = [
-      { name: "Meghan Dwyer", sends: 292, responseRate: 32.5, acceptRate: 29.5 },
-      { name: "Matthew Grimaldi", sends: 2168, responseRate: 23.9, acceptRate: 20.9 },
+      { name: "Meghan Dwyer", sends: 468, responses: 159, accepts: 147, responseRate: 34.0, acceptRate: 31.4 },
+      { name: "Matthew Grimaldi", sends: 3351, responses: 732, accepts: 636, responseRate: 21.8, acceptRate: 19.0 },
     ];
 
     const getWeekLabel = (d) => new Date(d + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" });
