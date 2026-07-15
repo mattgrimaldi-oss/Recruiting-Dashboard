@@ -1,0 +1,7 @@
+.vercel
+.env*.local
+.env.local
+
+# Credentials — never commit. Provisioned to CI via GitHub Actions secrets.
+google_credentials.json
+google_token.json

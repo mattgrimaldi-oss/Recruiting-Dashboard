@@ -1,0 +1,75 @@
+name: Refresh pipeline data
+
+# Cloud cron: pulls pipeline funnel data from Greenhouse + Google Calendar,
+# commits data.json, and deploys to Vercel. Runs on GitHub's servers, so it
+# does not depend on anyone's laptop being on.
+
+on:
+  schedule:
+    # 12:00 UTC daily ≈ 8am US Eastern (EDT) / 7am (EST). GitHub cron is UTC-only.
+    - cron: "0 12 * * *"
+  workflow_dispatch: {} # allow manual "Run workflow" from the Actions tab
+
+# Let the default GITHUB_TOKEN push the data.json commit back to the repo.
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-pipeline
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Restore Google credentials
+        run: |
+          printf '%s' "$GOOGLE_CREDENTIALS" > google_credentials.json
+          printf '%s' "$GOOGLE_TOKEN" > google_token.json
+        env:
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+          GOOGLE_TOKEN: ${{ secrets.GOOGLE_TOKEN }}
+
+      - name: Refresh data.json from Greenhouse + Calendar
+        run: python3 refresh_dashboard.py
+        env:
+          GREENHOUSE_API_KEY: ${{ secrets.GREENHOUSE_API_KEY }}
+          GREENHOUSE_V3_KEY: ${{ secrets.GREENHOUSE_V3_KEY }}
+          GREENHOUSE_V3_SECRET: ${{ secrets.GREENHOUSE_V3_SECRET }}
+
+      - name: Commit data.json if it changed
+        id: commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- data.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "data.json unchanged — nothing to deploy."
+          else
+            git add data.json
+            git commit -m "Refresh pipeline data from Greenhouse (automated)"
+            git push
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Deploy to Vercel
+        if: steps.commit.outputs.changed == 'true'
+        run: |
+          npm i -g vercel
+          vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+          vercel deploy --prod --yes --token="$VERCEL_TOKEN"
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
