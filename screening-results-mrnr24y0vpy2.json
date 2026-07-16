@@ -1,0 +1,41 @@
+{
+  "runAt": "2026-07-16T16:57:47.481Z",
+  "runId": "mrnr24y0vpy2",
+  "roles": [
+    {
+      "roleKey": "product_manager",
+      "jobName": "Product Manager",
+      "passing": [
+        {
+          "name": "Sithara Kumar",
+          "id": 69648211008,
+          "location": "Brooklyn, NY"
+        },
+        {
+          "name": "Lavanya Gali",
+          "id": 60143167008,
+          "location": "Newburgh, NY"
+        },
+        {
+          "name": "Sandeep Varma",
+          "id": 69423466008,
+          "location": "United States"
+        },
+        {
+          "name": "Sreekar Reddy Chanamgari",
+          "id": 62553247008,
+          "location": "Jersey City, NJ"
+        }
+      ],
+      "checked": 16,
+      "notified": 0
+    },
+    {
+      "roleKey": "customer_success_manager",
+      "jobName": "Customer Success Manager",
+      "passing": [],
+      "checked": 1,
+      "notified": 0
+    }
+  ]
+}
