@@ -23,7 +23,7 @@
       {
         "key": "criterion_1781891265496",
         "label": "Rejection",
-        "detail": "Not previously rejected more than once in greenhouse. ",
+        "detail": "Not previously rejected  at all in greenhouse. ",
         "status": "required"
       }
     ]
