@@ -138,16 +138,41 @@
       const set = k => e => setForm(f => ({ ...f, [k]: e.target.value }));
 
       // Greenhouse candidate picker. Reads the name->id index the Pipeline tab
-      // already builds and caches in localStorage (flipCandidateIndex_v1).
+      // already builds and caches in localStorage (flipCandidateIndex_v1). Index
+      // names are stored lowercase (for chat matching), so we title-case for
+      // display and when filling the form.
       const [ghIndex] = useState(() => {
         try { const s = localStorage.getItem('flipCandidateIndex_v1'); return s ? (JSON.parse(s).index || {}) : {}; }
         catch (e) { return {}; }
       });
-      const [ghQuery, setGhQuery] = useState('');
+      const titleCase = s => (s || '').replace(/\b\w/g, c => c.toUpperCase());
+      // Greenhouse job names are req-specific ("Account Executive (Healthcare OR
+      // Retail)"); the offer letter just wants the plain title.
+      const normalizePosition = title => {
+        if (!title) return title;
+        if (/^enterprise account executive/i.test(title)) return 'Enterprise Account Executive';
+        if (/^account executive/i.test(title)) return 'Account Executive';
+        return title;
+      };
       const [ghFocus, setGhFocus] = useState(false);
-      const ghMatches = ghQuery.trim().length >= 2
-        ? Object.keys(ghIndex).filter(n => n.toLowerCase().includes(ghQuery.trim().toLowerCase())).slice(0, 8)
+      const ghMatches = form.name.trim().length >= 2 && !form.ghCandidateId
+        ? Object.keys(ghIndex).filter(n => n.toLowerCase().includes(form.name.trim().toLowerCase())).slice(0, 8)
         : [];
+      // Pull email + position from Greenhouse when a candidate is linked.
+      const autofillFromGreenhouse = async (candidateId, applicationId) => {
+        try {
+          const r = await fetch('/api/chat', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ getContact: candidateId, applicationId }),
+          });
+          const d = await r.json();
+          setForm(f => ({
+            ...f,
+            email: f.email || d.email || '',
+            position: f.position || normalizePosition(d.position) || '',
+          }));
+        } catch (e) { /* non-fatal — recruiter can fill manually */ }
+      };
 
       const fmtDate = d => {
         if (!d) return '___________';
@@ -264,6 +289,18 @@
 
       const generate = () => {
         try { localStorage.setItem('lastOfferForm', JSON.stringify(form)); } catch(e) {}
+        // Fire-and-forget: log this draft so the hire webhook can still find
+        // the candidate later if the envelope gets created manually in DocuSign
+        // instead of via "Send to DocuSign". Only when actually linked.
+        if (form.ghCandidateId) {
+          fetch('/api/chat', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ logDraft: {
+              candidateId: form.ghCandidateId, applicationId: form.ghApplicationId,
+              candidateName: form.name, candidateEmail: form.email, startDate: form.startDate,
+            } }),
+          }).catch(() => {});
+        }
         const rd = getRoleData(form.position);
         const filename = (form.name || 'Offer Letter').replace(/\s+/g, '_') + '_Offer_Letter.pdf';
         const nameParts = (form.name || '').trim().split(/\s+/);
@@ -713,22 +750,22 @@ window.getPdfBase64 = async function() {
                 )}
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginTop: 16 }}>
-                {/* Greenhouse candidate picker — links this offer to a Greenhouse
-                    candidate so the background check + auto-hire fire on signing. */}
+                {/* Candidate Name — doubles as the Greenhouse candidate search.
+                    Typing/selecting a match links this offer so the background
+                    check + auto-hire fire on signing; free-typing a name that
+                    doesn't match just leaves it unlinked (webhook fallbacks apply). */}
                 <div style={{ gridColumn: 'span 2', position: 'relative' }}>
                   <label style={lbl}>
-                    Greenhouse Candidate{' '}
-                    {form.ghCandidateId
-                      ? <span style={{ color:'#22c55e' }}>✓ linked (candidate {form.ghCandidateId})</span>
-                      : <span style={{ color:'rgba(255,255,255,0.4)' }}>— links background check + auto-hire</span>}
+                    Candidate Name{' '}
+                    {form.ghCandidateId && <span style={{ color:'#22c55e' }}>✓</span>}
                   </label>
                   <input
                     type="text"
-                    value={ghQuery}
-                    onChange={e => { setGhQuery(e.target.value); setForm(f => ({ ...f, ghCandidateId:'', ghApplicationId:'' })); }}
+                    value={form.name}
+                    onChange={e => setForm(f => ({ ...f, name: e.target.value, ghCandidateId:'', ghApplicationId:'', email:'', position:'' }))}
                     onFocus={() => setGhFocus(true)}
                     onBlur={() => setTimeout(() => setGhFocus(false), 150)}
-                    placeholder={Object.keys(ghIndex).length ? 'Search candidate name…' : 'Open the Pipeline tab once to load candidates'}
+                    placeholder="Candidate name"
                     style={inp}
                   />
                   {ghFocus && ghMatches.length > 0 && (
@@ -737,21 +774,22 @@ window.getPdfBase64 = async function() {
                         <div key={n}
                           onMouseDown={() => {
                             const hit = ghIndex[n] || {};
-                            setGhQuery(n);
-                            setForm(f => ({ ...f, name: n, ghCandidateId: String(hit.candidateId || ''), ghApplicationId: String(hit.applicationId || '') }));
+                            const cid = String(hit.candidateId || '');
+                            const aid = String(hit.applicationId || '');
+                            setForm(f => ({ ...f, name: titleCase(n), ghCandidateId: cid, ghApplicationId: aid }));
                             setGhFocus(false);
+                            if (cid) autofillFromGreenhouse(cid, aid);
                           }}
                           onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
                           onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                           style={{ padding:'8px 12px', cursor:'pointer', fontSize:13, color:'white' }}>
-                          {n}
+                          {titleCase(n)}
                         </div>
                       ))}
                     </div>
                   )}
                 </div>
                 {[
-                  { k:'name',        label:'Candidate Name',   span:2 },
                   { k:'email',       label:'Email',            span:2 },
                   { k:'position',    label:'Position / Title', span:2 },
                   { k:'manager',     label:'Manager',          span:1 },
@@ -1609,7 +1647,7 @@ window.getPdfBase64 = async function() {
                   {screeningResults.roles.map((role, ri) => (
                     <Glass key={ri}>
                       <div style={{ fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 700, fontSize: 15, color: "#fff", marginBottom: 14 }}>
-                        {role.jobName}{role.passing.length > 0 ? ` — ${role.passing.length} passed` : ""}
+                        {role.jobName}{role.passing.length > 0 ? ` — ${role.passing.length} passed` : ""}{role.checked > 0 ? `, ${role.checked} screened` : ""}
                       </div>
                       {role.passing.length === 0 ? (
                         <div style={{ fontSize: 13, color: "rgba(255,255,255,0.35)", fontFamily: "JetBrains Mono" }}>No candidates found</div>
