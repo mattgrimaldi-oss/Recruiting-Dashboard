@@ -1,5 +1,5 @@
 {
-  "runAt": "2026-07-15T16:34:06.823Z",
+  "runAt": "2026-07-17T16:22:12.078Z",
   "runId": null,
   "roles": [
     {
@@ -7,39 +7,19 @@
       "jobName": "Product Manager",
       "passing": [
         {
-          "name": "Olivia Chen",
-          "id": 69398483008,
-          "location": "Los Angeles, CA"
-        },
-        {
-          "name": "Mohitha C.",
-          "id": 60144647008,
+          "name": "Sainath Veerla",
+          "id": 69781274008,
           "location": "CA"
-        },
-        {
-          "name": "Sandeep Varma",
-          "id": 69423466008,
-          "location": "United States (no specific city found)"
-        },
-        {
-          "name": "Rosie Ali",
-          "id": 69441580008,
-          "location": "New York, NY"
-        },
-        {
-          "name": "Manas Malviya",
-          "id": 69475496008,
-          "location": "Monterey Park, CA"
         }
       ],
-      "checked": 77,
-      "notified": 5
+      "checked": 28,
+      "notified": 1
     },
     {
       "roleKey": "customer_success_manager",
       "jobName": "Customer Success Manager",
       "passing": [],
-      "checked": 7,
+      "checked": 5,
       "notified": 0
     }
   ]
