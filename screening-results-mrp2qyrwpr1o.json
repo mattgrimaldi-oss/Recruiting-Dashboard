@@ -1,0 +1,19 @@
+{
+  "runAt": "2026-07-17T16:11:42.939Z",
+  "runId": "mrp2qyrwpr1o",
+  "roles": [
+    {
+      "roleKey": "swe",
+      "jobName": "Software Engineer",
+      "passing": [
+        {
+          "name": "Steve Zhang",
+          "id": 69750257008,
+          "location": "Los Angeles, CA"
+        }
+      ],
+      "checked": 308,
+      "notified": 0
+    }
+  ]
+}
