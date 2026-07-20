@@ -1872,7 +1872,7 @@ window.getPdfBase64 = async function() {
       const [confirmReset, setConfirmReset] = useState(false);
       const [timeframe, setTimeframe] = useState("all_time");
       const [manualEntries, setManualEntries] = useState(() => { try { return JSON.parse(localStorage.getItem('flipManualEntries_v2') || '[]'); } catch(e) { return []; } });
-      const [slackOffers, setSlackOffers] = useState([{"name":"Ji Sun (Alyce) Hong","date":"2026-02-16"},{"name":"Jason Lobell","date":"2026-02-23"},{"name":"Elizabeth Youshaei","date":"2026-03-11"},{"name":"Jonah Epstein","date":"2026-03-20"},{"name":"Aleksandre Natchkebia","date":"2026-03-27"},{"name":"Beylem Zanagar","date":"2026-03-27"},{"name":"Alexandra Dehaemers","date":"2026-04-04"},{"name":"Eren Ocal","date":"2026-04-04"},{"name":"Amanda Anderson","date":"2026-04-16"},{"name":"Amy Ji","date":"2026-04-24"},{"name":"Devon Armogeda","date":"2026-04-24"},{"name":"Devin Patel","date":"2026-04-24"},{"name":"Rob Suttman","date":"2026-04-28"},{"name":"Joelle Valadez","date":"2026-04-29"},{"name":"Ryan Miller","date":"2026-05-04"},{"name":"Matt Molt","date":"2026-05-06"},{"name":"Ian Masse","date":"2026-05-08"},{"name":"Lee Jacobs","date":"2026-05-11"},{"name":"Naina Thangada","date":"2026-05-22"},{"name":"Victor Moreno","date":"2026-05-22"},{"name":"Ben Linden","date":"2026-05-28"},{"name":"Jessica Jimenez","date":"2026-06-02"},{"name":"Matthew Young","date":"2026-06-10"},{"name":"Daniel Kolodney","date":"2026-06-12"},{"name":"Dan Seo","date":"2026-06-12"},{"name":"Vince Little","date":"2026-06-12"},{"name":"Kim Karston Bush","date":"2026-06-15"},{"name":"Mira Karande","date":"2026-06-24"},{"name":"Michael Downs","date":"2026-07-09"},{"name":"Charlotte Otremba","date":"2026-07-10"},{"name":"Iain Ferguson","date":"2026-07-10"}]); // lastSync: 2026-07-15
+      const [slackOffers, setSlackOffers] = useState([{"name":"Ji Sun (Alyce) Hong","date":"2026-02-16"},{"name":"Jason Lobell","date":"2026-02-23"},{"name":"Elizabeth Youshaei","date":"2026-03-11"},{"name":"Jonah Epstein","date":"2026-03-20"},{"name":"Aleksandre Natchkebia","date":"2026-03-27"},{"name":"Beylem Zanagar","date":"2026-03-27"},{"name":"Alexandra Dehaemers","date":"2026-04-04"},{"name":"Eren Ocal","date":"2026-04-04"},{"name":"Amanda Anderson","date":"2026-04-16"},{"name":"Amy Ji","date":"2026-04-24"},{"name":"Devon Armogeda","date":"2026-04-24"},{"name":"Devin Patel","date":"2026-04-24"},{"name":"Rob Suttman","date":"2026-04-28"},{"name":"Joelle Valadez","date":"2026-04-29"},{"name":"Ryan Miller","date":"2026-05-04"},{"name":"Matt Molt","date":"2026-05-06"},{"name":"Ian Masse","date":"2026-05-08"},{"name":"Lee Jacobs","date":"2026-05-11"},{"name":"Naina Thangada","date":"2026-05-22"},{"name":"Victor Moreno","date":"2026-05-22"},{"name":"Ben Linden","date":"2026-05-28"},{"name":"Jessica Jimenez","date":"2026-06-02"},{"name":"Matthew Young","date":"2026-06-10"},{"name":"Daniel Kolodney","date":"2026-06-12"},{"name":"Dan Seo","date":"2026-06-12"},{"name":"Vince Little","date":"2026-06-12"},{"name":"Kim Karston Bush","date":"2026-06-15"},{"name":"Mira Karande","date":"2026-06-24"},{"name":"Michael Downs","date":"2026-07-09"},{"name":"Charlotte Otremba","date":"2026-07-10"},{"name":"Iain Ferguson","date":"2026-07-10"},{"name":"Spencer Oberman","date":"2026-07-16"}]); // lastSync: 2026-07-20
       const [addingFor, setAddingFor] = useState(null);
       const [addDate, setAddDate] = useState("");
       const [addName, setAddName] = useState("");
@@ -2349,7 +2349,7 @@ window.getPdfBase64 = async function() {
 
                   <Glass style={{ marginBottom: 20 }}>
                     <h2 style={S.secTitle}>Response Rate Over Time</h2>
-                    <svg viewBox="0 0 700 220" style={{ width: "100%", height: "auto", display: "block" }}>
+                    <svg viewBox="0 0 700 235" style={{ width: "100%", height: "auto", display: "block" }}>
                       {[0, 20, 40, 60].map(v => {
                         const y = 180 - (v/60)*160;
                         return (<g key={v}><line x1="40" y1={y} x2="690" y2={y} stroke="rgba(255,255,255,0.04)" strokeWidth="1" /><text x="35" y={y+4} textAnchor="end" fill="rgba(255,255,255,0.2)" fontSize="10" fontFamily="JetBrains Mono">{v}%</text></g>);
@@ -2372,8 +2372,8 @@ window.getPdfBase64 = async function() {
                             {pts.map((p, i) => (
                               <g key={i}>
                                 <circle cx={p.x} cy={p.y} r="3" fill="#818cf8" />
-                                <text x={p.x} y={p.y - 8} textAnchor="middle" fill="#a5b4fc" fontSize="9" fontFamily="JetBrains Mono">{p.w.responseRate}%</text>
-                                <text x={p.x} y={196} textAnchor="middle" fill="rgba(255,255,255,0.2)" fontSize="8" fontFamily="JetBrains Mono">{getWeekLabel(p.w.week)}</text>
+                                <text x={p.x} y={p.y - 8} textAnchor="middle" fill="#a5b4fc" fontSize="9" fontFamily="JetBrains Mono">{Math.round(p.w.responseRate)}%</text>
+                                <text x={p.x} y={192} textAnchor="end" fill="rgba(255,255,255,0.25)" fontSize="8" fontFamily="JetBrains Mono" transform={`rotate(-45 ${p.x} 192)`}>{getWeekLabel(p.w.week)}</text>
                               </g>
                             ))}
                           </g>
