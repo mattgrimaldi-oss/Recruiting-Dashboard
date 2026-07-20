@@ -1,26 +1,26 @@
 {
-  "runAt": "2026-07-17T16:22:12.078Z",
+  "runAt": "2026-07-20T16:29:45.882Z",
   "runId": null,
   "roles": [
     {
       "roleKey": "product_manager",
       "jobName": "Product Manager",
-      "passing": [
-        {
-          "name": "Sainath Veerla",
-          "id": 69781274008,
-          "location": "CA"
-        }
-      ],
-      "checked": 28,
-      "notified": 1
+      "passing": [],
+      "checked": 13,
+      "notified": 0
     },
     {
       "roleKey": "customer_success_manager",
       "jobName": "Customer Success Manager",
-      "passing": [],
-      "checked": 5,
-      "notified": 0
+      "passing": [
+        {
+          "name": "DAntre Cole",
+          "id": 66292119008,
+          "location": "Los Angeles, CA"
+        }
+      ],
+      "checked": 7,
+      "notified": 1
     }
   ]
 }
