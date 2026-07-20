@@ -1,4 +1,5 @@
 const Anthropic = require('@anthropic-ai/sdk');
+const db = require('../lib/db');
 
 async function fetchGreenhouse(path) {
   const auth = Buffer.from(`${process.env.GREENHOUSE_API_KEY_V1}:`).toString('base64');
@@ -9,36 +10,6 @@ async function fetchGreenhouse(path) {
   return res.json();
 }
 
-async function buildCandidateIndex() {
-  const index = {};
-  let page = 1;
-  while (true) {
-    const candidates = await fetchGreenhouse(`/candidates?per_page=500&page=${page}`);
-    if (!Array.isArray(candidates) || candidates.length === 0) break;
-    for (const c of candidates) {
-      const name = `${c.first_name} ${c.last_name}`.toLowerCase().trim();
-      const appId = c.applications?.[0]?.id ?? null;
-      index[name] = { candidateId: c.id, applicationId: appId };
-    }
-    if (candidates.length < 500) break;
-    page++;
-  }
-  return index;
-}
-
-function findCandidateInMessage(message, index) {
-  const msg = message.toLowerCase();
-  let bestMatch = null;
-  let bestLen = 0;
-  for (const name of Object.keys(index)) {
-    if (msg.includes(name) && name.length > bestLen) {
-      bestMatch = name;
-      bestLen = name.length;
-    }
-  }
-  return bestMatch;
-}
-
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -46,53 +17,91 @@ module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { message, candidateIndex: clientIndex, buildIndex } = req.body;
+  const { message, candidateId, applicationId, getPage, getContact, logDraft } = req.body;
 
-  if (buildIndex) {
+  // ── Log an offer draft (fallback data for manually-uploaded envelopes) ─────
+  if (logDraft) {
     try {
-      const index = await buildCandidateIndex();
-      return res.json({ candidateIndex: index });
+      await db.logOfferDraft({
+        candidateId: logDraft.candidateId,
+        applicationId: logDraft.applicationId,
+        candidateName: logDraft.candidateName,
+        candidateEmail: logDraft.candidateEmail,
+        startDate: logDraft.startDate,
+      });
+      return res.json({ ok: true });
     } catch (e) {
-      return res.status(500).json({ error: `Failed to build index: ${e.message}` });
+      return res.status(500).json({ error: e.message });
     }
   }
 
-  if (!message) return res.status(400).json({ error: 'message required' });
+  // ── Contact lookup: email + position for one candidate (offer autofill) ────
+  // Per-candidate (not bulk) so this doesn't expose a harvestable email list.
+  if (getContact) {
+    try {
+      const cand = await fetchGreenhouse(`/candidates/${getContact}`).catch(() => null);
+      const email = cand?.email_addresses?.find(e => e.value)?.value ?? null;
+      // Position = the job on the linked application (fall back to first app).
+      let position = null;
+      const apps = cand?.applications || [];
+      const app = apps.find(a => String(a.id) === String(applicationId)) || apps[0];
+      position = app?.jobs?.[0]?.name ?? null;
+      return res.json({ email, position });
+    } catch (e) {
+      return res.status(500).json({ error: e.message });
+    }
+  }
 
-  const index = clientIndex || {};
-  const candidateName = findCandidateInMessage(message, index);
-  const candidateData = candidateName ? index[candidateName] : null;
+  // ── Index building: return a slim page of candidates ──────────────────────
+  if (getPage) {
+    try {
+      const candidates = await fetchGreenhouse(`/candidates?per_page=500&page=${getPage}`);
+      if (!Array.isArray(candidates)) return res.json({ candidates: [], done: true });
+      const slim = candidates.map(c => ({
+        id: c.id,
+        name: `${c.first_name} ${c.last_name}`.toLowerCase().trim(),
+        appId: c.applications?.[0]?.id ?? null,
+      }));
+      return res.json({ candidates: slim, done: candidates.length < 500 });
+    } catch (e) {
+      return res.status(500).json({ error: e.message });
+    }
+  }
+
+  // ── Chat message ──────────────────────────────────────────────────────────
+  if (!message) return res.status(400).json({ error: 'message required' });
 
   let contextData = '';
 
-  if (candidateData) {
-    const { candidateId, applicationId } = candidateData;
-
-    const fetches = [
+  if (candidateId) {
+    const [profile, activityFeed] = await Promise.all([
       fetchGreenhouse(`/candidates/${candidateId}`).catch(() => null),
       fetchGreenhouse(`/candidates/${candidateId}/activity_feed`).catch(() => null),
-    ];
-    if (applicationId) {
-      fetches.push(fetchGreenhouse(`/applications/${applicationId}/scorecards`).catch(() => null));
+    ]);
+
+    // Fetch scorecards for ALL applications, not just the first one
+    let scorecards = [];
+    if (profile?.applications?.length) {
+      const allScorecards = await Promise.all(
+        profile.applications.map(app =>
+          fetchGreenhouse(`/applications/${app.id}/scorecards`).catch(() => [])
+        )
+      );
+      scorecards = allScorecards.flat().filter(Boolean);
+    } else if (applicationId) {
+      scorecards = await fetchGreenhouse(`/applications/${applicationId}/scorecards`).catch(() => []);
     }
 
-    const [profile, activityFeed, scorecards] = await Promise.all(fetches);
-
     if (profile) {
-      contextData += `\n\n## Candidate Profile: ${candidateName}\n`;
+      contextData += `\n\n## Candidate: ${profile.first_name} ${profile.last_name}\n`;
       if (profile.phone_numbers?.length) {
         contextData += `Phone: ${profile.phone_numbers.map(p => p.value).join(', ')}\n`;
       }
       if (profile.email_addresses?.length) {
         contextData += `Email: ${profile.email_addresses.map(e => e.value).join(', ')}\n`;
       }
-      if (profile.applications?.length) {
-        const app = profile.applications[0];
-        contextData += `Current Stage: ${app.current_stage?.name ?? 'Unknown'}\n`;
-        contextData += `Status: ${app.status}\n`;
-        if (app.jobs?.length) {
-          contextData += `Applied For: ${app.jobs.map(j => j.name).join(', ')}\n`;
-        }
+      for (const app of profile.applications ?? []) {
+        contextData += `Application — Job: ${app.jobs?.map(j => j.name).join(', ') ?? 'Unknown'}, Stage: ${app.current_stage?.name ?? 'Unknown'}, Status: ${app.status}\n`;
       }
     }
 
@@ -103,6 +112,8 @@ module.exports = async (req, res) => {
         const author = note.user?.name ?? 'Unknown';
         contextData += `[${date} — ${author}]: ${note.body}\n`;
       }
+    } else {
+      contextData += `\n\n## Notes: None found.\n`;
     }
 
     if (scorecards?.length) {
@@ -112,6 +123,10 @@ module.exports = async (req, res) => {
         contextData += `Recommendation: ${sc.overall_recommendation}\n`;
         for (const q of sc.questions ?? []) {
           if (q.answer) contextData += `${q.question}: ${q.answer}\n`;
+        }
+        for (const a of sc.attributes ?? []) {
+          if (a.note) contextData += `${a.name}: ${a.note}\n`;
+          if (a.rating && a.rating !== 'no_decision') contextData += `${a.name} rating: ${a.rating}\n`;
         }
         contextData += '\n';
       }
@@ -132,10 +147,10 @@ module.exports = async (req, res) => {
   const completion = await anthropic.messages.create({
     model: 'claude-sonnet-4-6',
     max_tokens: 1024,
-    system: 'You are an internal recruiting assistant for Flip CX. Answer questions concisely using only the Greenhouse data provided. If specific data is not available, say so clearly. Be direct and helpful.',
+    system: 'You are an internal recruiting assistant for Flip CX. Answer questions conversationally in natural paragraph form — no bullet points, no asterisks, no markdown formatting of any kind. Just plain prose, direct and concise.',
     messages: [{
       role: 'user',
-      content: `${message}\n\n---\nGreenhouse Data:${contextData || ' No matching candidate or data found.'}`,
+      content: `${message}\n\n---\nGreenhouse Data:${contextData || ' No data found.'}`,
     }],
   });
 

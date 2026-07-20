@@ -5,3 +5,8 @@
 # Credentials — never commit. Provisioned to CI via GitHub Actions secrets.
 google_credentials.json
 google_token.json
+
+# Dependencies + OS cruft
+node_modules/
+.DS_Store
+.claude/

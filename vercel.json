@@ -1,6 +1,7 @@
 {
   "functions": {
     "api/send-to-docusign.js": { "maxDuration": 30 },
+    "api/docusign-webhook.js": { "maxDuration": 60 },
     "api/chat.js": { "maxDuration": 60 },
     "api/test-resume.js": { "maxDuration": 60 },
     "api/check-candidates-ae.js": { "maxDuration": 60 },
@@ -11,6 +12,7 @@
   },
   "routes": [
     { "src": "/api/send-to-docusign", "dest": "/api/send-to-docusign.js", "methods": ["POST", "OPTIONS"] },
+    { "src": "/api/docusign-webhook", "dest": "/api/docusign-webhook.js", "methods": ["POST", "OPTIONS"] },
     { "src": "/api/trigger-screening", "dest": "/api/trigger-screening.js", "methods": ["GET", "POST", "OPTIONS"] },
     { "src": "/api/criteria", "dest": "/api/criteria.js", "methods": ["GET", "POST", "OPTIONS"] },
     { "src": "/api/screening-results", "dest": "/api/screening-results.js", "methods": ["GET", "OPTIONS"] },

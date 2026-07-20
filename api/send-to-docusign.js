@@ -1,48 +1,8 @@
-const https = require('https');
-const crypto = require('crypto');
-
-
-function makeJwt(integrationKey, userId, audience, privateKeyPem) {
-  const header = Buffer.from(JSON.stringify({ alg: 'RS256', typ: 'JWT' })).toString('base64url');
-  const now = Math.floor(Date.now() / 1000);
-  const payload = Buffer.from(JSON.stringify({
-    iss: integrationKey,
-    sub: userId,
-    aud: audience,
-    iat: now,
-    exp: now + 3600,
-    scope: 'signature impersonation',
-  })).toString('base64url');
-
-  const signingInput = `${header}.${payload}`;
-  const sign = crypto.createSign('RSA-SHA256');
-  sign.update(signingInput);
-  const signature = sign.sign(privateKeyPem, 'base64url');
-  return `${signingInput}.${signature}`;
-}
-
-function httpsRequest(method, hostname, path, headers, body) {
-  return new Promise((resolve, reject) => {
-    const bodyStr = body ? (typeof body === 'string' ? body : JSON.stringify(body)) : '';
-    const req = https.request(
-      { hostname, path, method, headers: { ...headers, ...(bodyStr ? { 'Content-Length': Buffer.byteLength(bodyStr) } : {}) } },
-      (res) => {
-        let data = '';
-        res.on('data', (chunk) => (data += chunk));
-        res.on('end', () => {
-          try { resolve({ status: res.statusCode, body: JSON.parse(data) }); }
-          catch { resolve({ status: res.statusCode, body: data }); }
-        });
-      }
-    );
-    req.on('error', reject);
-    if (bodyStr) req.write(bodyStr);
-    req.end();
-  });
-}
-
-const httpsPost = (hostname, path, headers, body) => httpsRequest('POST', hostname, path, headers, body);
-const httpsPut  = (hostname, path, headers, body) => httpsRequest('PUT',  hostname, path, headers, body);
+// Shared DocuSign auth/HTTPS helpers live in lib/docusign so the hire webhook
+// and this send endpoint use the exact same JWT flow.
+const docusign = require('../lib/docusign');
+const db = require('../lib/db');
+const { makeJwt, httpsRequest, httpsPost, httpsPut, CUSTOM_FIELDS } = docusign;
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -54,7 +14,14 @@ module.exports = async (req, res) => {
 
   try {
 
-  const { pdfBase64, candidateName, candidateEmail, sender } = req.body || {};
+  const {
+    pdfBase64, candidateName, candidateEmail, sender,
+    // Greenhouse ids from the dashboard's name->id index (index.html). Stashed on
+    // the envelope as custom fields so the hire webhook can map back to the
+    // candidate deterministically. Optional so offer-sending still works if a
+    // candidate isn't matched, but the hire automation needs them.
+    candidateId, applicationId, startDate,
+  } = req.body || {};
   if (!pdfBase64 || !candidateEmail || !candidateName) {
     return res.status(400).json({ error: 'Missing required fields: pdfBase64, candidateName, candidateEmail' });
   }
@@ -133,7 +100,20 @@ module.exports = async (req, res) => {
   const candidateTabs = remapTabs(candidateSigner?.tabs, '1');
   const ceoTabs = remapTabs(ceoSigner?.tabs, '2');
 
+  // Stamp the Greenhouse mapping onto the envelope so envelope-completed can
+  // resolve the candidate without name/email matching. show: false keeps them
+  // out of the signer-facing UI.
+  const textCustomFields = [
+    [CUSTOM_FIELDS.candidateId, candidateId],
+    [CUSTOM_FIELDS.applicationId, applicationId],
+    [CUSTOM_FIELDS.candidateEmail, candidateEmail],
+    [CUSTOM_FIELDS.startDate, startDate],
+  ]
+    .filter(([, value]) => value != null && value !== '')
+    .map(([name, value]) => ({ name, value: String(value), show: 'false', required: 'false' }));
+
   const envelopeResp = await httpsPost(DOCUSIGN_BASE_URL, `${apiBase}/envelopes`, authHeader, {
+    ...(textCustomFields.length ? { customFields: { textCustomFields } } : {}),
     emailSubject: `Action Required: Offer Letter for ${candidateName} — Flip CX`,
     documents: [{
       documentBase64: pdfBase64,
@@ -168,6 +148,18 @@ module.exports = async (req, res) => {
   }
 
   const eid = envelopeResp.body.envelopeId;
+
+  // Best-effort: record the envelope -> Greenhouse mapping so the hire webhook
+  // can resolve it even if the custom fields are ever missing. Never blocks the
+  // offer send if the DB is unavailable.
+  try {
+    await db.recordEnvelopeSent({
+      envelopeId: eid, candidateId, applicationId,
+      candidateName, candidateEmail, startDate,
+    });
+  } catch (e) {
+    console.warn('Could not record envelope mapping (non-fatal):', e.message);
+  }
 
   // Get sender view URL so user can review and send from DocuSign
   const viewResp = await httpsPost(DOCUSIGN_BASE_URL, `${apiBase}/envelopes/${eid}/views/sender`, authHeader, {
