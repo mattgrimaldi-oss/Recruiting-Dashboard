@@ -1,0 +1,20 @@
+{
+  "runAt": "2026-07-21T19:40:35.965Z",
+  "runId": "mrv23wdvwly3",
+  "roles": [
+    {
+      "roleKey": "product_manager",
+      "jobName": "Product Manager",
+      "passing": [],
+      "checked": 14,
+      "notified": 0
+    },
+    {
+      "roleKey": "customer_success_manager",
+      "jobName": "Customer Success Manager",
+      "passing": [],
+      "checked": 7,
+      "notified": 0
+    }
+  ]
+}
