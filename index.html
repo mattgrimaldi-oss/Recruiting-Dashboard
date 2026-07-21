@@ -2141,23 +2141,27 @@ window.getPdfBase64 = async function() {
       const totalHires = activeWeeks.reduce((a, w) => a + (w.hires || 0), 0);
       const pipelineHires = pipelineWeeks.reduce((a, w) => a + (w.hires || 0), 0);
 
-      // ── Trend arrows: trailing 30 days vs the prior 30 days ──
+      // ── Trend arrows: the selected time window vs. the prior equivalent window ──
+      // Window length follows the Time-period filter (All Time has no prior
+      // equivalent, so it falls back to a trailing 30 days).
+      const TF_TREND_DAYS = { last_week: 7, last_month: 30, last_3_months: 90, all_time: 30 };
+      const trendDays = TF_TREND_DAYS[timeframe] || 30;
       const _now = new Date();
-      const _d30 = new Date(_now); _d30.setDate(_d30.getDate() - 30);
-      const _d60 = new Date(_now); _d60.setDate(_d60.getDate() - 60);
+      const _dA = new Date(_now); _dA.setDate(_dA.getDate() - trendDays);
+      const _dB = new Date(_now); _dB.setDate(_dB.getDate() - trendDays * 2);
       const sumWk = (arr, key, s, e) => arr.filter(w => { const d = new Date(w.weekOf); return d >= s && d < e; }).reduce((a, w) => a + (w[key] || 0), 0);
       const sumInm = (key, s, e) => INMAIL_WEEKLY.filter(w => { const d = new Date(w.week); return d >= s && d < e; }).reduce((a, w) => a + (w[key] || 0), 0);
       const countByDate = (arr, s, e) => arr.filter(x => { const d = new Date(x.date); return d >= s && d < e; }).length;
       const pctChange = (cur, prev) => { if (!prev) return cur > 0 ? 100 : null; return ((cur - prev) / prev) * 100; };
       const offerEvents = [...slackOffers, ...manualEntries.filter(e => e.type === 'offer' && !slackOffers.some(s => s.name && e.name && s.name.toLowerCase() === e.name.toLowerCase()))];
-      const rrCur = sumInm('sends', _d30, _now), rrPrev = sumInm('sends', _d60, _d30);
+      const rrCur = sumInm('sends', _dA, _now), rrPrev = sumInm('sends', _dB, _dA);
       const trend = {
-        responses: pctChange(sumWk(activeWeeks, 'responses', _d30, _now), sumWk(activeWeeks, 'responses', _d60, _d30)),
-        screens: pctChange(sumWk(activeWeeks, 'screens', _d30, _now), sumWk(activeWeeks, 'screens', _d60, _d30)),
-        offers: pctChange(countByDate(offerEvents, _d30, _now), countByDate(offerEvents, _d60, _d30)),
-        hires: pctChange(sumWk(activeWeeks, 'hires', _d30, _now), sumWk(activeWeeks, 'hires', _d60, _d30)),
+        responses: pctChange(sumWk(activeWeeks, 'responses', _dA, _now), sumWk(activeWeeks, 'responses', _dB, _dA)),
+        screens: pctChange(sumWk(activeWeeks, 'screens', _dA, _now), sumWk(activeWeeks, 'screens', _dB, _dA)),
+        offers: pctChange(countByDate(offerEvents, _dA, _now), countByDate(offerEvents, _dB, _dA)),
+        hires: pctChange(sumWk(activeWeeks, 'hires', _dA, _now), sumWk(activeWeeks, 'hires', _dB, _dA)),
         inmails: pctChange(rrCur, rrPrev),
-        responseRate: pctChange(rrCur ? sumInm('inmailResponses', _d30, _now) / rrCur * 100 : 0, rrPrev ? sumInm('inmailResponses', _d60, _d30) / rrPrev * 100 : 0),
+        responseRate: pctChange(rrCur ? sumInm('inmailResponses', _dA, _now) / rrCur * 100 : 0, rrPrev ? sumInm('inmailResponses', _dB, _dA) / rrPrev * 100 : 0),
       };
 
       if (loading) return (
@@ -2295,7 +2299,7 @@ window.getPdfBase64 = async function() {
                     <StatCard label="InMails Sent" pct={trend.inmails} accent="#c7d2fe" gradient="linear-gradient(135deg, rgba(99,102,241,0.3), rgba(129,140,248,0.12))" value={totalSends.toLocaleString()} />
                     <StatCard label="Response Rate" pct={trend.responseRate} accent="#c7d2fe" value={avgRR + "%"} />
                   </div>
-                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.25)", fontFamily: "JetBrains Mono", margin: "-12px 0 22px", textAlign: "right" }}>▲▼ vs. prior 30 days</div>
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.25)", fontFamily: "JetBrains Mono", margin: "-12px 0 22px", textAlign: "right" }}>▲▼ last {trendDays} days vs. prior {trendDays} days</div>
 
                   <Glass style={{ marginBottom: 20 }}>
                     <h2 style={S.secTitle}>Pipeline Funnel{selectedJob !== "All" ? ` — ${selectedJob}` : ""}</h2>
