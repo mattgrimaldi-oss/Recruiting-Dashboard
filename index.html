@@ -850,8 +850,8 @@ window.getPdfBase64 = async function() {
 
       return (
         <div>
-          {/* ── FULL-SCREEN LETTER OVERLAY ── */}
-          {letterHtml && (
+          {/* ── FULL-SCREEN LETTER OVERLAY (portaled to body so it covers the sidebar) ── */}
+          {letterHtml && ReactDOM.createPortal((
             <div style={{ position:'fixed', inset:0, zIndex:9999, background:'rgba(0,0,0,0.85)', display:'flex', flexDirection:'column' }}>
               <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 20px', background:'#1e1b4b', flexShrink:0 }}>
                 <span style={{ color:'white', fontWeight:600, fontSize:14 }}>{form.name} — Offer Letter</span>
@@ -895,7 +895,7 @@ window.getPdfBase64 = async function() {
               <iframe id="offer-iframe" srcDoc={letterHtml}
                 style={{ flex:1, border:'none', background:'white' }} />
             </div>
-          )}
+          ), document.body)}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             {/* ── FORM ── */}
             <Glass style={{ padding: 24 }}>
