@@ -2133,9 +2133,12 @@ window.getPdfBase64 = async function() {
         } catch(e) { setImportStatus({ ok: false, msg: e.message }); }
       };
 
-      const totalSends = INMAIL_WEEKLY.reduce((a, w) => a + w.sends, 0);
-      const totalResp = INMAIL_WEEKLY.reduce((a, w) => a + w.inmailResponses, 0);
-      const totalAccepts = INMAIL_WEEKLY.reduce((a, w) => a + w.accepts, 0);
+      // InMail metrics respect the Time-period filter (INMAIL_WEEKLY is weekly).
+      // Note: it has no per-job dimension, so the job filter does not apply here.
+      const inmailWeeks = INMAIL_WEEKLY.filter(w => new Date(w.week) >= tfCutoff);
+      const totalSends = inmailWeeks.reduce((a, w) => a + w.sends, 0);
+      const totalResp = inmailWeeks.reduce((a, w) => a + w.inmailResponses, 0);
+      const totalAccepts = inmailWeeks.reduce((a, w) => a + w.accepts, 0);
       const avgRR = totalSends ? (totalResp / totalSends * 100).toFixed(1) : 0;
       const avgAR = totalSends ? (totalAccepts / totalSends * 100).toFixed(1) : 0;
       const totalHires = activeWeeks.reduce((a, w) => a + (w.hires || 0), 0);
@@ -2533,7 +2536,7 @@ window.getPdfBase64 = async function() {
                       <div style={S.kpiLabel}>Accept Rate</div>
                     </Glass>
                     <Glass style={{ textAlign: "center", padding: "20px 14px" }}>
-                      <div style={{ fontSize: 28, fontWeight: 800, color: "#fff" }}>{totalHires ? Math.ceil(totalSends / totalHires) : "—"}</div>
+                      <div style={{ fontSize: 28, fontWeight: 800, color: "#fff" }}>{pipelineHires ? Math.ceil(totalSends / pipelineHires) : "—"}</div>
                       <div style={S.kpiLabel}>InMails / Hire</div>
                     </Glass>
                   </div>
@@ -2546,8 +2549,9 @@ window.getPdfBase64 = async function() {
                         return (<g key={v}><line x1="40" y1={y} x2="690" y2={y} stroke="rgba(255,255,255,0.04)" strokeWidth="1" /><text x="35" y={y+4} textAnchor="end" fill="rgba(255,255,255,0.2)" fontSize="10" fontFamily="JetBrains Mono">{v}%</text></g>);
                       })}
                       {(() => {
-                        const gw = 650 / INMAIL_WEEKLY.length;
-                        const pts = INMAIL_WEEKLY.map((w, i) => ({ x: 45 + i * gw + gw / 2, y: 180 - (w.responseRate / 60) * 160, w }));
+                        if (!inmailWeeks.length) return <text x="350" y="100" textAnchor="middle" fill="rgba(255,255,255,0.3)" fontSize="12" fontFamily="JetBrains Mono">No InMail data in this period</text>;
+                        const gw = 650 / inmailWeeks.length;
+                        const pts = inmailWeeks.map((w, i) => ({ x: 45 + i * gw + gw / 2, y: 180 - (w.responseRate / 60) * 160, w }));
                         const pathD = pts.map((p, i) => `${i === 0 ? "M" : "L"}${p.x},${p.y}`).join(" ");
                         const areaD = `M${pts[0].x},180 ` + pts.map(p => `L${p.x},${p.y}`).join(" ") + ` L${pts[pts.length-1].x},180 Z`;
                         return (
@@ -2578,8 +2582,9 @@ window.getPdfBase64 = async function() {
                     <svg viewBox="0 0 700 160" style={{ width: "100%", height: "auto", display: "block" }}>
                       <defs><linearGradient id="volGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#818cf8" /><stop offset="100%" stopColor="#818cf833" /></linearGradient></defs>
                       <line x1="30" y1="125" x2="690" y2="125" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
-                      {INMAIL_WEEKLY.map((w, i) => {
-                        const mx = Math.max(...INMAIL_WEEKLY.map(x => x.sends)), gw = 650/INMAIL_WEEKLY.length;
+                      {!inmailWeeks.length && <text x="350" y="70" textAnchor="middle" fill="rgba(255,255,255,0.3)" fontSize="12" fontFamily="JetBrains Mono">No InMail data in this period</text>}
+                      {inmailWeeks.map((w, i) => {
+                        const mx = Math.max(...inmailWeeks.map(x => x.sends)), gw = 650/inmailWeeks.length;
                         const bw = gw * 0.6, x = 30 + i*gw + (gw-bw)/2, h = (w.sends/mx)*110;
                         return (
                           <g key={i}>
@@ -2593,7 +2598,7 @@ window.getPdfBase64 = async function() {
                   </Glass>
 
                   <Glass style={{ marginBottom: 20 }}>
-                    <h2 style={S.secTitle}>Recruiter Performance</h2>
+                    <h2 style={S.secTitle}>Recruiter Performance <span style={{ color: "rgba(255,255,255,0.25)", fontWeight: 400 }}>· all time</span></h2>
                     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                       {RECRUITERS.map((r, i) => (
                         <div key={i} style={{ background: "rgba(255,255,255,0.03)", borderRadius: 14, padding: 18, border: "1px solid rgba(255,255,255,0.05)" }}>
