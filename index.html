@@ -119,6 +119,163 @@
       }}>{children}</div>
     );
 
+    // ── Hex color + alpha helper ──
+    const hexA = (hex, a) => hex + Math.round(Math.min(1, Math.max(0, a)) * 255).toString(16).padStart(2, "0");
+
+    // ── Sidebar navigation ──
+    const NAV_ITEMS = [
+      { id: "dashboard", label: "Dashboard", icon: (
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+      ) },
+      { id: "offer", label: "Offer Letter Generator", icon: (
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg>
+      ) },
+      { id: "screening", label: "Applicant Screening", icon: (
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M16 11l2 2 4-4"/></svg>
+      ) },
+    ];
+
+    const Sidebar = ({ active, onSelect, collapsed, onToggle }) => (
+      <aside style={{
+        position: "sticky", top: 0, alignSelf: "flex-start", height: "100vh",
+        width: collapsed ? 64 : 240, flexShrink: 0, zIndex: 20, overflow: "hidden",
+        transition: "width 0.34s cubic-bezier(0.4,0,0.2,1)",
+        display: "flex", flexDirection: "column",
+        padding: collapsed ? "20px 10px" : "22px 16px",
+        background: "rgba(255,255,255,0.045)", backdropFilter: "blur(22px)", WebkitBackdropFilter: "blur(22px)",
+        borderRight: "1px solid rgba(255,255,255,0.08)",
+      }}>
+        <div style={{ marginBottom: 26 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, minHeight: 40, justifyContent: collapsed ? "center" : "flex-start" }}>
+            <div style={{ width: 34, height: 34, borderRadius: 10, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(135deg, #6366f1, #a78bfa)", boxShadow: "0 4px 16px rgba(99,102,241,0.4)", fontWeight: 800, fontSize: 17, color: "#fff", fontFamily: "Plus Jakarta Sans" }}>F</div>
+            {!collapsed && <span style={{ transition: "opacity 0.2s", whiteSpace: "nowrap", fontSize: 17, fontWeight: 800, letterSpacing: "-0.02em", background: "linear-gradient(135deg, #e0e7ff, #c084fc)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Flip Hub</span>}
+            {!collapsed && (
+              <button className="nav-toggle" onClick={onToggle} title="Collapse" style={{ marginLeft: "auto", width: 30, height: 30, borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.6)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+              </button>
+            )}
+          </div>
+          {collapsed && (
+            <button className="nav-toggle" onClick={onToggle} title="Expand" style={{ width: "100%", marginTop: 14, height: 30, borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.6)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+          )}
+        </div>
+        <nav style={{ display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
+          {NAV_ITEMS.map(it => {
+            const on = active === it.id;
+            return (
+              <button key={it.id} className="nav-item" onClick={() => onSelect(it.id)} title={collapsed ? it.label : undefined}
+                style={{ ...S.navItem, ...(on ? S.navItemOn : {}), justifyContent: collapsed ? "center" : "flex-start" }}>
+                <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 22, flexShrink: 0 }}>{it.icon}</span>
+                {!collapsed && <span style={{ whiteSpace: "nowrap", overflow: "hidden" }}>{it.label}</span>}
+              </button>
+            );
+          })}
+        </nav>
+      </aside>
+    );
+
+    // ── Trend arrow chip (up=green, down=red) ──
+    const TrendArrow = ({ pct }) => {
+      if (pct === null || pct === undefined || !isFinite(pct)) return null;
+      const up = pct >= 0;
+      const color = up ? "#34d399" : "#f87171";
+      return (
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 2, fontSize: 11, fontWeight: 700, fontFamily: "JetBrains Mono", color, background: hexA(color, 0.13), borderRadius: 6, padding: "2px 6px", whiteSpace: "nowrap" }}>
+          {up ? "▲" : "▼"} {Math.abs(Math.round(pct))}%
+        </span>
+      );
+    };
+
+    const StatCard = ({ label, value, pct, gradient, accent }) => (
+      <Glass className="metric-card" gradient={gradient} style={{ padding: "18px 18px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, minHeight: 22 }}>
+          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", fontWeight: 500 }}>{label}</div>
+          <TrendArrow pct={pct} />
+        </div>
+        <div style={{ fontSize: 30, fontWeight: 800, color: accent || "#fff", letterSpacing: "-0.02em", marginTop: 8 }}>{value}</div>
+      </Glass>
+    );
+
+    // ── Weekly activity heatmap ──
+    const Heatmap = ({ weeks }) => {
+      const rows = [
+        { key: "screens", label: "Screens", color: "#a78bfa" },
+        { key: "takehomes", label: "Take Homes", color: "#c084fc" },
+        { key: "virtuals", label: "Virtuals", color: "#7dd3fc" },
+        { key: "face_to_face", label: "F2F", color: "#2dd4bf" },
+        { key: "offers", label: "Offers", color: "#f0abfc" },
+        { key: "hires", label: "Hires", color: "#34d399" },
+      ];
+      const cols = [...weeks].sort((a, b) => new Date(a.weekOf) - new Date(b.weekOf)).slice(-18);
+      if (!cols.length) return <div style={{ textAlign: "center", padding: 28, color: "rgba(255,255,255,0.3)" }}>No weekly data yet</div>;
+      const rowMax = {};
+      rows.forEach(r => { rowMax[r.key] = Math.max(1, ...cols.map(w => w[r.key] || 0)); });
+      const monthOf = (d) => new Date(d + "T12:00:00").toLocaleDateString("en-US", { month: "short" });
+      return (
+        <div style={{ overflowX: "auto", paddingBottom: 4 }}>
+          <div style={{ display: "grid", gridTemplateColumns: `84px repeat(${cols.length}, 22px)`, gap: 4, alignItems: "center", minWidth: "min-content" }}>
+            <div />
+            {cols.map((w, i) => {
+              const showM = i === 0 || monthOf(w.weekOf) !== monthOf(cols[i - 1].weekOf);
+              return <div key={"m" + i} style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", fontFamily: "JetBrains Mono", textAlign: "left", whiteSpace: "nowrap" }}>{showM ? monthOf(w.weekOf) : ""}</div>;
+            })}
+            {rows.map(r => (
+              <Fragment key={r.key}>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", fontFamily: "JetBrains Mono", whiteSpace: "nowrap", paddingRight: 4 }}>{r.label}</div>
+                {cols.map((w, i) => {
+                  const v = w[r.key] || 0;
+                  const intensity = v / rowMax[r.key];
+                  return <div key={r.key + i} title={`${r.label} · week of ${getWeekLabel(w.weekOf)}: ${v}`} style={{ width: 22, height: 22, borderRadius: 5, background: v ? hexA(r.color, 0.18 + intensity * 0.75) : "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)", transition: "transform 0.15s" }} className="heat-cell" />;
+                })}
+              </Fragment>
+            ))}
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 14, fontSize: 10, color: "rgba(255,255,255,0.3)", fontFamily: "JetBrains Mono" }}>
+            <span>Less</span>
+            {[0.18, 0.4, 0.6, 0.8, 0.95].map((a, i) => <div key={i} style={{ width: 14, height: 14, borderRadius: 4, background: hexA("#a78bfa", a) }} />)}
+            <span>More</span>
+          </div>
+        </div>
+      );
+    };
+
+    // ── Floating chat bubble (bottom-left) ──
+    const ChatBubble = () => {
+      const [open, setOpen] = useState(false);
+      return (
+        <Fragment>
+          {open && <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 90 }} />}
+          <div style={{ position: "fixed", left: 24, bottom: 24, zIndex: 100, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 14 }}>
+            {open && (
+              <div className="chat-panel" style={{ width: "min(420px, calc(100vw - 48px))", height: "min(620px, calc(100vh - 130px))", borderRadius: 20, overflow: "hidden", display: "flex", flexDirection: "column", background: "rgba(18,16,40,0.82)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(99,102,241,0.15)" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,0.08)", flexShrink: 0 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ fontSize: 16 }}>✨</span>
+                    <span style={{ fontWeight: 700, fontSize: 14, color: "#fff" }}>Ask Flip AI</span>
+                  </div>
+                  <button onClick={() => setOpen(false)} title="Close" style={{ background: "transparent", border: "none", color: "rgba(255,255,255,0.5)", fontSize: 20, cursor: "pointer", lineHeight: 1, padding: 4 }}>×</button>
+                </div>
+                <div style={{ flex: 1, minHeight: 0, padding: 14, display: "flex", flexDirection: "column" }}>
+                  <ChatTab />
+                </div>
+              </div>
+            )}
+            <button onClick={() => setOpen(o => !o)} title={open ? "Close chat" : "Ask Flip AI"}
+              style={{ width: 58, height: 58, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.15)", cursor: "pointer", background: "linear-gradient(135deg, #6366f1, #8b5cf6, #a78bfa)", boxShadow: "0 8px 28px rgba(99,102,241,0.5)", display: "flex", alignItems: "center", justifyContent: "center", transition: "transform 0.2s, box-shadow 0.2s" }}
+              className="chat-fab">
+              {open ? (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+              ) : (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8z"/></svg>
+              )}
+            </button>
+          </div>
+        </Fragment>
+      );
+    };
+
     function OfferLetterTab() {
       const today = new Date().toISOString().split('T')[0];
       const [lastSavedForm] = useState(() => {
@@ -1029,7 +1186,7 @@ window.getPdfBase64 = async function() {
       const aiBubble = { ...bubbleBase, background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.9)", alignSelf: "flex-start", borderBottomLeftRadius: 3 };
 
       return (
-        <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 180px)", minHeight: 500 }}>
+        <div style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0, flex: 1 }}>
           <Glass style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", padding: 0 }}>
             {/* Header */}
             <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.08)", display: "flex", alignItems: "center", gap: 10 }}>
@@ -1860,7 +2017,8 @@ window.getPdfBase64 = async function() {
     function RecruitingDashboard() {
       const [weeks, setWeeks] = useState([]);
       const [activeView, setActiveView] = useState("dashboard");
-      const [activeTab, setActiveTab] = useState("funnel");
+      const [activeTab, setActiveTab] = useState("dashboard");
+      const [navCollapsed, setNavCollapsed] = useState(false);
       const [editingWeek, setEditingWeek] = useState(null);
       const [formData, setFormData] = useState({ ...EMPTY_WEEK });
       const [loading, setLoading] = useState(true);
@@ -1983,16 +2141,37 @@ window.getPdfBase64 = async function() {
       const totalHires = activeWeeks.reduce((a, w) => a + (w.hires || 0), 0);
       const pipelineHires = pipelineWeeks.reduce((a, w) => a + (w.hires || 0), 0);
 
+      // ── Trend arrows: trailing 30 days vs the prior 30 days ──
+      const _now = new Date();
+      const _d30 = new Date(_now); _d30.setDate(_d30.getDate() - 30);
+      const _d60 = new Date(_now); _d60.setDate(_d60.getDate() - 60);
+      const sumWk = (arr, key, s, e) => arr.filter(w => { const d = new Date(w.weekOf); return d >= s && d < e; }).reduce((a, w) => a + (w[key] || 0), 0);
+      const sumInm = (key, s, e) => INMAIL_WEEKLY.filter(w => { const d = new Date(w.week); return d >= s && d < e; }).reduce((a, w) => a + (w[key] || 0), 0);
+      const countByDate = (arr, s, e) => arr.filter(x => { const d = new Date(x.date); return d >= s && d < e; }).length;
+      const pctChange = (cur, prev) => { if (!prev) return cur > 0 ? 100 : null; return ((cur - prev) / prev) * 100; };
+      const offerEvents = [...slackOffers, ...manualEntries.filter(e => e.type === 'offer' && !slackOffers.some(s => s.name && e.name && s.name.toLowerCase() === e.name.toLowerCase()))];
+      const rrCur = sumInm('sends', _d30, _now), rrPrev = sumInm('sends', _d60, _d30);
+      const trend = {
+        responses: pctChange(sumWk(activeWeeks, 'responses', _d30, _now), sumWk(activeWeeks, 'responses', _d60, _d30)),
+        screens: pctChange(sumWk(activeWeeks, 'screens', _d30, _now), sumWk(activeWeeks, 'screens', _d60, _d30)),
+        offers: pctChange(countByDate(offerEvents, _d30, _now), countByDate(offerEvents, _d60, _d30)),
+        hires: pctChange(sumWk(activeWeeks, 'hires', _d30, _now), sumWk(activeWeeks, 'hires', _d60, _d30)),
+        inmails: pctChange(rrCur, rrPrev),
+        responseRate: pctChange(rrCur ? sumInm('inmailResponses', _d30, _now) / rrCur * 100 : 0, rrPrev ? sumInm('inmailResponses', _d60, _d30) / rrPrev * 100 : 0),
+      };
+
       if (loading) return (
-        <div style={S.root}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh" }}>
-            <div style={S.spinner} />
-          </div>
+        <div style={{ ...S.appShell, alignItems: "center", justifyContent: "center" }}>
+          <div style={S.spinner} />
         </div>
       );
 
+      const sectionLabel = (NAV_ITEMS.find(n => n.id === activeTab) || {}).label || "Dashboard";
+
       return (
-        <div style={S.root}>
+        <div style={S.appShell}>
+          {/* ── Purple gradient glow backdrop ── */}
+          <div style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none", background: "radial-gradient(1200px 800px at 18% -12%, rgba(124,58,237,0.30), transparent 60%), radial-gradient(1000px 700px at 105% 5%, rgba(167,139,250,0.20), transparent 55%), radial-gradient(950px 950px at 55% 125%, rgba(88,28,135,0.28), transparent 60%)" }} />
           {/* ── Leaf vein background ── */}
           <svg style={{ position:'fixed', inset:0, width:'100vw', height:'100vh', pointerEvents:'none', zIndex:0, opacity:0.045 }} viewBox="0 0 1200 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
             <g stroke="white" strokeWidth="1" fill="none" strokeLinecap="round">
@@ -2052,12 +2231,21 @@ window.getPdfBase64 = async function() {
             .ghost-btn:hover { background: rgba(255,255,255,0.1) !important; border-color: rgba(255,255,255,0.2) !important; }
             .bubble-node { animation: dotPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
             .chart-area { animation: fadeIn 0.8s ease both; animation-delay: 0.2s; }
+            .nav-item:hover { background: rgba(255,255,255,0.07) !important; color: #fff !important; }
+            .nav-toggle:hover { background: rgba(255,255,255,0.1) !important; color: #fff !important; }
+            .heat-cell:hover { transform: scale(1.18); }
+            .chat-fab:hover { transform: scale(1.08); box-shadow: 0 10px 34px rgba(99,102,241,0.65) !important; }
+            @keyframes chatIn { from { opacity: 0; transform: translateY(16px) scale(0.94); } to { opacity: 1; transform: translateY(0) scale(1); } }
+            .chat-panel { animation: chatIn 0.28s cubic-bezier(0.34,1.3,0.64,1) both; transform-origin: bottom left; }
           `}</style>
 
+          <Sidebar active={activeTab} onSelect={setActiveTab} collapsed={navCollapsed} onToggle={() => setNavCollapsed(c => !c)} />
+
+          <main style={S.main}>
           {/* Header */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28, flexWrap: "wrap", gap: 12, animation: "fadeIn 0.6s ease" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
-              <h1 style={{ ...S.title, margin: 0 }}>Flip Recruiting Hub</h1>
+              <h1 style={{ ...S.title, margin: 0 }}>{sectionLabel}</h1>
             </div>
             <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
               {saving && <span style={{ color: "#818cf8", fontSize: 11, fontFamily: "JetBrains Mono" }}>saving...</span>}
@@ -2067,15 +2255,8 @@ window.getPdfBase64 = async function() {
 
           {activeView === "dashboard" ? (
             <>
-              {/* Tabs */}
-              <div style={{ ...S.tabBar, animation: "fadeUp 0.5s ease 0.1s both" }}>
-                {[{ id: "funnel", label: "Pipeline" }, { id: "inmail", label: "InMail Analytics" }, { id: "offer", label: "Offer Letter Generator" }, { id: "chat", label: "Ask Flip AI" }, { id: "screening", label: "Applicant Screening" }].map(t => (
-                  <button key={t.id} className="tab-btn" onClick={() => setActiveTab(t.id)} style={{ ...S.tab, ...(activeTab === t.id ? S.tabOn : {}) }}>{t.label}</button>
-                ))}
-              </div>
-
-              {/* ── PIPELINE TAB ── */}
-              {activeTab === "funnel" && (
+              {/* ── MERGED DASHBOARD (Pipeline + InMail) ── */}
+              {activeTab === "dashboard" && (
                 <>
                   {jobNames.length > 0 && (
                     <Glass style={{ padding: "14px 20px", marginBottom: 14, display: "flex", alignItems: "center", gap: 14 }}>
@@ -2105,17 +2286,16 @@ window.getPdfBase64 = async function() {
                     </select>
                   </Glass>
 
-                  {pipelineWeeks.length > 0 && (
-                    <div style={{ marginBottom: 24 }}>
-                      <Glass gradient="linear-gradient(135deg, rgba(124,58,237,0.35), rgba(167,139,250,0.2))" style={{ padding: "28px 24px", position: "relative", overflow: "hidden" }}>
-                        <div style={{ position: "absolute", top: -30, right: -30, width: 120, height: 120, borderRadius: "50%", background: "radial-gradient(circle, rgba(167,139,250,0.25), transparent)", filter: "blur(20px)" }} />
-                        <div style={{ position: "relative" }}>
-                          <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", fontWeight: 500, marginBottom: 8 }}>Applicants</div>
-                          <div style={{ fontSize: 36, fontWeight: 800, color: "#e0d4ff", letterSpacing: "-0.02em" }}><AnimatedNumber value={totals.responses || 0} /></div>
-                        </div>
-                      </Glass>
-                    </div>
-                  )}
+                  {/* ── Headline KPIs with 30-day trend arrows ── */}
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 14, marginBottom: 22 }}>
+                    <StatCard label="Applicants" pct={trend.responses} accent="#e0d4ff" gradient="linear-gradient(135deg, rgba(124,58,237,0.35), rgba(167,139,250,0.15))" value={<AnimatedNumber value={totals.responses || 0} />} />
+                    <StatCard label="Screens" pct={trend.screens} value={<AnimatedNumber value={totals.screens || 0} />} />
+                    <StatCard label="Offers" pct={trend.offers} value={<AnimatedNumber value={totals.offers || 0} />} />
+                    <StatCard label="Hires" pct={trend.hires} accent="#a7f3d0" value={<AnimatedNumber value={pipelineHires || 0} />} />
+                    <StatCard label="InMails Sent" pct={trend.inmails} accent="#c7d2fe" gradient="linear-gradient(135deg, rgba(99,102,241,0.3), rgba(129,140,248,0.12))" value={totalSends.toLocaleString()} />
+                    <StatCard label="Response Rate" pct={trend.responseRate} accent="#c7d2fe" value={avgRR + "%"} />
+                  </div>
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.25)", fontFamily: "JetBrains Mono", margin: "-12px 0 22px", textAlign: "right" }}>▲▼ vs. prior 30 days</div>
 
                   <Glass style={{ marginBottom: 20 }}>
                     <h2 style={S.secTitle}>Pipeline Funnel{selectedJob !== "All" ? ` — ${selectedJob}` : ""}</h2>
@@ -2216,6 +2396,11 @@ window.getPdfBase64 = async function() {
                       ))}
                     </div>
                   )}
+
+                  <Glass style={{ marginBottom: 20 }}>
+                    <h2 style={S.secTitle}>Weekly Activity Heatmap</h2>
+                    <Heatmap weeks={activeWeeks} />
+                  </Glass>
 
                   {pipelineWeeks.length > 1 && (() => {
                     const CHART_OPTIONS = [
@@ -2322,13 +2507,14 @@ window.getPdfBase64 = async function() {
                       Median days from application to rejection at each stage
                     </div>
                   </Glass>
-                </>
-              )}
 
-              {/* ── CANDIDATES TAB ── */}
-              {/* ── INMAIL TAB ── */}
-              {activeTab === "inmail" && (
-                <>
+                  {/* ── InMail analytics ── */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 14, margin: "34px 0 20px" }}>
+                    <div style={{ height: 1, flex: 1, background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.12))" }} />
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.5)", fontFamily: "JetBrains Mono", textTransform: "uppercase", letterSpacing: "0.08em", whiteSpace: "nowrap" }}>✉️ InMail Analytics</span>
+                    <div style={{ height: 1, flex: 1, background: "linear-gradient(90deg, rgba(255,255,255,0.12), transparent)" }} />
+                  </div>
+
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 14, marginBottom: 20 }}>
                     <Glass gradient="linear-gradient(135deg, rgba(99,102,241,0.3), rgba(129,140,248,0.15))" style={{ textAlign: "center", padding: "20px 14px" }}>
                       <div style={{ fontSize: 28, fontWeight: 800, color: "#c7d2fe" }}>{totalSends.toLocaleString()}</div>
@@ -2457,7 +2643,6 @@ window.getPdfBase64 = async function() {
               )}
 
               {activeTab === "offer" && <OfferLetterTab />}
-              {activeTab === "chat" && <ChatTab />}
               {activeTab === "screening" && <ScreeningTab />}
 
             </>
@@ -2499,12 +2684,19 @@ window.getPdfBase64 = async function() {
               </div>
             </Glass>
           )}
+          </main>
+
+          <ChatBubble />
         </div>
       );
     }
 
     const S = {
       root: { fontFamily: "Plus Jakarta Sans, sans-serif", maxWidth: 880, margin: "0 auto", padding: "28px 20px", color: "#fff", minHeight: "100vh", background: "linear-gradient(160deg, #0c0e1a 0%, #131835 40%, #1a1040 100%)", position: "relative", zIndex: 1 },
+      appShell: { fontFamily: "Plus Jakarta Sans, sans-serif", display: "flex", minHeight: "100vh", color: "#fff", position: "relative", zIndex: 1, background: "linear-gradient(160deg, #0c0e1a 0%, #131835 40%, #1a1040 100%)" },
+      main: { flex: 1, minWidth: 0, width: "100%", maxWidth: 1160, margin: "0 auto", padding: "28px 34px 60px", position: "relative", zIndex: 1 },
+      navItem: { display: "flex", alignItems: "center", gap: 12, width: "100%", padding: "10px 12px", border: "none", borderRadius: 12, background: "transparent", color: "rgba(255,255,255,0.55)", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "Plus Jakarta Sans", textAlign: "left", transition: "background 0.2s, color 0.2s" },
+      navItemOn: { background: "linear-gradient(135deg, rgba(99,102,241,0.55), rgba(139,92,246,0.35))", color: "#fff", boxShadow: "0 2px 12px rgba(99,102,241,0.25)" },
       spinner: { width: 36, height: 36, border: "3px solid rgba(255,255,255,0.08)", borderTopColor: "#818cf8", borderRadius: "50%", animation: "spin 0.8s linear infinite" },
       title: { fontSize: 30, fontWeight: 800, margin: 0, letterSpacing: "-0.03em", background: "linear-gradient(135deg, #e0e7ff, #c084fc, #f0abfc)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" },
       sub: { fontSize: 13, color: "rgba(255,255,255,0.35)", margin: "6px 0 0", fontFamily: "JetBrains Mono" },
