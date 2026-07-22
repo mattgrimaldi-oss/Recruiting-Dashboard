@@ -1,13 +1,29 @@
 {
-  "runAt": "2026-07-20T16:29:45.882Z",
+  "runAt": "2026-07-22T16:26:26.289Z",
   "runId": null,
   "roles": [
     {
       "roleKey": "product_manager",
       "jobName": "Product Manager",
-      "passing": [],
-      "checked": 13,
-      "notified": 0
+      "passing": [
+        {
+          "name": "Israr Khan",
+          "id": 58383882008,
+          "location": "New York, NY"
+        },
+        {
+          "name": "Shruti Dey",
+          "id": 70076974008,
+          "location": "New York, NY"
+        },
+        {
+          "name": "Meghan O'Brien",
+          "id": 70098993008,
+          "location": "New York, NY"
+        }
+      ],
+      "checked": 22,
+      "notified": 3
     },
     {
       "roleKey": "customer_success_manager",
@@ -19,7 +35,7 @@
           "location": "Los Angeles, CA"
         }
       ],
-      "checked": 7,
+      "checked": 10,
       "notified": 1
     }
   ]
