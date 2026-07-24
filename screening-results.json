@@ -1,5 +1,5 @@
 {
-  "runAt": "2026-07-22T16:26:26.289Z",
+  "runAt": "2026-07-24T16:48:13.270Z",
   "runId": null,
   "roles": [
     {
@@ -7,35 +7,25 @@
       "jobName": "Product Manager",
       "passing": [
         {
-          "name": "Israr Khan",
-          "id": 58383882008,
-          "location": "New York, NY"
-        },
-        {
-          "name": "Shruti Dey",
-          "id": 70076974008,
-          "location": "New York, NY"
-        },
-        {
-          "name": "Meghan O'Brien",
-          "id": 70098993008,
+          "name": "Nikhil Jyothinagaram",
+          "id": 70434730008,
           "location": "New York, NY"
         }
       ],
-      "checked": 22,
-      "notified": 3
+      "checked": 17,
+      "notified": 1
     },
     {
       "roleKey": "customer_success_manager",
       "jobName": "Customer Success Manager",
       "passing": [
         {
-          "name": "DAntre Cole",
-          "id": 66292119008,
-          "location": "Los Angeles, CA"
+          "name": "Kathryn Morse",
+          "id": 70287021008,
+          "location": "Los Angeles, California"
         }
       ],
-      "checked": 10,
+      "checked": 4,
       "notified": 1
     }
   ]
