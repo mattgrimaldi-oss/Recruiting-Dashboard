@@ -1,25 +1,31 @@
 {
-  "runAt": "2026-07-20T16:29:45.882Z",
+  "runAt": "2026-07-24T16:48:13.270Z",
   "runId": null,
   "roles": [
     {
       "roleKey": "product_manager",
       "jobName": "Product Manager",
-      "passing": [],
-      "checked": 13,
-      "notified": 0
+      "passing": [
+        {
+          "name": "Nikhil Jyothinagaram",
+          "id": 70434730008,
+          "location": "New York, NY"
+        }
+      ],
+      "checked": 17,
+      "notified": 1
     },
     {
       "roleKey": "customer_success_manager",
       "jobName": "Customer Success Manager",
       "passing": [
         {
-          "name": "DAntre Cole",
-          "id": 66292119008,
-          "location": "Los Angeles, CA"
+          "name": "Kathryn Morse",
+          "id": 70287021008,
+          "location": "Los Angeles, California"
         }
       ],
-      "checked": 7,
+      "checked": 4,
       "notified": 1
     }
   ]
