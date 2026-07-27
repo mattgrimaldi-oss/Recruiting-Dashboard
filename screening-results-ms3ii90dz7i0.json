@@ -1,0 +1,19 @@
+{
+  "runAt": "2026-07-27T17:47:13.043Z",
+  "runId": "ms3ii90dz7i0",
+  "roles": [
+    {
+      "roleKey": "content_social_manager",
+      "jobName": "Content & Social Manager",
+      "passing": [
+        {
+          "name": "Nicholas Bencivengo",
+          "id": 70531250008,
+          "location": "Playa del Rey, CA"
+        }
+      ],
+      "checked": 40,
+      "notified": 0
+    }
+  ]
+}
