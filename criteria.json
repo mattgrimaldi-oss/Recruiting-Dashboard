@@ -179,5 +179,43 @@
         "status": "required"
       }
     ]
+  },
+  "content_social_manager": {
+    "jobIds": [
+      "4520433008"
+    ],
+    "jobName": "Content & Social Manager",
+    "criteria": [
+      {
+        "key": "b2b_paid_marketing",
+        "label": "B2B Paid Marketing",
+        "detail": "- Something in the resume showing that they have worked on some paid B2B marketing campaigns.",
+        "status": "required"
+      },
+      {
+        "key": "linkedin_experience",
+        "label": "LinkedIn Experience",
+        "detail": "- Resume must show that they have used LinkedIn as a marketing channel",
+        "status": "required"
+      },
+      {
+        "key": "content",
+        "label": "Content",
+        "detail": "- Something on the resume indicating that they have experience making content.",
+        "status": "required"
+      },
+      {
+        "key": "saas_experience",
+        "label": "SaaS Experience",
+        "detail": "- Worked for a Saas company",
+        "status": "required"
+      },
+      {
+        "key": "seniority",
+        "label": "Seniority",
+        "detail": "3+ years of Marketing or similar experience",
+        "status": "required"
+      }
+    ]
   }
 }
