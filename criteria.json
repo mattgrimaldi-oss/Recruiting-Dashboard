@@ -33,7 +33,8 @@
     "timeWindowHours": 48,
     "cronRole": [
       "product_manager",
-      "customer_success_manager"
+      "customer_success_manager",
+      "content_social_manager"
     ]
   },
   "ae": {
