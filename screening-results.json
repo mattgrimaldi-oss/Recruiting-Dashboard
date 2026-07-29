@@ -1,12 +1,37 @@
 {
-  "runAt": "2026-07-27T17:04:45.926Z",
+  "runAt": "2026-07-29T16:42:47.511Z",
   "runId": null,
   "roles": [
     {
       "roleKey": "product_manager",
       "jobName": "Product Manager",
+      "passing": [
+        {
+          "name": "Julia Jordahl-Henry",
+          "id": 70801829008,
+          "location": "New York, NY"
+        },
+        {
+          "name": "Israr Khan",
+          "id": 58383882008,
+          "location": "New York, NY"
+        }
+      ],
+      "checked": 21,
+      "notified": 2
+    },
+    {
+      "roleKey": "customer_success_manager",
+      "jobName": "Customer Success Manager",
       "passing": [],
-      "checked": 14,
+      "checked": 1,
+      "notified": 0
+    },
+    {
+      "roleKey": "content_social_manager",
+      "jobName": "Content & Social Manager",
+      "passing": [],
+      "checked": 53,
       "notified": 0
     }
   ]
