@@ -1,32 +1,26 @@
 {
-  "runAt": "2026-07-31T17:04:21.719Z",
+  "runAt": "2026-08-03T17:18:01.298Z",
   "runId": null,
   "roles": [
     {
       "roleKey": "product_manager",
       "jobName": "Product Manager",
       "passing": [],
-      "checked": 14,
+      "checked": 10,
       "notified": 0
     },
     {
       "roleKey": "customer_success_manager",
       "jobName": "Customer Success Manager",
-      "passing": [
-        {
-          "name": "James Brasco",
-          "id": 70972706008,
-          "location": "Brooklyn, NY"
-        }
-      ],
-      "checked": 23,
-      "notified": 1
+      "passing": [],
+      "checked": 9,
+      "notified": 0
     },
     {
       "roleKey": "content_social_manager",
       "jobName": "Content & Social Manager",
       "passing": [],
-      "checked": 35,
+      "checked": 12,
       "notified": 0
     }
   ]
