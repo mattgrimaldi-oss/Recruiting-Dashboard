@@ -1,0 +1,22 @@
+name: Screening Diagnostic
+
+on:
+  workflow_dispatch:
+    inputs:
+      window_hours:
+        description: 'Time window in hours (default: use config)'
+        required: false
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Run diagnostic
+        env:
+          GREENHOUSE_API_KEY_V1: ${{ secrets.GREENHOUSE_API_KEY_V1 }}
+          WINDOW_HOURS: ${{ github.event.inputs.window_hours }}
+        run: node scripts/diagnose-screening.js
