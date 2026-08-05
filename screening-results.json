@@ -1,26 +1,26 @@
 {
-  "runAt": "2026-08-03T17:18:01.298Z",
+  "runAt": "2026-08-05T16:58:58.799Z",
   "runId": null,
   "roles": [
     {
       "roleKey": "product_manager",
       "jobName": "Product Manager",
       "passing": [],
-      "checked": 10,
+      "checked": 20,
       "notified": 0
     },
     {
       "roleKey": "customer_success_manager",
       "jobName": "Customer Success Manager",
       "passing": [],
-      "checked": 9,
+      "checked": 4,
       "notified": 0
     },
     {
       "roleKey": "content_social_manager",
       "jobName": "Content & Social Manager",
       "passing": [],
-      "checked": 12,
+      "checked": 36,
       "notified": 0
     }
   ]
