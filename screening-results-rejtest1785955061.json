@@ -1,0 +1,13 @@
+{
+  "runAt": "2026-08-05T18:42:29.840Z",
+  "runId": "rejtest1785955061",
+  "roles": [
+    {
+      "roleKey": "product_manager",
+      "jobName": "Product Manager",
+      "passing": [],
+      "checked": 17,
+      "notified": 0
+    }
+  ]
+}
