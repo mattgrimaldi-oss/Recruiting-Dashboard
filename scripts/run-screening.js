@@ -83,6 +83,7 @@ async function main() {
       console.log(`📥 Fetched (active in window): ${results.fetched}`);
       console.log(`⏭️  Skipped (not in App Review): ${results.skipped_wrong_stage}`);
       console.log(`⏭️  Skipped (work auth): ${results.skipped_work_auth}`);
+      console.log(`⛔ Skipped (previously rejected): ${results.skipped_prior_rejection}`);
       console.log(`⏭️  Skipped (no/unreadable resume): ${results.skipped_no_resume}`);
       console.log(`⚠️  Skipped (scoring error): ${results.skipped_score_error}`);
       console.log(`✅ Actually scored: ${results.checked}`);
