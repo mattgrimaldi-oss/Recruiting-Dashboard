@@ -80,9 +80,12 @@ async function main() {
         checked:  results.checked,
         notified: results.notified,
       });
-      console.log(`✅ Checked: ${results.checked}`);
+      console.log(`📥 Fetched (active in window): ${results.fetched}`);
+      console.log(`⏭️  Skipped (not in App Review): ${results.skipped_wrong_stage}`);
       console.log(`⏭️  Skipped (work auth): ${results.skipped_work_auth}`);
-      console.log(`⏭️  Skipped (no resume): ${results.skipped_no_resume}`);
+      console.log(`⏭️  Skipped (no/unreadable resume): ${results.skipped_no_resume}`);
+      console.log(`⚠️  Skipped (scoring error): ${results.skipped_score_error}`);
+      console.log(`✅ Actually scored: ${results.checked}`);
       console.log(`🚨 Notified: ${results.notified}`);
       if (results.candidates?.length) {
         results.candidates.forEach(c => console.log(`   ${c.passes ? '✅' : '❌'} ${c.name}`));
