@@ -1,26 +1,48 @@
 {
-  "runAt": "2026-08-05T16:58:58.799Z",
+  "runAt": "2026-08-07T16:11:27.340Z",
   "runId": null,
   "roles": [
     {
       "roleKey": "product_manager",
       "jobName": "Product Manager",
-      "passing": [],
+      "passing": [
+        {
+          "name": "Bobni Das",
+          "id": 71536980008,
+          "location": "New York, NY"
+        },
+        {
+          "name": "Etienne Venet",
+          "id": 71601541008,
+          "location": "Los Angeles, CA"
+        },
+        {
+          "name": "Alisa Delikatna",
+          "id": 71728854008,
+          "location": "Los Angeles, CA"
+        }
+      ],
       "checked": 20,
-      "notified": 0
+      "notified": 3
     },
     {
       "roleKey": "customer_success_manager",
       "jobName": "Customer Success Manager",
-      "passing": [],
+      "passing": [
+        {
+          "name": "Nick Vega",
+          "id": 71662605008,
+          "location": "New York, NY"
+        }
+      ],
       "checked": 4,
-      "notified": 0
+      "notified": 1
     },
     {
       "roleKey": "content_social_manager",
       "jobName": "Content & Social Manager",
       "passing": [],
-      "checked": 36,
+      "checked": 20,
       "notified": 0
     }
   ]
