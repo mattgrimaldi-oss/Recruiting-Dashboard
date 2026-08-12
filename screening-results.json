@@ -1,26 +1,37 @@
 {
-  "runAt": "2026-08-10T16:08:28.070Z",
+  "runAt": "2026-08-12T16:14:19.014Z",
   "runId": null,
   "roles": [
     {
       "roleKey": "product_manager",
       "jobName": "Product Manager",
       "passing": [],
-      "checked": 9,
+      "checked": 21,
       "notified": 0
     },
     {
       "roleKey": "customer_success_manager",
       "jobName": "Customer Success Manager",
-      "passing": [],
-      "checked": 5,
-      "notified": 0
+      "passing": [
+        {
+          "name": "Edmond Quan",
+          "id": 72084264008,
+          "location": "Los Angeles, CA"
+        },
+        {
+          "name": "Malcolm Asher",
+          "id": 72135654008,
+          "location": "New York, NY"
+        }
+      ],
+      "checked": 7,
+      "notified": 2
     },
     {
       "roleKey": "content_social_manager",
       "jobName": "Content & Social Manager",
       "passing": [],
-      "checked": 10,
+      "checked": 23,
       "notified": 0
     }
   ]
