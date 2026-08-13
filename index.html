@@ -316,7 +316,7 @@
       };
       const [ghFocus, setGhFocus] = useState(false);
       const ghMatches = form.name.trim().length >= 2 && !form.ghCandidateId
-        ? Object.keys(ghIndex).filter(n => n.toLowerCase().includes(form.name.trim().toLowerCase())).slice(0, 8)
+        ? Object.keys(ghIndex).filter(n => n.toLowerCase().includes(form.name.trim().toLowerCase())).slice(0, 50)
         : [];
       // Pull email + position from Greenhouse when a candidate is linked.
       const autofillFromGreenhouse = async (candidateId, applicationId) => {
