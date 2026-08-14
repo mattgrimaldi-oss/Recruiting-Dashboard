@@ -1,12 +1,12 @@
 {
-  "runAt": "2026-08-12T16:14:19.014Z",
+  "runAt": "2026-08-14T16:04:00.417Z",
   "runId": null,
   "roles": [
     {
       "roleKey": "product_manager",
       "jobName": "Product Manager",
       "passing": [],
-      "checked": 21,
+      "checked": 11,
       "notified": 0
     },
     {
@@ -14,24 +14,24 @@
       "jobName": "Customer Success Manager",
       "passing": [
         {
-          "name": "Edmond Quan",
-          "id": 72084264008,
-          "location": "Los Angeles, CA"
+          "name": "ALEX KALAF",
+          "id": 72372541008,
+          "location": "Brooklyn, NY"
         },
         {
-          "name": "Malcolm Asher",
-          "id": 72135654008,
-          "location": "New York, NY"
+          "name": "Ryan Turi",
+          "id": 72334529008,
+          "location": "Los Angeles, CA"
         }
       ],
-      "checked": 7,
+      "checked": 8,
       "notified": 2
     },
     {
       "roleKey": "content_social_manager",
       "jobName": "Content & Social Manager",
       "passing": [],
-      "checked": 23,
+      "checked": 17,
       "notified": 0
     }
   ]
