@@ -1,5 +1,5 @@
 {
-  "lastSync": "2026-08-03",
+  "lastSync": "2026-08-17",
   "offers": [
     { "name": "Ji Sun (Alyce) Hong",    "date": "2026-02-16" },
     { "name": "Jason Lobell",           "date": "2026-02-23" },
@@ -32,6 +32,9 @@
     { "name": "Michael Downs",          "date": "2026-07-09" },
     { "name": "Charlotte Otremba",      "date": "2026-07-10" },
     { "name": "Iain Ferguson",          "date": "2026-07-10" },
-    { "name": "Spencer Oberman",        "date": "2026-07-16" }
+    { "name": "Spencer Oberman",        "date": "2026-07-16" },
+    { "name": "Sarah Ramsey",           "date": "2026-08-14" },
+    { "name": "Sean Drews",             "date": "2026-08-14" },
+    { "name": "Adael Boksenbaum",       "date": "2026-08-14" }
   ]
 }
