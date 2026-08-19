@@ -1,12 +1,12 @@
 {
-  "runAt": "2026-08-17T15:34:33.541Z",
+  "runAt": "2026-08-19T15:46:07.371Z",
   "runId": null,
   "roles": [
     {
       "roleKey": "product_manager",
       "jobName": "Product Manager",
       "passing": [],
-      "checked": 8,
+      "checked": 15,
       "notified": 0
     },
     {
@@ -14,19 +14,19 @@
       "jobName": "Customer Success Manager",
       "passing": [
         {
-          "name": "Nicholas Grissom",
-          "id": 72501493008,
+          "name": "Steven Chapman",
+          "id": 72741890008,
           "location": "Los Angeles, CA"
         }
       ],
-      "checked": 8,
+      "checked": 10,
       "notified": 1
     },
     {
       "roleKey": "content_social_manager",
       "jobName": "Content & Social Manager",
       "passing": [],
-      "checked": 7,
+      "checked": 18,
       "notified": 0
     }
   ]
