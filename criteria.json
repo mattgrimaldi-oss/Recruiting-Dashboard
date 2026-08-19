@@ -155,7 +155,7 @@
       {
         "key": "ai_product_experience",
         "label": "AI Product Experience",
-        "detail": "Experience working for an AI native company or on a product that involves AI",
+        "detail": "Experience working on an AI product",
         "status": "required"
       }
     ]
