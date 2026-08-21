@@ -29,12 +29,10 @@
     ]
   },
   "config": {
-    "frequency": "every_2_days",
-    "timeWindowHours": 48,
+    "frequency": "weekly",
+    "timeWindowHours": 24,
     "cronRole": [
-      "product_manager",
-      "customer_success_manager",
-      "content_social_manager"
+      "ae"
     ]
   },
   "ae": {
