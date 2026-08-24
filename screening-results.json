@@ -1,48 +1,12 @@
 {
-  "runAt": "2026-08-21T15:47:19.767Z",
+  "runAt": "2026-08-24T15:42:05.752Z",
   "runId": null,
   "roles": [
     {
-      "roleKey": "product_manager",
-      "jobName": "Product Manager",
-      "passing": [
-        {
-          "name": "Sergio Macias-Vazquez",
-          "id": 72861929008,
-          "location": "Brooklyn, NY"
-        },
-        {
-          "name": "Zoe Qiu",
-          "id": 73016868008,
-          "location": "Los Angeles, CA"
-        }
-      ],
-      "checked": 19,
-      "notified": 2
-    },
-    {
-      "roleKey": "customer_success_manager",
-      "jobName": "Customer Success Manager",
-      "passing": [
-        {
-          "name": "Viviana Ramirez",
-          "id": 72884151008,
-          "location": "Los Angeles, CA"
-        },
-        {
-          "name": "Jennifer Fiamengo",
-          "id": 72974560008,
-          "location": "Los Angeles, CA"
-        }
-      ],
-      "checked": 10,
-      "notified": 2
-    },
-    {
-      "roleKey": "content_social_manager",
-      "jobName": "Content & Social Manager",
+      "roleKey": "ae",
+      "jobName": "ae",
       "passing": [],
-      "checked": 11,
+      "checked": 0,
       "notified": 0
     }
   ]
