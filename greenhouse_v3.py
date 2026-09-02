@@ -145,8 +145,8 @@ def v3_get(token, endpoint, params=None):
                     url = part.split(";")[0].strip().strip("<>")
                     break
 
-        if len(all_results) >= 10000:
-            print(f"  (capped at 10,000 for /{endpoint})")
+        if len(all_results) >= 200000:
+            print(f"  (safety cap at 200,000 for /{endpoint})")
             break
 
     return all_results
@@ -814,9 +814,9 @@ def cmd_funnel(token):
       - hires:  applications with status "hired", bucketed by offer starts_at
                 (start date); future start dates excluded
     """
-    if not V1_API_KEY:
-        print("ERROR: The funnel command needs your v1 API key.")
-        sys.exit(1)
+    # Harvest V1/V2 are retired for this org — the funnel runs entirely on V3.
+    if not token:
+        token = get_v3_token()
 
     cutoff = datetime.now() - timedelta(weeks=WEEKS_BACK)
     cutoff_str = cutoff.strftime("%Y-%m-%dT00:00:00Z")
@@ -824,43 +824,65 @@ def cmd_funnel(token):
     print(f"Pulling Greenhouse data for the last {WEEKS_BACK} weeks...")
     print(f"(Since {cutoff.strftime('%B %d, %Y')})\n")
 
+    # ── V3 migration note ────────────────────────────────────────────────────
+    # Greenhouse retired Harvest V1/V2 for this org (v1 now 401s with
+    # "Harvest V1 and V2 are no longer available"). Everything below moved to V3.
+    # Two behavioural differences the V3 API forces on us:
+    #   1. Response shape: applications expose a scalar `job_id` (not a `jobs`
+    #      list) and a `stage_name` string (not a `current_stage` object), and
+    #      active apps report status "in_process" (not "active"). `_norm_app`
+    #      shims each record back into the shape the funnel logic below expects.
+    #   2. No server-side date filters: V3 rejects `created_after` /
+    #      `last_activity_after` (422). So we pull by status and window-filter in
+    #      memory against cutoff_str (ISO-8601 + "Z" sorts lexicographically).
+    def _norm_app(a):
+        if "jobs" not in a:
+            jid = a.get("job_id")
+            a["jobs"] = [{"id": jid}] if jid else []
+        if "current_stage" not in a:
+            sn = a.get("stage_name")
+            a["current_stage"] = {"name": sn} if sn else None
+        return a
+
     # Pull jobs (all statuses — hires may land on reqs that are now closed,
     # so we need closed job names too for attribution).
     print("Fetching jobs...")
-    jobs = v1_get("jobs")
+    jobs = v3_get(token, "jobs")
     job_names = {j["id"]: j["name"] for j in jobs if "id" in j}
     print(f"  Found {len(jobs)} jobs")
 
     # Active apps: pull ALL — some candidates applied long ago but are still in pipeline
     print("Fetching active applications (all)...")
-    active_apps = v1_get("applications", {"status": "active"})
+    active_apps = [_norm_app(a) for a in v3_get(token, "applications", {"status": "active"})]
     print(f"  Found {len(active_apps)} active applications")
 
-    # Rejected apps: only those with activity in our window
-    print(f"Fetching rejected applications (active since {cutoff.strftime('%b %d')})...")
-    rejected_apps = v1_get("applications", {"status": "rejected", "last_activity_after": cutoff_str})
-    print(f"  Found {len(rejected_apps)} recently rejected applications")
-
-    # New applications (for response/application_review counts): by applied_at
-    print("Fetching new applications (by applied date)...")
-    new_apps = v1_get("applications", {"created_after": cutoff_str})
-    print(f"  Found {len(new_apps)} new applications")
+    # Rejected apps: pull all, then keep only those with activity in our window
+    # (V3 has no last_activity_after filter, so we window-filter in memory).
+    print(f"Fetching rejected applications (window-filtering to since {cutoff.strftime('%b %d')})...")
+    rejected_all = [_norm_app(a) for a in v3_get(token, "applications", {"status": "rejected"})]
+    rejected_apps = [a for a in rejected_all if (a.get("last_activity_at") or "") >= cutoff_str]
+    print(f"  Found {len(rejected_apps)} recently rejected applications (of {len(rejected_all)} total)")
 
     # Hired applications — source of truth for hires (status flips to "hired")
     print("Fetching hired applications...")
-    hired_apps = v1_get("applications", {"status": "hired"})
+    hired_apps = [_norm_app(a) for a in v3_get(token, "applications", {"status": "hired"})]
     print(f"  Found {len(hired_apps)} hired applications")
+
+    # New applications (for response/application_review counts): created within the
+    # window. V3 has no created_after filter, so derive from the pulls above.
+    new_apps = [a for a in (active_apps + rejected_all + hired_apps)
+                if (a.get("created_at") or "") >= cutoff_str]
+    print(f"  Found {len(new_apps)} new applications")
 
     # Pull offers. Wide window (52w) so a recently-started hire whose offer was
     # created months earlier still has a start date available. We build the
     # latest accepted offer per application for hire dates, and separately
     # window-filter for the weekly "offers" count.
     print("Fetching offers...")
-    offers_cutoff = (datetime.now() - timedelta(weeks=52)).strftime("%Y-%m-%dT00:00:00Z")
-    all_offers = v1_get("offers", {"created_after": offers_cutoff})
+    all_offers = v3_get(token, "offers")  # V3 has no created_after filter; window-filter below
     offer_by_app = {}
     for o in all_offers:
-        if o.get("status") != "accepted":
+        if (o.get("status") or "").lower() != "accepted":  # V3 returns "Accepted"
             continue
         aid = o.get("application_id")
         if aid is None:
@@ -1020,7 +1042,10 @@ def cmd_funnel(token):
         if aid not in app_to_job:
             app_to_job[aid] = job_name
         off = offer_by_app.get(aid, {})
-        date_str = off.get("starts_at") or off.get("resolved_at") or app.get("last_activity_at")
+        # V3 names the start date "starts_on" (a YYYY-MM-DD date); keep "starts_at"
+        # as a fallback for any legacy/cached records.
+        date_str = (off.get("starts_on") or off.get("starts_at")
+                    or off.get("resolved_at") or app.get("last_activity_at"))
         if not date_str:
             continue
         try:
@@ -1092,14 +1117,13 @@ NOTES:
 # MAIN
 # ============================================================
 def main():
-    # All commands use v1 now
-    if V1_API_KEY == "YOUR_V1_KEY_HERE":
+    # The default funnel export runs on V3 (Harvest V1/V2 are retired for this
+    # org). The legacy --timing/--stages/--companies/--titles/--sources commands
+    # still call the v1 API and will fail until migrated.
+    if V3_KEY in ("", "YOUR_KEY_HERE") or V3_SECRET in ("", "YOUR_SECRET_HERE"):
         print("=" * 60)
-        print("  Please set your Greenhouse v1 API key!")
-        print()
-        print("  Edit this file and replace YOUR_V1_KEY_HERE")
-        print("  with your Harvest API key from Greenhouse")
-        print("  Or set: export GREENHOUSE_API_KEY=your_key")
+        print("  Please set your Greenhouse v3 API credentials!")
+        print("  export GREENHOUSE_V3_KEY=...   export GREENHOUSE_V3_SECRET=...")
         print("=" * 60)
         sys.exit(1)
 

@@ -183,13 +183,29 @@ def build_email_job_map(emails):
     if not emails:
         return {}
 
-    # 1. Job names
+    # 1. Job names (V3 — Harvest V1/V2 are retired for this org)
     print("  Fetching jobs...")
-    jobs_resp = requests.get(
-        "https://harvest.greenhouse.io/v1/jobs",
-        headers=v1_auth(), params={"per_page": 100, "status": "open"}
-    ).json()
-    job_names = {j["id"]: j["name"] for j in jobs_resp if "id" in j}
+    v3_token = get_v3_token()
+    v3_headers = {"Authorization": f"Bearer {v3_token}"}
+    job_names = {}
+    jurl = "https://harvest.greenhouse.io/v3/jobs"
+    jparams = {"per_page": 500}
+    while jurl:
+        jr = requests.get(jurl, headers=v3_headers, params=jparams)
+        jparams = None
+        if not jr.ok:
+            break
+        jd = jr.json()
+        for j in (jd if isinstance(jd, list) else jd.get("results", [])):
+            if "id" in j:
+                job_names[j["id"]] = j["name"]
+        jurl = None
+        jlink = jr.headers.get("Link", "")
+        if 'rel="next"' in jlink:
+            for part in jlink.split(","):
+                if 'rel="next"' in part:
+                    jurl = part.split(";")[0].strip().strip("<>")
+                    break
 
     # 2. All candidates via v3 — build email → candidate_id
     # v3 paginates via a cursor in the Link: rel="next" header. The cursor URL
@@ -228,33 +244,33 @@ def build_email_job_map(emails):
         url = next_url
     print(f"  Loaded {total} candidates, {len(email_to_cand)} email addresses")
 
-    # 3. All applications via v1 — build candidate_id → job_name
-    print("  Fetching all applications (v1 bulk)...")
+    # 3. All applications via v3 — build candidate_id → job_name.
+    # V3 exposes a scalar `job_id` per application (not a `jobs` list) and
+    # paginates via the Link: rel="next" cursor header.
+    print("  Fetching all applications (v3 bulk)...")
     cand_to_job = {}
-    page = 1
-    while True:
-        r = requests.get(
-            "https://harvest.greenhouse.io/v1/applications",
-            headers=v1_auth(), params={"per_page": 100, "page": page}
-        )
+    aurl = "https://harvest.greenhouse.io/v3/applications"
+    aparams = {"per_page": 500}
+    while aurl:
+        r = requests.get(aurl, headers=v3_headers, params=aparams)
+        aparams = None
         if not r.ok:
             break
-        apps = r.json()
-        if not apps:
-            break
+        ad = r.json()
+        apps = ad if isinstance(ad, list) else ad.get("results", [])
         for app in apps:
             cid = app.get("candidate_id")
             if cid and cid not in cand_to_job:
-                for j in app.get("jobs", []):
-                    jid = j.get("id") if isinstance(j, dict) else j
-                    if jid in job_names:
-                        cand_to_job[cid] = job_names[jid]
-                        break
-        if len(apps) < 100:
-            break
-        page += 1
-        if page > 150:  # safety cap
-            break
+                jid = app.get("job_id")
+                if jid in job_names:
+                    cand_to_job[cid] = job_names[jid]
+        aurl = None
+        link = r.headers.get("Link", "")
+        if 'rel="next"' in link:
+            for part in link.split(","):
+                if 'rel="next"' in part:
+                    aurl = part.split(";")[0].strip().strip("<>")
+                    break
     print(f"  Mapped {len(cand_to_job)} candidates to jobs")
 
     # 4. Match in memory
