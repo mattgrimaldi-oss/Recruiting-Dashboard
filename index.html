@@ -101,15 +101,18 @@
       { week: "2026-08-10", sends: 101, inmailResponses: 17,  accepts: 15,  responseRate: 16.8, acceptRate: 14.9 },
       { week: "2026-08-17", sends: 61,  inmailResponses: 6,   accepts: 5,   responseRate: 9.8,  acceptRate: 8.2 },
       { week: "2026-08-24", sends: 189, inmailResponses: 38,  accepts: 26,  responseRate: 20.1, acceptRate: 13.8 },
-      { week: "2026-08-31", sends: 150, inmailResponses: 14,  accepts: 11,  responseRate: 9.3,  acceptRate: 7.3 },
-      { week: "2026-09-07", sends: 95,  inmailResponses: 12,  accepts: 11,  responseRate: 12.6, acceptRate: 11.6 },
+      { week: "2026-08-31", sends: 150, inmailResponses: 17,  accepts: 14,  responseRate: 11.3, acceptRate: 9.3 },
+      { week: "2026-09-07", sends: 95,  inmailResponses: 14,  accepts: 12,  responseRate: 14.7, acceptRate: 12.6 },
+      { week: "2026-09-14", sends: 206, inmailResponses: 41,  accepts: 36,  responseRate: 19.9, acceptRate: 17.5 },
+      { week: "2026-09-21", sends: 237, inmailResponses: 35,  accepts: 30,  responseRate: 14.8, acceptRate: 12.7 },
+      { week: "2026-09-28", sends: 148, inmailResponses: 14,  accepts: 9,   responseRate: 9.5,  acceptRate: 6.1 },
     ];
     // sends/responses/accepts are cumulative since 2026-02-02 (when weekly tracking began).
     // responseRate/acceptRate are derived: responses/sends*100 and accepts/sends*100.
-    // RECRUITERS cumulative through 2026-09-13
+    // RECRUITERS cumulative through 2026-09-30
     const RECRUITERS = [
-      { name: "Meghan Dwyer", sends: 874, responses: 239, accepts: 219, responseRate: 27.3, acceptRate: 25.1 },
-      { name: "Matthew Grimaldi", sends: 4016, responses: 838, accepts: 716, responseRate: 20.9, acceptRate: 17.8 },
+      { name: "Meghan Dwyer", sends: 1138, responses: 278, accepts: 254, responseRate: 24.4, acceptRate: 22.3 },
+      { name: "Matthew Grimaldi", sends: 4343, responses: 889, accepts: 756, responseRate: 20.5, acceptRate: 17.4 },
     ];
 
     const getWeekLabel = (d) => new Date(d + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" });
